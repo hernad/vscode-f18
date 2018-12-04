@@ -28,11 +28,11 @@ class ReactPanel {
 
 		// If we already have a panel, show it.
 		// Otherwise, create a new panel.
-		if (ReactPanel.currentPanel) {
-			ReactPanel.currentPanel._panel.reveal(column);
-		} else {
+		// if (ReactPanel.currentPanel) {
+		//	ReactPanel.currentPanel._panel.reveal(column);
+		//} else {
 			ReactPanel.currentPanel = new ReactPanel(extensionPath, column || vscode.ViewColumn.One);
-		}
+		//}
 	}
 
 	private constructor(extensionPath: string, column: vscode.ViewColumn) {
@@ -42,11 +42,12 @@ class ReactPanel {
 		this._panel = vscode.window.createWebviewPanel(ReactPanel.viewType, "React", column, {
 			// Enable javascript in the webview
 			enableScripts: true,
-
+			
 			// And restric the webview to only loading content from our extension's `media` directory.
 			localResourceRoots: [
 				vscode.Uri.file(path.join(this._extensionPath, 'build'))
-			]
+			],
+			
 		});
 		
 		// Set the webview's initial html content 
@@ -87,19 +88,41 @@ class ReactPanel {
 	}
 
 	private _getHtmlForWebview() {
-		const manifest = require(path.join(this._extensionPath, 'build', 'asset-manifest.json'));
-		const mainScript = manifest['main.js'];
-		const mainStyle = manifest['main.css'];
+		// const manifest = require(path.join(this._extensionPath, 'out', 'asset-manifest.json'));
+		// const mainScript = 'index.js';
+		// const mainStyle = 'index.css';
+
+		// app.5793fd45.js   app.5793fd45.map
+		const mainScript = 'webpack/dist/bundle.js';
+		const mainStyle = 'index.css';
+		const reactScript1 = 'webpack/node_modules/react/umd/react.development.js';
+		const reactScript2 = 'webpack/node_modules/react-dom/umd/react-dom.development.js';
+
+
+		//<script src="./node_modules/react/umd/react.development.js"></script>
+        //<script src="./node_modules/react-dom/umd/react-dom.development.js"></script>
+
 
 		const scriptPathOnDisk = vscode.Uri.file(path.join(this._extensionPath, 'build', mainScript));
 		const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
+
+		const scriptReact1OnDisk = vscode.Uri.file(path.join(this._extensionPath, 'build', reactScript1));
+		const scriptReact1Uri = scriptReact1OnDisk.with({ scheme: 'vscode-resource' });
+
+		const scriptReact2OnDisk = vscode.Uri.file(path.join(this._extensionPath, 'build', reactScript2));
+		const scriptReact2Uri = scriptReact2OnDisk.with({ scheme: 'vscode-resource' });
+
 		const stylePathOnDisk = vscode.Uri.file(path.join(this._extensionPath, 'build', mainStyle));
 		const styleUri = stylePathOnDisk.with({ scheme: 'vscode-resource' });
 
-		// Use a nonce to whitelist which scripts can be run
+		
+
+
+		// Use a nonce to whitelist which scripts can bereact.development.js run
 		const nonce = getNonce();
 
-		return `<!DOCTYPE html>
+
+		const strHtml = `<!DOCTYPE html>
 			<html lang="en">
 			<head>
 				<meta charset="utf-8">
@@ -112,12 +135,17 @@ class ReactPanel {
 			</head>
 
 			<body>
+			    test test test
 				<noscript>You need to enable JavaScript to run this app.</noscript>
 				<div id="root"></div>
-				
+				<div id="example"></div>
+				<script nonce="${nonce}" src="${scriptReact1Uri}"></script>
+				<script nonce="${nonce}" src="${scriptReact2Uri}"></script>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
+		console.log(strHtml);
+		return strHtml;
 	}
 }
 

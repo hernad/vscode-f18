@@ -8,11 +8,21 @@
             "request": "launch",
             "runtimeExecutable": "${execPath}",
             "args": [
-                "--extensionDevelopmentPath=${workspaceRoot}"
+                "--extensionDevelopmentPath=${workspaceRoot}",
+                "--remote-debugging-port=9222"
             ],
             "stopOnEntry": false,
             "sourceMaps": true,
             "outDir": "${workspaceRoot}/ext-src"
-        }
+        },
+        {
+			"type": "chrome",
+            "request": "attach",
+            "targetTypes": [
+                "webview"
+            ],
+			"name": "Attach to webview",
+			"port": 9222
+		}
     ]
 }
