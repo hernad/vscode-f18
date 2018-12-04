@@ -3,8 +3,11 @@
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
-	  "node_modules/**/*.ts",
-	  "ext-src/**/*.ts"
+	    "node_modules/**/*.ts",
+	    "ext-src/**/*.ts"
     ]
+  },
+  "rules": {
+    "max-classes-per-file": [true, 10, "exclude-class-expressions"]
   }
 }

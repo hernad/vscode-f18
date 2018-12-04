@@ -135,7 +135,6 @@ class ReactPanel {
 			</head>
 
 			<body>
-			    test test test
 				<noscript>You need to enable JavaScript to run this app.</noscript>
 				<div id="root"></div>
 				<div id="example"></div>
