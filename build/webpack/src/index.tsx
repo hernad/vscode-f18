@@ -28,29 +28,6 @@ for (const num of numbers) {
 }
 */
 
-// const mySection : React.ReactElement<any> = <MySection.Third />;
-
-
-/*
-
-var helloWorld = <div>Hello World!</div>;
-
-// And this is what the JSX syntax compiles into in JavaScript:
-var helloWorld = React.createElement(
-  "div",
-  null,
-  "Hello World!"
-);
-
-*/
-
-// And this is what the JSX syntax compiles into in JavaScript:
-/*
-const myThirdElement = React.createElement(
-	"MySection.Third",
-	null
-  );
-*/
 
 const propDugmeNaslov = "P2 Dugme from Var"; 
 const myThirdElement = <MySection.Third ptext={propDugmeNaslov} />
@@ -71,7 +48,6 @@ const resolveFn = (resolve: TResoveFn) => {
 function fetchData() {
 	return new Promise( resolveFn );
 }
-
 
 
 class MyContainer extends React.Component<{}, IMyContainerState> {
@@ -109,8 +85,30 @@ setTimeout(() => {
 }, 1000);
 */
 
+import { PermissionProvider } from "./components/PermissionContext"
+
 const myCompInstance = ReactDOM.render(
-    <MyContainer/>,
+	
+	<div>
+		<MyContainer />
+		<MySection.MyList items={["AAA", "BBB"]} />
+		<MySection>
+			<button>btn 1</button>
+			<p />
+			<button>btn 2</button>
+		</MySection>
+		<PermissionProvider>
+			<MyButton>
+				<label>vako nako</label>
+				<p />
+				<label>novi label</label>
+				<ul>
+					<li>item 1</li>
+					<li>item 2</li>
+				</ul>
+			</MyButton>
+		</PermissionProvider>
+	</div>,
 	document.getElementById('example')
 );
 
