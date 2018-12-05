@@ -126,12 +126,61 @@ ReactDOM.render(<InheritedComponent />, document.getElementById('example'));
 */
 
 // import App from './components/BootApp';
-import 'bootstrap/dist/css/bootstrap.css';
-import './components/BootApp.css';
+// import 'bootstrap/dist/css/bootstrap.css';
+// import './components/BootApp.css';
 
+
+import ApolloClient from 'apollo-boost';
 
 import Forms from './components/BootForms';
 import Lists from './components/BootLists';
+
+const client = new ApolloClient({
+	uri: 'http://localhost:5000/graphql'
+});
+
+import gql from "graphql-tag";
+
+
+ReactDOM.render( 
+	<ul>
+	   <li>loading....</li>
+	</ul>, document.getElementById('example'));
+
+
+client.query({
+	query: gql`
+	{
+      allKontos{
+        nodes {
+          id
+          naz
+        }
+      }
+	  allRobas{
+        nodes {
+          id
+          naz
+        }
+      }
+	}
+    `
+  })
+  .then(result => { 
+	const nodesK = (result as any).data.allKontos.nodes;
+	const nodesR = (result as any).data.allRobas.nodes;  
+	console.log(nodesK);  
+	const kontaElement = Object.keys(nodesK).map(key => <li key={key}>key={key} val={nodesK[key].naz}</li>);
+	const robaElement = Object.keys(nodesR).map(key => <li key={key}>key={key} val={nodesR[key].naz}</li>);
+	ReactDOM.render( 
+		<ul>
+		   {kontaElement}
+		   <button>======================================================================</button>
+		   {robaElement}
+		</ul>, document.getElementById('example'));
+
+   });
+//  .then(result => console.log((result as any).data.allKontos.nodes));
 
 import {
 	Navbar,
@@ -143,11 +192,17 @@ import {
 	Col
   } from 'react-bootstrap';
 
+/*
 ReactDOM.render( 
   <Navbar className="navbar-top" fluid={true}>
      <Forms/>,
 	 <Lists/>,
+	 <ul>
+        {Object.keys(konta).map(key => <li key={key}>key={key} val={(konta as any)[key]}</li>)}
+     </ul>
   </Navbar>, document.getElementById('example'));
+*/
+
 
 
 // const domInstance = ReactDOM.findDOMNode(myCompInstance);

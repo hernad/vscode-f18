@@ -12,7 +12,7 @@ module.exports = {
 
 	resolve: {
 		// Add '.ts' and '.tsx' as resolvable extensions.
-		extensions: [ '.ts', '.tsx', '.js', '.json' ]
+		extensions: [ '.ts', '.tsx', '.js', '.json', '.mjs' ]
 	},
 
 	module: {
@@ -23,7 +23,7 @@ module.exports = {
 			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
 			{ enforce: 'pre', test: /\.js$/, loader: 'source-map-loader' },
 
-            { test: /\.css$/, loader: 'style-loader!css-loader'}
+            { test: /\.css$/, loader: 'style-loader!css-loader'},
             /*
 			{
 				test: /\.css$/,
@@ -40,6 +40,12 @@ module.exports = {
 				]
             }
             */
+           {
+            test: /\.mjs$/,
+            include: /node_modules/,
+            type: "javascript/auto",
+           }
+          
 		]
 	},
 
