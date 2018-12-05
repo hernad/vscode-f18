@@ -17,8 +17,7 @@ export class PermissionProvider extends React.Component<{}, IPermissionState> {
 
     public render() {
         return (
-            // @ts-ignore
-            <Provider value={this.state}>{this.props.children}</Provider>
+            <Provider value={this.state as any}>{this.props.children}</Provider>
         )
     }
 }
