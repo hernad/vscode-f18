@@ -127,12 +127,27 @@ ReactDOM.render(<InheritedComponent />, document.getElementById('example'));
 
 // import App from './components/BootApp';
 import 'bootstrap/dist/css/bootstrap.css';
-
 import './components/BootApp.css';
 
-import Forms from './components/BootForms';
 
-ReactDOM.render(<Forms/>, document.getElementById('example'));
+import Forms from './components/BootForms';
+import Lists from './components/BootLists';
+
+import {
+	Navbar,
+	Nav,
+	NavItem,
+	MenuItem,
+	Grid,
+	Row,
+	Col
+  } from 'react-bootstrap';
+
+ReactDOM.render( 
+  <Navbar className="navbar-top" fluid={true}>
+     <Forms/>,
+	 <Lists/>,
+  </Navbar>, document.getElementById('example'));
 
 
 // const domInstance = ReactDOM.findDOMNode(myCompInstance);
