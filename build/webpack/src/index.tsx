@@ -115,9 +115,13 @@ const myCompInstance = ReactDOM.render(
 );
 */
 
-
+/*
 import MyFeature from './components/MyFeature';
 ReactDOM.render(<MyFeature />, document.getElementById('example'));
+*/
+
+import InheritedComponent from './components/InheritedComponent';
+ReactDOM.render(<InheritedComponent />, document.getElementById('example'));
 
 
 // const domInstance = ReactDOM.findDOMNode(myCompInstance);
