@@ -46,10 +46,14 @@ function fetchData() {
 	return new Promise(resolveFn);
 }
 
+import reverse from "./reverse";
+
 class MyContainer extends React.Component<{}, IMyContainerState> {
 	public state: IMyContainerState = {
 		items: [ 'nula' ]
 	};
+
+	public onClick = reverse.bind(this);
 
 	// After the component has been rendered, make the
 	// call to fetch the component data, and change the
@@ -62,7 +66,10 @@ class MyContainer extends React.Component<{}, IMyContainerState> {
 	}
 
 	public render() {
-		return <MySection.MyList {...this.state} />;
+		return <React.Fragment>
+			    <MySection.MyList {...this.state} />
+				<button onClick={this.onClick}>REVERSE</button>
+				</React.Fragment>;
 	}
 }
 
