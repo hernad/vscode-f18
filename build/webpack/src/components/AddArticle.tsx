@@ -5,8 +5,8 @@ interface IProps {
     name: string,
     title: string,
     summary: string,
-    onChangeTitle: any
-    onChangeSummary: any
+    onChangeTitle: (e: React.ChangeEvent<HTMLInputElement>) => void,
+    onChangeSummary: (e: React.ChangeEvent<HTMLInputElement>) => void,
     onClickAdd: any
 }
 

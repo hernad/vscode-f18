@@ -52,14 +52,14 @@ export default class MyFeature extends React.Component {
   // When the title of a new article changes, update the state
   // of the component with the new title value, by using "set()"
   // to create a new map.
-  public onChangeTitle: (e: any) => void = e => {
+  public onChangeTitle: (e: React.ChangeEvent<HTMLInputElement>) => void = e => {
     this.data = this.data.set('title', e.target.value);
   };
 
   // When the summary of a new article changes, update the state
   // of the component with the new summary value, by using "set()"
   // to create a new map.
-  public onChangeSummary: (e: any) => void = e => {
+  public onChangeSummary: (e: React.ChangeEvent<HTMLInputElement>) => void = e => {
     this.data = this.data.set('summary', e.target.value);
   };
 
