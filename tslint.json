@@ -10,6 +10,8 @@
   "rules": {
     "max-classes-per-file": [true, 10, "exclude-class-expressions"],
     "object-literal-sort-keys": false,
-    "no-console": false
+    "no-console": false,
+    "jsx-no-lambda": false,
+    "ordered-imports": false
   }
 }

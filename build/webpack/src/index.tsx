@@ -87,6 +87,7 @@ setTimeout(() => {
 }, 1000);
 */
 
+/*
 import { PermissionProvider } from './components/PermissionContext';
 
 const myCompInstance = ReactDOM.render(
@@ -112,5 +113,11 @@ const myCompInstance = ReactDOM.render(
 	</div>,
 	document.getElementById('example')
 );
+*/
+
+
+import MyFeature from './components/MyFeature';
+ReactDOM.render(<MyFeature />, document.getElementById('example'));
+
 
 // const domInstance = ReactDOM.findDOMNode(myCompInstance);
