@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "react": "^16.6.3",
+    "react-bootstrap": "^0.32.4",
     "react-dom": "^16.6.3",
     "react-scripts-ts": "2.16.0",
     "shelljs": "^0.8.3",
