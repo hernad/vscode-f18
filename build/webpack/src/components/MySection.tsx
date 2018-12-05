@@ -44,12 +44,16 @@ interface IMyListProps {
    items: string[];
 }
 
+import { PermissionConsumer } from "./PermissionContext"
+
 class MyList extends React.Component<IMyListProps> {
     public render() {
         // The "items" property is an array.
         const { items } = this.props;
         // Maps each item in the array to a list item.
-        return <ul>{items.map(i => <li key={i}>{i}</li>)}</ul>;
+        return  <PermissionConsumer name="second" >
+                    <ul>{items.map(i => <li key={i}>{i}</li>)}</ul>
+                </PermissionConsumer>;
     }
 }
 

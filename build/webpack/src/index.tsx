@@ -5,7 +5,6 @@ import { Hello } from './components/Hello';
 import MyButton from './components/MyButton';
 import MySection from './components/MySection';
 
-
 class MyCompoment extends React.Component {
 	public render() {
 		return (
@@ -15,7 +14,7 @@ class MyCompoment extends React.Component {
 				<footer>
 					<small>&copy; hernad 2018</small>
 				</footer>
-                <button>BTN</button>
+				<button>BTN</button>
 			</section>
 		);
 	}
@@ -28,41 +27,37 @@ for (const num of numbers) {
 }
 */
 
+const propDugmeNaslov = 'P2 Dugme from Var';
+const myThirdElement = <MySection.Third ptext={propDugmeNaslov} />;
 
-const propDugmeNaslov = "P2 Dugme from Var"; 
-const myThirdElement = <MySection.Third ptext={propDugmeNaslov} />
-
-interface  IMyContainerState {
+interface IMyContainerState {
 	items: string[];
 }
 type TResoveFn = (items: IMyContainerState) => void;
 
 const resolveFn = (resolve: TResoveFn) => {
 	setTimeout(() => {
-	   const posaljiItems: IMyContainerState = {items: ['First', 'Second', 'Third', 'pet']};
-	   resolve(posaljiItems);
+		const posaljiItems: IMyContainerState = { items: [ 'First', 'Second', 'Third', 'pet' ] };
+		resolve(posaljiItems);
 	}, 2000);
-}
-
+};
 
 function fetchData() {
-	return new Promise( resolveFn );
+	return new Promise(resolveFn);
 }
 
-
 class MyContainer extends React.Component<{}, IMyContainerState> {
-
 	public state: IMyContainerState = {
-		items: [ "nula" ]
+		items: [ 'nula' ]
 	};
 
 	// After the component has been rendered, make the
 	// call to fetch the component data, and change the
 	// state when the data arrives.
 	public componentDidMount() {
-		fetchData().then( value => {
+		fetchData().then((value) => {
 			const fetchedItems = value.items;
-			this.setState( {items: [...this.state.items, ...fetchedItems]} as IMyContainerState )
+			this.setState({ items: [ ...this.state.items, ...fetchedItems ] } as IMyContainerState);
 		});
 	}
 
@@ -85,19 +80,18 @@ setTimeout(() => {
 }, 1000);
 */
 
-import { PermissionProvider } from "./components/PermissionContext"
+import { PermissionProvider } from './components/PermissionContext';
 
 const myCompInstance = ReactDOM.render(
-	
 	<div>
-		<MyContainer />
-		<MySection.MyList items={["AAA", "BBB"]} />
-		<MySection>
-			<button>btn 1</button>
-			<p />
-			<button>btn 2</button>
-		</MySection>
 		<PermissionProvider>
+			<MyContainer />
+			<MySection.MyList items={[ 'AAA', 'BBB' ]} />
+			<MySection>
+				<button>btn 1</button>
+				<p />
+				<button>btn 2</button>
+			</MySection>
 			<MyButton>
 				<label>vako nako</label>
 				<p />
