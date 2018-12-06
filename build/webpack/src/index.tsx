@@ -170,8 +170,12 @@ client.query({
 	const nodesK = (result as any).data.allKontos.nodes;
 	const nodesR = (result as any).data.allRobas.nodes;  
 	console.log(nodesK);  
-	const kontaElement = Object.keys(nodesK).map(key => <li key={key}>key={key} val={nodesK[key].naz}</li>);
-	const robaElement = Object.keys(nodesR).map(key => <li key={key}>key={key} val={nodesR[key].naz}</li>);
+	const kontaElement = Object.keys(nodesK).map(key => 
+	    <li key={key}>id={nodesK[key].id} naz={nodesK[key].naz}
+	     <p/>
+		 <input value={nodesK[key].naz} size={100} />
+		</li>);
+	const robaElement = Object.keys(nodesR).map(key => <li key={key}>id={nodesR[key].id} naz={nodesR[key].naz}</li>);
 	ReactDOM.render( 
 		<ul>
 		   {kontaElement}
