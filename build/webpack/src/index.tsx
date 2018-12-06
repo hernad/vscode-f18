@@ -136,18 +136,20 @@ import Forms from './components/BootForms';
 import Lists from './components/BootLists';
 
 const client = new ApolloClient({
-	uri: 'http://localhost:5000/graphql'
+	// uri: 'http://localhost:5000/graphql'
+	uri: "https://w5xlvm3vzz.lp.gql.zone/graphql"
 });
 
 import gql from "graphql-tag";
 
-
+/*
 ReactDOM.render( 
 	<ul>
 	   <li>loading....</li>
 	</ul>, document.getElementById('example'));
+*/
 
-
+/*
 client.query({
 	query: gql`
 	{
@@ -185,6 +187,7 @@ client.query({
 
    });
 //  .then(result => console.log((result as any).data.allKontos.nodes));
+*/
 
 import {
 	Navbar,
@@ -210,3 +213,47 @@ ReactDOM.render(
 
 
 // const domInstance = ReactDOM.findDOMNode(myCompInstance);
+
+import { ApolloProvider } from "react-apollo";
+
+import { Query } from "react-apollo";
+// import gql from "graphql-tag";
+
+const ExchangeRates = () => (
+  <Query
+    query={gql`
+      {
+        rates(currency: "EUR") {
+          currency
+          rate
+        }
+      }
+    `}
+  >
+    {({ loading, error, data }) => {
+      if (loading) { 
+		  return <p>Učitavam...</p> 
+	  };
+      if (error) { 
+		  return (<p>Greška</p>) 
+	  };
+
+      return data.rates.map(({ currency, rate }) => (
+        <div key={currency}>
+          <p>{`${currency}: ${rate}`}</p>
+        </div>
+      ));
+    }}
+  </Query>
+);
+
+const App = () => (
+  <ApolloProvider client={client}>
+    <div>
+      <h2>First Apollo app 🚀</h2>
+	  <ExchangeRates/>
+    </div>
+  </ApolloProvider>
+);
+
+ReactDOM.render(<App />, document.getElementById("example"));
