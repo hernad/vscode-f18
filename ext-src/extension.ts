@@ -120,6 +120,7 @@ class ReactPanel {
 
 	public dispose() {
 		ReactPanel.currentPanel = undefined;
+		this.terminal.dispose();
 
 		// Clean up our resources
 		this._panel.dispose();
