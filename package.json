@@ -6,15 +6,27 @@
   },
   "publisher": "rebornix",
   "activationEvents": [
-    "onCommand:react-webview.start"
+    "onCommand:f18.start.fin",
+    "onCommand:f18.start.kalk",
+    "onCommand:f18.start.pos"
   ],
   "main": "./build/ext-src/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "react-webview.start",
-        "title": "Start React Webview",
-        "category": "React"
+        "command": "f18.start.pos",
+        "title": "start POS",
+        "category": "F18"
+      },
+      {
+        "command": "f18.start.fin",
+        "title": "start FIN",
+        "category": "F18"
+      },
+      {
+        "command": "f18.start.kalk",
+        "title": "start KALK",
+        "category": "F18"
       }
     ]
   },

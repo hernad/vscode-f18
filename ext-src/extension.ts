@@ -3,10 +3,20 @@ import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
 
-	context.subscriptions.push(vscode.commands.registerCommand('react-webview.start', () => {
-		ReactPanel.createOrShow(context.extensionPath);
+	context.subscriptions.push(vscode.commands.registerCommand('f18.start.pos', () => {
+		ReactPanel.createOrShow(context.extensionPath, 'pos');
 	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f18.start.fin', () => {
+		ReactPanel.createOrShow(context.extensionPath, 'fin');
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('f18.start.kalk', () => {
+		ReactPanel.createOrShow(context.extensionPath, 'kalk');
+	}));
+
 }
+
 
 
 class ReactPanel {
@@ -22,8 +32,9 @@ class ReactPanel {
 	private readonly _extensionPath: string;
 	private _disposables: vscode.Disposable[] = [];
 	private terminal: vscode.Terminal;
+	private readonly _modul: string;
 
-	public static createOrShow(extensionPath: string) {
+	public static createOrShow(extensionPath: string, cModul: string) {
 		const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 
 		// If we already have a panel, show it.
@@ -31,15 +42,16 @@ class ReactPanel {
 		// if (ReactPanel.currentPanel) {
 		//	ReactPanel.currentPanel._panel.reveal(column);
 		//} else {
-			ReactPanel.currentPanel = new ReactPanel(extensionPath, column || vscode.ViewColumn.One);
+			ReactPanel.currentPanel = new ReactPanel(cModul, extensionPath, column || vscode.ViewColumn.One);
 		//}
 
 	}
 
-	private constructor(extensionPath: string, column: vscode.ViewColumn) {
+	private constructor(cModul: string, extensionPath: string, column: vscode.ViewColumn) {
 		this._extensionPath = extensionPath;
 
-		const currentPanelCaption = `F18 - ${ReactPanel.panelNum}`;
+		this._modul = cModul
+		const currentPanelCaption = `F18 ${this._modul} - ${ReactPanel.panelNum}`;
 		ReactPanel.panelNum++;
 
 		this.terminal = vscode.window.createTerminal(currentPanelCaption);
@@ -53,7 +65,7 @@ class ReactPanel {
 		this.terminal.show(true);
 		this.terminal.hide();
 		// this.terminal.sendText("stty cols 100 rows 40 ; cd /home/hernad/F18_knowhow ; ./F18.sh ");
-		this.terminal.sendText("stty cols 100 rows 40 ; cd /home/hernad/F18_knowhow ; ./F18.sh -h 127.0.0.1 -y 5432 -u hernad -p hernad -d proba_2018 --pos");
+		this.terminal.sendText(`stty cols 100 rows 40 ; cd /home/hernad/F18_knowhow ; ./F18.sh -h 127.0.0.1 -y 5432 -u hernad -p hernad -d proba_2018 --${this._modul}`);
 
 		 
 		// Create and show a new webview panel
