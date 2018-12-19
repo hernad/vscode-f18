@@ -215,6 +215,34 @@ ReactDOM.render(
 // const domInstance = ReactDOM.findDOMNode(myCompInstance);
 
 import { ApolloProvider } from "react-apollo";
+// @ts-ignore
+// import { Terminal as XTermTerminal } from "vscode-xterm";
+
+// import { Terminal } from 'vscode-xterm';
+//import { Terminal } from '';
+
+
+/// <reference path="xterm/typings/xterm.d.ts"/>
+
+import { Terminal } from 'xterm/lib/public/Terminal';
+import * as attach from 'xterm/lib/addons/attach/attach';
+import * as fit from 'xterm/lib/addons/fit/fit';
+import * as fullscreen from 'xterm/lib/addons/fullscreen/fullscreen';
+import * as search from 'xterm/lib/addons/search/search';
+import * as webLinks from 'xterm/lib/addons/webLinks/webLinks';
+import * as winptyCompat from 'xterm/lib/addons/winptyCompat/winptyCompat';
+import { ISearchOptions } from 'xterm/lib/addons/search/Interfaces';
+import { Terminal as TerminalType } from 'xterm';
+
+
+// import * as fit from 'xterm/lib/addons/fit/fit';
+
+// Enable xterm.js addons
+// @ts-ignore
+// import * as search from 'vscode-xterm/lib/addons/search/search';
+// import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
+
+
 
 import { Query } from "react-apollo";
 // import gql from "graphql-tag";
@@ -247,6 +275,7 @@ const ExchangeRates = () => (
   </Query>
 );
 
+
 const App = () => (
   <ApolloProvider client={client}>
     <div>
@@ -256,4 +285,125 @@ const App = () => (
   </ApolloProvider>
 );
 
-ReactDOM.render(<App />, document.getElementById("example"));
+// @ts-ignore
+const vscode = acquireVsCodeApi();
+
+
+Terminal.applyAddon(attach);
+Terminal.applyAddon(fit);
+Terminal.applyAddon(fullscreen);
+Terminal.applyAddon(search);
+Terminal.applyAddon(webLinks);
+Terminal.applyAddon(winptyCompat);
+
+const term : Terminal = new Terminal({
+	cols: 100,
+	rows: 40,
+	cursorBlink: true,
+	bellStyle: 'sound',
+	cursorStyel: 'block'
+});
+
+
+
+term.on('key', (key: any, ev: any) => {
+	
+	vscode.postMessage({
+		command: 'terminal-input',
+		data: key
+	})
+	
+
+});
+
+
+window.addEventListener('message', event => {
+
+	const message = (event as any).data; // The JSON data our extension sent
+
+	switch (message.command) {
+			case 'terminal':;
+				term.write(message.data);
+				break;
+	}
+});
+
+
+const xtermWrapper = document.createElement('div');
+xtermWrapper.classList.add('terminal-wrapper');
+xtermWrapper.innerHTML = 'Komande: <button id="btn_k_f5">F5</button>  <button id="btn_k_f8">F8</button>  <button id="btn_k_ins">INS/OVER</button>';
+
+//(<any>xtermWrapper).xterm = xterm;
+	
+const xtermElement = document.createElement('div');
+// xtermElement.classList.add("");
+
+
+const container = document.getElementById('example');
+
+xtermWrapper.appendChild(xtermElement);
+container.appendChild( xtermWrapper );
+
+
+document.getElementById('btn_k_f5').onclick = ( event: any ) =>
+{
+	vscode.postMessage({
+		command: 'terminal-input',
+		data: '\x1b[15~'  // K_F5
+	});
+	term.focus();
+};
+
+document.getElementById('btn_k_f8').onclick = ( event: any ) =>
+{
+	vscode.postMessage({
+		command: 'terminal-input',
+		data: '\x1b[18~'  // K_F8
+	});
+	term.focus();
+};
+
+document.getElementById('btn_k_ins').onclick = ( event: any ) =>
+{
+	vscode.postMessage({
+		command: 'terminal-input',
+		data: '\x1b[2~' // INS
+	});
+	term.focus();
+};
+
+term.open(xtermElement);
+term.winptyCompatInit();
+term.webLinksInit();
+term.fit();
+
+term.on('focus', () => { 
+	console.log( `xterm ima focus rows: ${term.cols} cols: ${term.rows}`);
+	// alt-D
+	// term.write('\x1bD');
+	// F1
+	vscode.postMessage({
+		command: 'terminal-input',
+		// data: '\x1b[11~'  // K_F1
+		data: '\x1b[24~'  // K_F12
+	})
+}); 
+
+/*
+term.setOption('cursorBlink', true);
+term.setOption('cursorStyle', 'block');
+term.setOption('rows', 40);
+term.setOption('cols', 100);
+*/
+
+term.focus();
+
+
+// (document.getElementsByClassName("xterm-helpers").item(0) as HTMLDivElement).style.visibility = "hidden";;
+// (document.getElementsByClassName("xterm-helper-textarea").item(0) as HTMLDivElement).style.display = 'none';
+//(document.getElementsByClassName("xterm-char-measure-element").item(0) as HTMLDivElement).style.display = 'none';
+
+
+// xterm.fit();
+
+// ReactDOM.render(<App />, document.getElementById("example"));

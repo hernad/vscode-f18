@@ -8,9 +8,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 }
 
-/**
- * Manages react webview panels
- */
+
 class ReactPanel {
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
@@ -18,10 +16,12 @@ class ReactPanel {
 	public static currentPanel: ReactPanel | undefined;
 
 	private static readonly viewType = 'react';
+	private static panelNum = 1;
 
 	private readonly _panel: vscode.WebviewPanel;
 	private readonly _extensionPath: string;
 	private _disposables: vscode.Disposable[] = [];
+	private terminal: vscode.Terminal;
 
 	public static createOrShow(extensionPath: string) {
 		const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
@@ -33,15 +33,34 @@ class ReactPanel {
 		//} else {
 			ReactPanel.currentPanel = new ReactPanel(extensionPath, column || vscode.ViewColumn.One);
 		//}
+
 	}
 
 	private constructor(extensionPath: string, column: vscode.ViewColumn) {
 		this._extensionPath = extensionPath;
 
+		const currentPanelCaption = `F18 - ${ReactPanel.panelNum}`;
+		ReactPanel.panelNum++;
+
+		this.terminal = vscode.window.createTerminal(currentPanelCaption);
+		
+
+		(<any> this.terminal).onDidWriteData((data: string) => {
+			// console.log('onDidWriteData: ' + data);
+			this.doTerminalWrite(data); 
+		});
+
+		this.terminal.show(true);
+		this.terminal.hide();
+		// this.terminal.sendText("stty cols 100 rows 40 ; cd /home/hernad/F18_knowhow ; ./F18.sh ");
+		this.terminal.sendText("stty cols 100 rows 40 ; cd /home/hernad/F18_knowhow ; ./F18.sh -h 127.0.0.1 -y 5432 -u hernad -p hernad -d proba_2018 --pos");
+
+		 
 		// Create and show a new webview panel
-		this._panel = vscode.window.createWebviewPanel(ReactPanel.viewType, "React", column, {
+		this._panel = vscode.window.createWebviewPanel(ReactPanel.viewType, currentPanelCaption, column, {
 			// Enable javascript in the webview
 			enableScripts: true,
+			retainContextWhenHidden: true,
 			
 			// And restric the webview to only loading content from our extension's `media` directory.
 			localResourceRoots: [
@@ -49,7 +68,8 @@ class ReactPanel {
 			],
 			
 		});
-		
+
+	
 		// Set the webview's initial html content 
 		this._panel.webview.html = this._getHtmlForWebview();
 
@@ -63,14 +83,27 @@ class ReactPanel {
 				case 'alert':
 					vscode.window.showErrorMessage(message.text);
 					return;
+				case 'terminal-input':
+					this.terminal.sendText(message.data, false);
+					console.log(`terminal-input: ${message.data}`);
+				    
 			}
 		}, null, this._disposables);
+
+
+		
 	}
 
 	public doRefactor() {
 		// Send a message to the webview webview.
 		// You can send any JSON serializable data.
 		this._panel.webview.postMessage({ command: 'refactor' });
+	}
+
+	public doTerminalWrite( data: string ) {
+		// Send a message to the webview webview.
+		// You can send any JSON serializable data.
+		this._panel.webview.postMessage({ command: 'terminal', data });
 	}
 
 	public dispose() {
@@ -94,7 +127,10 @@ class ReactPanel {
 
 		// app.5793fd45.js   app.5793fd45.map
 		const mainScript = 'webpack/dist/bundle.js';
+
+		const xtermStyle = 'webpack/node_modules/xterm/dist/xterm.css';
 		const mainStyle = 'index.css';
+
 		const reactScript1 = 'webpack/node_modules/react/umd/react.development.js';
 		const reactScript2 = 'webpack/node_modules/react-dom/umd/react-dom.development.js';
 
@@ -115,6 +151,8 @@ class ReactPanel {
 		const stylePathOnDisk = vscode.Uri.file(path.join(this._extensionPath, 'build', mainStyle));
 		const styleUri = stylePathOnDisk.with({ scheme: 'vscode-resource' });
 
+		const xermStylePathOnDisk = vscode.Uri.file(path.join(this._extensionPath, 'build', xtermStyle));
+		const xtermStyleUri = xermStylePathOnDisk.with({ scheme: 'vscode-resource' });
 		
 
 
@@ -130,6 +168,7 @@ class ReactPanel {
 				<meta name="theme-color" content="#000000">
 				<title>React App</title>
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
+				<link rel="stylesheet" type="text/css" href="${xtermStyleUri}">
 				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000 https://w5xlvm3vzz.lp.gql.zone/graphql; img-src vscode-resource: https: http:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
 				<base href="${vscode.Uri.file(path.join(this._extensionPath, 'build')).with({ scheme: 'vscode-resource' })}/">
 			</head>
@@ -143,7 +182,7 @@ class ReactPanel {
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
-		console.log(strHtml);
+		// console.log(strHtml);
 		return strHtml;
 	}
 }
