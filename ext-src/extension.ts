@@ -4,28 +4,30 @@ import * as vscode from 'vscode';
 export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('f18.start.pos', () => {
-		ReactPanel.createOrShow(context.extensionPath, 'pos');
+		F18Panel.createOrShow(context.extensionPath, 'pos', 'vindija_2018');
+	
+		
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f18.start.fin', () => {
-		ReactPanel.createOrShow(context.extensionPath, 'fin');
+		F18Panel.createOrShow(context.extensionPath, 'fin', 'vindija_2018');
 	}));
 
 	context.subscriptions.push(vscode.commands.registerCommand('f18.start.kalk', () => {
-		ReactPanel.createOrShow(context.extensionPath, 'kalk');
+		F18Panel.createOrShow(context.extensionPath, 'kalk', 'vindija_2018');
 	}));
 
 }
 
 
 
-class ReactPanel {
+class F18Panel {
 	/**
 	 * Track the currently panel. Only allow a single panel to exist at a time.
 	 */
-	public static currentPanel: ReactPanel | undefined;
+	public static currentPanel: F18Panel | undefined;
 
-	private static readonly viewType = 'react';
+	private static readonly viewType = 'F18';
 	private static panelNum = 1;
 
 	private readonly _panel: vscode.WebviewPanel;
@@ -33,26 +35,42 @@ class ReactPanel {
 	private _disposables: vscode.Disposable[] = [];
 	private terminal: vscode.Terminal;
 	private readonly _modul: string;
+	private readonly _organizacija: string;
 
-	public static createOrShow(extensionPath: string, cModul: string) {
+	public static createOrShow(extensionPath: string, cModul: string, cOrganizacija: string) {
 		const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 
 		// If we already have a panel, show it.
 		// Otherwise, create a new panel.
-		// if (ReactPanel.currentPanel) {
-		//	ReactPanel.currentPanel._panel.reveal(column);
+		// if (F18Panel.currentPanel) { 
+		//	F18Panel.currentPanel._panel.reveal(column);
 		//} else {
-			ReactPanel.currentPanel = new ReactPanel(cModul, extensionPath, column || vscode.ViewColumn.One);
+			F18Panel.currentPanel = new F18Panel(cModul, cOrganizacija, extensionPath, column || vscode.ViewColumn.One);
+			// vscode.workspace.textDocuments;
 		//}
+
+			
+		// vscode.window.showInformationMessage(`${vscode.window.activeTextEditor}`);
+		/*
+		setTimeout(() => {
+		   
+			
+		   vscode.commands.executeCommand('workbench.action.focusFirstEditorGroup');
+		   vscode.commands.executeCommand('workbench.action.nextEditor');
+		   vscode.commands.executeCommand('workbench.action.previousEditor');
+		}, 2000);
+		*/
 
 	}
 
-	private constructor(cModul: string, extensionPath: string, column: vscode.ViewColumn) {
+	private constructor(cModul: string, cOrganizacija: string, extensionPath: string, column: vscode.ViewColumn) {
 		this._extensionPath = extensionPath;
 
-		this._modul = cModul
-		const currentPanelCaption = `F18 ${this._modul} - ${ReactPanel.panelNum}`;
-		ReactPanel.panelNum++;
+		this._modul = cModul;
+		this._organizacija = cOrganizacija;
+
+		const currentPanelCaption = `F18 ${this._modul} - ${F18Panel.panelNum}`;
+		F18Panel.panelNum++;
 
 		this.terminal = vscode.window.createTerminal(currentPanelCaption);
 		
@@ -65,11 +83,18 @@ class ReactPanel {
 		this.terminal.show(true);
 		this.terminal.hide();
 		// this.terminal.sendText("stty cols 100 rows 40 ; cd /home/hernad/F18_knowhow ; ./F18.sh ");
-		this.terminal.sendText(`stty cols 100 rows 40 ; cd /home/hernad/F18_knowhow ; ./F18.sh -h 127.0.0.1 -y 5432 -u hernad -p hernad -d proba_2018 --${this._modul}`);
+		this.terminal.sendText(`stty cols 120 rows 40 ; cd /home/hernad/F18_knowhow ; ./F18.sh -h 127.0.0.1 -y 5432 -u hernad -p hernad -d ${this._organizacija} --${this._modul} ; exit`);
 
-		 
+		
+		vscode.window.onDidCloseTerminal( (terminal: vscode.Terminal) => {
+			vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
+			if ( terminal.name == this.terminal.name ) {
+				this._panel.dispose();
+			}
+		});
+
 		// Create and show a new webview panel
-		this._panel = vscode.window.createWebviewPanel(ReactPanel.viewType, currentPanelCaption, column, {
+		this._panel = vscode.window.createWebviewPanel(F18Panel.viewType, currentPanelCaption, column, {
 			// Enable javascript in the webview
 			enableScripts: true,
 			retainContextWhenHidden: true,
@@ -93,7 +118,7 @@ class ReactPanel {
 		this._panel.webview.onDidReceiveMessage(message => {
 			switch (message.command) {
 				case 'alert':
-					vscode.window.showErrorMessage(message.text);
+					vscode.window.showErrorMessage(message.data);
 					return;
 				case 'terminal-input':
 					this.terminal.sendText(message.data, false);
@@ -101,7 +126,6 @@ class ReactPanel {
 				    
 			}
 		}, null, this._disposables);
-
 
 		
 	}
@@ -119,7 +143,7 @@ class ReactPanel {
 	}
 
 	public dispose() {
-		ReactPanel.currentPanel = undefined;
+		F18Panel.currentPanel = undefined;
 		this.terminal.dispose();
 
 		// Clean up our resources

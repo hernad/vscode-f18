@@ -297,13 +297,18 @@ Terminal.applyAddon(webLinks);
 Terminal.applyAddon(winptyCompat);
 
 const term : Terminal = new Terminal({
-	cols: 100,
+	cols: 120,
 	rows: 40,
+	fontSize: 17,
 	cursorBlink: true,
-	bellStyle: 'sound',
-	cursorStyel: 'block'
+	// bellStyle: 'sound',
+	// cursorStyel: 'block',
+	//rendererType: 'canvas',
+	// renderType: 'dom',
+	fontFamily: "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+	letterSpacing: 0,
+	lineHeight: 0.99
 });
-
 
 
 term.on('key', (key: any, ev: any) => {
@@ -311,8 +316,7 @@ term.on('key', (key: any, ev: any) => {
 	vscode.postMessage({
 		command: 'terminal-input',
 		data: key
-	})
-	
+	})	
 
 });
 
@@ -378,15 +382,20 @@ term.webLinksInit();
 term.fit();
 
 term.on('focus', () => { 
-	console.log( `xterm ima focus rows: ${term.cols} cols: ${term.rows}`);
-	// alt-D
-	// term.write('\x1bD');
-	// F1
+	// console.log( `xterm ima focus rows: ${term.cols} cols: ${term.rows}`);
+
 	vscode.postMessage({
 		command: 'terminal-input',
 		// data: '\x1b[11~'  // K_F1
 		data: '\x1b[24~'  // K_F12
-	})
+	});
+
+	/*
+	vscode.postMessage({
+		command: 'alert',
+		data: 'desio se focus'
+	});
+	*/
 }); 
 
 /*

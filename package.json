@@ -28,6 +28,11 @@
         "title": "start KALK",
         "category": "F18"
       }
+    ],
+    "languages": [
+      {
+         "id": "F18"
+      }
     ]
   },
   "dependencies": {
