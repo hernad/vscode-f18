@@ -87,7 +87,7 @@ class F18Panel {
 
 		
 		vscode.window.onDidCloseTerminal( (terminal: vscode.Terminal) => {
-			vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
+			// vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
 			if ( terminal.name == this.terminal.name ) {
 				this._panel.dispose();
 			}
