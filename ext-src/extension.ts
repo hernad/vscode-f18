@@ -122,7 +122,7 @@ class F18Panel {
 					return;
 				case 'terminal-input':
 					this.terminal.sendText(message.data, false);
-					console.log(`terminal-input: ${message.data}`);
+					// console.log(`terminal-input: ${message.data}`);
 				    
 			}
 		}, null, this._disposables);
