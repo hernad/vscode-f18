@@ -10,7 +10,7 @@
     "onCommand:f18.start.kalk",
     "onCommand:f18.start.pos"
   ],
-  "main": "./build/ext-src/extension.js",
+  "main": "./build/ext/extension.js",
   "contributes": {
     "commands": [
       {
