@@ -80,7 +80,9 @@ class F18Panel {
 			
 			// And restric the webview to only loading content from our extension's `media` directory.
 			localResourceRoots: [
+				vscode.Uri.file(path.join(this.extensionPath, 'cli')),
 				vscode.Uri.file(path.join(this.extensionPath, 'build'))
+				
 			],
 			
 		});
@@ -167,7 +169,7 @@ class F18Panel {
 		const xermStylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', xtermStyle));
 		const xtermStyleUri = xermStylePathOnDisk.with({ scheme: 'vscode-resource' });
 
-		const stylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, '.', mainStyle));
+		const stylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', mainStyle));
 		const styleUri = stylePathOnDisk.with({ scheme: 'vscode-resource' });
 
 		
@@ -180,11 +182,11 @@ class F18Panel {
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
 				<meta name="theme-color" content="#000000">
-				<title>React App</title>
+				<title>F18 screen</title>
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
 				<link rel="stylesheet" type="text/css" href="${xtermStyleUri}">
 				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000 https://w5xlvm3vzz.lp.gql.zone/graphql; img-src vscode-resource: https: http:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
-				<base href="${vscode.Uri.file(path.join(this.extensionPath, '.')).with({ scheme: 'vscode-resource' })}/">
+				<base href="${vscode.Uri.file(this.extensionPath).with({ scheme: 'vscode-resource' })}/">
 			</head>
 
 			<body>
