@@ -38,10 +38,8 @@
     "react-apollo": "^2.3.2",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.6.3",
-    "react-scripts-ts": "2.16.0",
     "shelljs": "^0.8.3",
-    "vscode": "^1.1.26",
-    "vscode-xterm": "^3.9.0-beta1"
+    "vscode": "^1.1.26"
   },
   "scripts": {
     "vscode:prepublish": "cd cli && webpack && cd .. && tsc -p tsconfig.json",
@@ -59,5 +57,9 @@
     "awesome-typescript-loader": "^5.2.1",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.2.1"
+  },
+  "repository": {
+        "type": "git",
+        "url": "https://github.com/hernad/vscode-f18"
   }
 }
