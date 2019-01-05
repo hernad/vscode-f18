@@ -1,10 +1,10 @@
 {
-  "name": "vscode-webview-react",
-  "version": "0.1.0",
+  "name": "vscode-f18",
+  "version": "0.0.1",
   "engines": {
     "vscode": "^1.30.0"
   },
-  "publisher": "rebornix",
+  "publisher": "hernad",
   "activationEvents": [
     "onCommand:f18.start.fin",
     "onCommand:f18.start.kalk",

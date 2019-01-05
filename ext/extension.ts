@@ -142,13 +142,13 @@ class F18Panel {
 		// const mainStyle = 'index.css';
 
 		// app.5793fd45.js   app.5793fd45.map
-		const mainScript = 'webpack/dist/bundle.js';
+		const mainScript = 'dist/bundle.js';
 
-		const xtermStyle = 'webpack/node_modules/xterm/dist/xterm.css';
+		const xtermStyle = 'node_modules/xterm/dist/xterm.css';
 		const mainStyle = 'index.css';
 
-		const reactScript1 = 'webpack/node_modules/react/umd/react.development.js';
-		const reactScript2 = 'webpack/node_modules/react-dom/umd/react-dom.development.js';
+		const reactScript1 = 'node_modules/react/umd/react.development.js';
+		const reactScript2 = 'node_modules/react-dom/umd/react-dom.development.js';
 
 
 		//<script src="./node_modules/react/umd/react.development.js"></script>
@@ -158,23 +158,21 @@ class F18Panel {
 		const scriptPathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'build', mainScript));
 		const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
 
-		const scriptReact1OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'build', reactScript1));
+		const scriptReact1OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', reactScript1));
 		const scriptReact1Uri = scriptReact1OnDisk.with({ scheme: 'vscode-resource' });
 
-		const scriptReact2OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'build', reactScript2));
+		const scriptReact2OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', reactScript2));
 		const scriptReact2Uri = scriptReact2OnDisk.with({ scheme: 'vscode-resource' });
 
-		const stylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'build', mainStyle));
+		const xermStylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', xtermStyle));
+		const xtermStyleUri = xermStylePathOnDisk.with({ scheme: 'vscode-resource' });
+
+		const stylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, '.', mainStyle));
 		const styleUri = stylePathOnDisk.with({ scheme: 'vscode-resource' });
 
-		const xermStylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'build', xtermStyle));
-		const xtermStyleUri = xermStylePathOnDisk.with({ scheme: 'vscode-resource' });
 		
-
-
 		// Use a nonce to whitelist which scripts can bereact.development.js run
 		const nonce = getNonce();
-
 
 		const strHtml = `<!DOCTYPE html>
 			<html lang="en">
@@ -186,7 +184,7 @@ class F18Panel {
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
 				<link rel="stylesheet" type="text/css" href="${xtermStyleUri}">
 				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000 https://w5xlvm3vzz.lp.gql.zone/graphql; img-src vscode-resource: https: http:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
-				<base href="${vscode.Uri.file(path.join(this.extensionPath, 'build')).with({ scheme: 'vscode-resource' })}/">
+				<base href="${vscode.Uri.file(path.join(this.extensionPath, '.')).with({ scheme: 'vscode-resource' })}/">
 			</head>
 
 			<body>
@@ -198,7 +196,7 @@ class F18Panel {
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
-		// console.log(strHtml);
+		console.log(strHtml);
 		return strHtml;
 	}
 }
