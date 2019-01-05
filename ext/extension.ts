@@ -82,7 +82,6 @@ class F18Panel {
 			localResourceRoots: [
 				vscode.Uri.file(path.join(this.extensionPath, 'cli')),
 				vscode.Uri.file(path.join(this.extensionPath, 'build'))
-				
 			],
 			
 		});
