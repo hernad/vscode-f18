@@ -10,7 +10,9 @@
     "@types/react-router-dom": "^4.3.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "typings-for-css-modules-loader": "^1.7.0"
+    "typings-for-css-modules-loader": "^1.7.0",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.2.0"
   },
   "dependencies": {
     "apollo-boost": "^0.1.22",
@@ -23,8 +25,6 @@
     "react-router": "^4.3.1",
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.3.1",
-    "webpack": "^4.28.3",
-    "webpack-cli": "^3.2.0",
     "xterm": "^3.9.1"
   }
 }
