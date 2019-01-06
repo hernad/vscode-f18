@@ -46,7 +46,7 @@ function fetchData() {
 	return new Promise(resolveFn);
 }
 
-import reverse from "./reverse";
+import reverse from './reverse';
 
 class MyContainer extends React.Component<{}, IMyContainerState> {
 	public state: IMyContainerState = {
@@ -66,10 +66,12 @@ class MyContainer extends React.Component<{}, IMyContainerState> {
 	}
 
 	public render() {
-		return <React.Fragment>
-			    <MySection.MyList {...this.state} />
+		return (
+			<React.Fragment>
+				<MySection.MyList {...this.state} />
 				<button onClick={this.onClick}>REVERSE</button>
-				</React.Fragment>;
+			</React.Fragment>
+		);
 	}
 }
 
@@ -129,7 +131,6 @@ ReactDOM.render(<InheritedComponent />, document.getElementById('example'));
 // import 'bootstrap/dist/css/bootstrap.css';
 // import './components/BootApp.css';
 
-
 import ApolloClient from 'apollo-boost';
 
 import Forms from './components/BootForms';
@@ -137,10 +138,10 @@ import Lists from './components/BootLists';
 
 const client = new ApolloClient({
 	// uri: 'http://localhost:5000/graphql'
-	uri: "https://w5xlvm3vzz.lp.gql.zone/graphql"
+	uri: 'https://w5xlvm3vzz.lp.gql.zone/graphql'
 });
 
-import gql from "graphql-tag";
+import gql from 'graphql-tag';
 
 /*
 ReactDOM.render( 
@@ -189,15 +190,7 @@ client.query({
 //  .then(result => console.log((result as any).data.allKontos.nodes));
 */
 
-import {
-	Navbar,
-	Nav,
-	NavItem,
-	MenuItem,
-	Grid,
-	Row,
-	Col
-  } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, MenuItem, Grid, Row, Col } from 'react-bootstrap';
 
 /*
 ReactDOM.render( 
@@ -210,30 +203,26 @@ ReactDOM.render(
   </Navbar>, document.getElementById('example'));
 */
 
-
-
 // const domInstance = ReactDOM.findDOMNode(myCompInstance);
 
-import { ApolloProvider } from "react-apollo";
+import { ApolloProvider } from 'react-apollo';
 // @ts-ignore
 // import { Terminal as XTermTerminal } from "vscode-xterm";
 
 // import { Terminal } from 'vscode-xterm';
 //import { Terminal } from '';
 
-
 /// <reference path="xterm/typings/xterm.d.ts"/>
 
 import { Terminal } from 'xterm/lib/public/Terminal';
-import * as attach from 'xterm/lib/addons/attach/attach';
-import * as fit from 'xterm/lib/addons/fit/fit';
-import * as fullscreen from 'xterm/lib/addons/fullscreen/fullscreen';
-import * as search from 'xterm/lib/addons/search/search';
+// import * as attach from 'xterm/lib/addons/attach/attach';
+// import * as fit from 'xterm/lib/addons/fit/fit';
+// import * as fullscreen from 'xterm/lib/addons/fullscreen/fullscreen';
+// import * as search from 'xterm/lib/addons/search/search';
 import * as webLinks from 'xterm/lib/addons/webLinks/webLinks';
 import * as winptyCompat from 'xterm/lib/addons/winptyCompat/winptyCompat';
-import { ISearchOptions } from 'xterm/lib/addons/search/Interfaces';
+// import { ISearchOptions } from 'xterm/lib/addons/search/Interfaces';
 import { Terminal as TerminalType } from 'xterm';
-
 
 // import * as fit from 'xterm/lib/addons/fit/fit';
 
@@ -242,161 +231,131 @@ import { Terminal as TerminalType } from 'xterm';
 // import * as search from 'vscode-xterm/lib/addons/search/search';
 // import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
 
-
-
-import { Query } from "react-apollo";
+import { Query } from 'react-apollo';
 // import gql from "graphql-tag";
 
 const ExchangeRates = () => (
-  <Query
-    query={gql`
-      {
-        rates(currency: "EUR") {
-          currency
-          rate
-        }
-      }
-    `}
-  >
-    {({ loading, error, data }) => {
-      if (loading) { 
-		  return <p>Učitavam...</p> 
-	  };
-      if (error) { 
-		  return (<p>Greška</p>) 
-	  };
+	<Query
+		query={gql`
+			{
+				rates(currency: "EUR") {
+					currency
+					rate
+				}
+			}
+		`}
+	>
+		{({ loading, error, data }) => {
+			if (loading) {
+				return <p>Učitavam...</p>;
+			}
+			if (error) {
+				return <p>Greška</p>;
+			}
 
-      return data.rates.map(({ currency, rate }) => (
-        <div key={currency}>
-          <p>{`${currency}: ${rate}`}</p>
-        </div>
-      ));
-    }}
-  </Query>
+			return data.rates.map(({ currency, rate }) => (
+				<div key={currency}>
+					<p>{`${currency}: ${rate}`}</p>
+				</div>
+			));
+		}}
+	</Query>
 );
 
-
 const App = () => (
-  <ApolloProvider client={client}>
-    <div>
-      <h2>First Apollo app 🚀</h2>
-	  <ExchangeRates/>
-    </div>
-  </ApolloProvider>
+	<ApolloProvider client={client}>
+		<div>
+			<h2>First Apollo app 🚀</h2>
+			<ExchangeRates />
+		</div>
+	</ApolloProvider>
 );
 
 // @ts-ignore
 const vscode = acquireVsCodeApi();
 
-
-Terminal.applyAddon(attach);
-Terminal.applyAddon(fit);
-Terminal.applyAddon(fullscreen);
-Terminal.applyAddon(search);
+// https://xtermjs.org/docs/api/addons/attach/
+// Terminal.applyAddon(attach);
+// Terminal.applyAddon(fit);
+// https://xtermjs.org/docs/api/addons/fullscreen/
+// Terminal.applyAddon(fullscreen);
+// Terminal.applyAddon(search);
 Terminal.applyAddon(webLinks);
 Terminal.applyAddon(winptyCompat);
 
-const term : Terminal = new Terminal({
-	cols: 120,
-	rows: 40,
-	fontSize: 17,
-	cursorBlink: true,
-	// bellStyle: 'sound',
-	// cursorStyel: 'block',
-	//rendererType: 'canvas',
-	// renderType: 'dom',
-	fontFamily: "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
-	letterSpacing: 0,
-	lineHeight: 0.99
-});
+let term: any;
 
-
-term.on('key', (key: any, ev: any) => {
-	
-	vscode.postMessage({
-		command: 'terminal-input',
-		data: key
-	})	
-
-});
-
-
-window.addEventListener('message', event => {
-
+window.addEventListener('message', (event) => {
 	const message = (event as any).data; // The JSON data our extension sent
 
 	switch (message.command) {
-			case 'terminal':;
-				term.write(message.data);
-				break;
+		case 'term-create':
+			console.log('message: term-create');
+			const termOptions = JSON.parse(message.data);
+			term = new Terminal(termOptions);
+			term.on('key', (key: any, ev: any) => {
+				vscode.postMessage({
+					command: 'terminal-input',
+					data: key
+				});
+			});
+
+			const xtermWrapper = document.createElement('div');
+			xtermWrapper.classList.add('terminal-wrapper');
+			xtermWrapper.innerHTML =
+				'Komande: <button id="btn_k_f5">F5</button>  <button id="btn_k_f8">F8</button>  <button id="btn_k_ins">INS/OVER</button>';
+
+			const xtermElement = document.createElement('div');
+			// xtermElement.classList.add("");
+			const container = document.getElementById('example');
+			xtermWrapper.appendChild(xtermElement);
+			container.appendChild(xtermWrapper);
+
+			document.getElementById('btn_k_f5').onclick = (event: any) => {
+				vscode.postMessage({
+					command: 'terminal-input',
+					data: '\x1b[15~' // K_F5
+				});
+				term.focus();
+			};
+
+			document.getElementById('btn_k_f8').onclick = (event: any) => {
+				vscode.postMessage({
+					command: 'terminal-input',
+					data: '\x1b[18~' // K_F8
+				});
+				term.focus();
+			};
+
+			document.getElementById('btn_k_ins').onclick = (event: any) => {
+				vscode.postMessage({
+					command: 'terminal-input',
+					data: '\x1b[2~' // INS
+				});
+				term.focus();
+			};
+
+			term.open(xtermElement);
+			term.winptyCompatInit();
+			term.webLinksInit();
+			// term.fit();
+			// term.toggleFullScreen(true);
+			term.on('focus', () => {
+				// console.log( `xterm ima focus rows: ${term.cols} cols: ${term.rows}`);
+				vscode.postMessage({
+					command: 'terminal-input',
+					// data: '\x1b[11~'  // K_F1
+					data: '\x1b[24~' // K_F12
+				});
+			});
+			term.focus();
+			break;
+
+		case 'term-write':
+			term.write(message.data);
+			break;
 	}
 });
-
-
-const xtermWrapper = document.createElement('div');
-xtermWrapper.classList.add('terminal-wrapper');
-xtermWrapper.innerHTML = 'Komande: <button id="btn_k_f5">F5</button>  <button id="btn_k_f8">F8</button>  <button id="btn_k_ins">INS/OVER</button>';
-
-//(<any>xtermWrapper).xterm = xterm;
-	
-const xtermElement = document.createElement('div');
-// xtermElement.classList.add("");
-
-
-const container = document.getElementById('example');
-
-xtermWrapper.appendChild(xtermElement);
-container.appendChild( xtermWrapper );
-
-
-document.getElementById('btn_k_f5').onclick = ( event: any ) =>
-{
-	vscode.postMessage({
-		command: 'terminal-input',
-		data: '\x1b[15~'  // K_F5
-	});
-	term.focus();
-};
-
-document.getElementById('btn_k_f8').onclick = ( event: any ) =>
-{
-	vscode.postMessage({
-		command: 'terminal-input',
-		data: '\x1b[18~'  // K_F8
-	});
-	term.focus();
-};
-
-document.getElementById('btn_k_ins').onclick = ( event: any ) =>
-{
-	vscode.postMessage({
-		command: 'terminal-input',
-		data: '\x1b[2~' // INS
-	});
-	term.focus();
-};
-
-term.open(xtermElement);
-term.winptyCompatInit();
-term.webLinksInit();
-term.fit();
-
-term.on('focus', () => { 
-	// console.log( `xterm ima focus rows: ${term.cols} cols: ${term.rows}`);
-
-	vscode.postMessage({
-		command: 'terminal-input',
-		// data: '\x1b[11~'  // K_F1
-		data: '\x1b[24~'  // K_F12
-	});
-
-	/*
-	vscode.postMessage({
-		command: 'alert',
-		data: 'desio se focus'
-	});
-	*/
-}); 
 
 /*
 term.setOption('cursorBlink', true);
@@ -405,13 +364,9 @@ term.setOption('rows', 40);
 term.setOption('cols', 100);
 */
 
-term.focus();
-
-
 // (document.getElementsByClassName("xterm-helpers").item(0) as HTMLDivElement).style.visibility = "hidden";;
 // (document.getElementsByClassName("xterm-helper-textarea").item(0) as HTMLDivElement).style.display = 'none';
 //(document.getElementsByClassName("xterm-char-measure-element").item(0) as HTMLDivElement).style.display = 'none';
-
 
 // xterm.fit();
 
