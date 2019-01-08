@@ -1,15 +1,13 @@
 {
   "name": "vscode-f18",
-  "version": "0.0.9",
+  "version": "0.0.18",
   "description": "F18 client",
   "engines": {
     "vscode": "^1.30.0"
   },
   "publisher": "hernad",
   "activationEvents": [
-    "onCommand:f18.start.fin",
-    "onCommand:f18.start.kalk",
-    "onCommand:f18.start.pos"
+    "*"
   ],
   "main": "./build/ext/extension.js",
   "contributes": {
@@ -29,7 +27,19 @@
         "title": "start KALK",
         "category": "F18"
       }
-    ]
+    ],
+    "configuration": [
+			{
+				"title": "F18 podešenja",
+				"properties": {
+					"f18.onStart": {
+            "description": "F18 modul (fin;kalk;pos) koji se inicijalno pokreće",
+						"type": "string",
+            "default": "fin"
+					}
+				}
+			}
+		]
   },
   "dependencies": {
     "vscode": "^1.1.26"

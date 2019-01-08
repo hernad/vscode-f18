@@ -212,17 +212,17 @@ import { ApolloProvider } from 'react-apollo';
 // import { Terminal } from 'vscode-xterm';
 //import { Terminal } from '';
 
-/// <reference path="xterm/typings/xterm.d.ts"/>
+/// <reference path="vscode-xterm/typings/xterm.d.ts"/>
 
-import { Terminal } from 'xterm/lib/public/Terminal';
+import { Terminal } from 'vscode-xterm/lib/public/Terminal';
 // import * as attach from 'xterm/lib/addons/attach/attach';
 // import * as fit from 'xterm/lib/addons/fit/fit';
 // import * as fullscreen from 'xterm/lib/addons/fullscreen/fullscreen';
 // import * as search from 'xterm/lib/addons/search/search';
-import * as webLinks from 'xterm/lib/addons/webLinks/webLinks';
-import * as winptyCompat from 'xterm/lib/addons/winptyCompat/winptyCompat';
+import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
+import * as winptyCompat from 'vscode-xterm/lib/addons/winptyCompat/winptyCompat';
 // import { ISearchOptions } from 'xterm/lib/addons/search/Interfaces';
-import { Terminal as TerminalType } from 'xterm';
+// import { Terminal as TerminalType } from 'vscode-xterm';
 
 // import * as fit from 'xterm/lib/addons/fit/fit';
 
@@ -290,26 +290,27 @@ window.addEventListener('message', (event) => {
 
 	switch (message.command) {
 		case 'term-create':
-			console.log('message: term-create');
-			const termOptions = JSON.parse(message.data);
-			term = new Terminal(termOptions);
-			term.on('key', (key: any, ev: any) => {
-				vscode.postMessage({
-					command: 'terminal-input',
-					data: key
-				});
-			});
-
+			// console.log('message: term-create');
 			const xtermWrapper = document.createElement('div');
 			xtermWrapper.classList.add('terminal-wrapper');
 			xtermWrapper.innerHTML =
 				'Komande: <button id="btn_k_f5">F5</button>  <button id="btn_k_f8">F8</button>  <button id="btn_k_ins">INS/OVER</button>';
 
 			const xtermElement = document.createElement('div');
-			// xtermElement.classList.add("");
 			const container = document.getElementById('example');
 			xtermWrapper.appendChild(xtermElement);
 			container.appendChild(xtermWrapper);
+			
+			const termOptions = JSON.parse(message.data);
+			term = new Terminal(termOptions);
+			term.winptyCompatInit();
+
+			term.on('key', (key: any, ev: any) => {
+				vscode.postMessage({
+					command: 'terminal-input',
+					data: key
+				});
+			});
 
 			document.getElementById('btn_k_f5').onclick = (event: any) => {
 				vscode.postMessage({
@@ -318,7 +319,6 @@ window.addEventListener('message', (event) => {
 				});
 				term.focus();
 			};
-
 			document.getElementById('btn_k_f8').onclick = (event: any) => {
 				vscode.postMessage({
 					command: 'terminal-input',
@@ -326,7 +326,6 @@ window.addEventListener('message', (event) => {
 				});
 				term.focus();
 			};
-
 			document.getElementById('btn_k_ins').onclick = (event: any) => {
 				vscode.postMessage({
 					command: 'terminal-input',
@@ -352,8 +351,15 @@ window.addEventListener('message', (event) => {
 			break;
 
 		case 'term-write':
-			term.write(message.data);
+			if (term) term.write(message.data);
 			break;
+
+		//case 'term-cmd':
+		//	vscode.postMessage({
+		//		command: 'terminal-cmd',
+		//		data: message.data
+		//	});
+		//	break;
 	}
 });
 
