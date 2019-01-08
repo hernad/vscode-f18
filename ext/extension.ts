@@ -109,7 +109,12 @@ class F18Panel {
 						// if (this.terminal) this.terminal.sendText(message.data);
 						return;
 					case 'terminal-input':
-					    if (this.terminal) this.terminal.sendText(message.data, false);
+
+					    if (this.terminal) {
+							// @ts-ignore
+							this.terminal.resize(120, 40);
+							this.terminal.sendText(message.data, false);
+						}
 					    // console.log(`terminal-input: ${message.data}`);
 				}
 			}
@@ -121,7 +126,11 @@ class F18Panel {
 		});
 		// kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
 		this.terminal.show(true);
+		// @ts-ignore
+		this.terminal.resize(120, 40);
 		this.terminal.hide();
+
+		// vscode.window.showInformationMessage("resize 120 x 40");
 
 		let sendInitCmds: string;
 
@@ -191,13 +200,11 @@ class F18Panel {
 
 	}
 
-
 	public doTerminalWrite(data: string) {
 		// Send a message to the webview webview.
 		// You can send any JSON serializable data.
 		this.panel.webview.postMessage({ command: 'term-write', data });
 	}
-
 
 	private _getHtmlForWebview() {
 		// const manifest = require(path.join(this.extensionPath, 'out', 'asset-manifest.json'));
