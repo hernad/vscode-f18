@@ -89,7 +89,6 @@ class F18Panel {
 			() => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
 		);
 
-
 	}
 
 
@@ -193,7 +192,6 @@ class F18Panel {
 	}
 
 
-
 	public doTerminalWrite(data: string) {
 		// Send a message to the webview webview.
 		// You can send any JSON serializable data.
@@ -201,13 +199,11 @@ class F18Panel {
 	}
 
 
-
 	private _getHtmlForWebview() {
 		// const manifest = require(path.join(this.extensionPath, 'out', 'asset-manifest.json'));
 		// const mainScript = 'index.js';
 		// const mainStyle = 'index.css';
 
-		// app.5793fd45.js   app.5793fd45.map
 		const mainScript = 'dist/bundle.js';
 
 		const xtermStyle = 'node_modules/vscode-xterm/lib/xterm.css';
