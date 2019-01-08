@@ -33,9 +33,10 @@
 				"title": "F18 podešenja",
 				"properties": {
 					"f18.onStart": {
-            "description": "F18 modul (fin;kalk;pos) koji se inicijalno pokreće",
+            "description": "F18 modul koji se inicijalno pokreće",
 						"type": "string",
-            "default": "fin"
+            "default": "fin",
+            "enum": ["", "fin", "kalk", "pos"]
 					}
 				}
 			}

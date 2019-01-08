@@ -19,7 +19,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.commands.executeCommand('workbench.action.toggleFullScreen');
 	vscode.commands.executeCommand('workbench.action.closeAllEditors');
-	// vscode.commands.executeCommand('f18.start.kalk');
+
+	// activity bar always visible
+	if (!vscode.workspace.getConfiguration('workbench').get('activityBar.visible'))
+	   vscode.commands.executeCommand('workbench.action.toggleActivityBarVisibility');
+
+	// const visibleSideBar = vscode.workspace.getConfiguration('workbench').get('sideBar.location');
+	// vscode.commands.executeCommand('workbench.action.toggleSidebarVisibility');
 
 	setTimeout(() => {
 		const onStart = vscode.workspace.getConfiguration('f18').get('onStart');
@@ -76,13 +82,13 @@ class F18Panel {
 
 		this.terminal = vscode.window.createTerminal(currentPanelCaption);
 		this.terminal.processId.then(
-			(processId) => { 
-				// vscode.window.showInformationMessage( `kreiran terminal ${processId}`); 
+			(processId) => {
+				// vscode.window.showInformationMessage( `kreiran terminal ${processId}`);
 				this.setupTerminal();
 			},
 			() => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
 		);
-		
+
 
 	}
 
@@ -153,11 +159,11 @@ class F18Panel {
 			//rendererType: 'canvas',
 			// renderType: 'dom',
 			fontFamily: "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
-			
+
 			//fontSize: 12,
 			//letterSpacing: 0,
 			//lineHeight: 0.99
-			
+
 			fontSize: 14,
 			letterSpacing: 0,
 			lineHeight: 0.90
@@ -183,7 +189,7 @@ class F18Panel {
 		// 		x.dispose();
 		// 	}
 		// }
-		
+
 	}
 
 
@@ -194,7 +200,7 @@ class F18Panel {
 		this.panel.webview.postMessage({ command: 'term-write', data });
 	}
 
-	
+
 
 	private _getHtmlForWebview() {
 		// const manifest = require(path.join(this.extensionPath, 'out', 'asset-manifest.json'));
