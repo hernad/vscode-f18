@@ -20,7 +20,7 @@ class MyCompoment extends React.Component {
 	}
 }
 
-/*    
+/*
 const numbers = [1, 2, 3];
 for (const num of numbers) {
     console.log(num);
@@ -144,7 +144,7 @@ const client = new ApolloClient({
 import gql from 'graphql-tag';
 
 /*
-ReactDOM.render( 
+ReactDOM.render(
 	<ul>
 	   <li>loading....</li>
 	</ul>, document.getElementById('example'));
@@ -169,17 +169,17 @@ client.query({
 	}
     `
   })
-  .then(result => { 
+  .then(result => {
 	const nodesK = (result as any).data.allKontos.nodes;
-	const nodesR = (result as any).data.allRobas.nodes;  
-	console.log(nodesK);  
-	const kontaElement = Object.keys(nodesK).map(key => 
+	const nodesR = (result as any).data.allRobas.nodes;
+	console.log(nodesK);
+	const kontaElement = Object.keys(nodesK).map(key =>
 	    <li key={key}>id={nodesK[key].id} naz={nodesK[key].naz}
 	     <p/>
 		 <input value={nodesK[key].naz} size={100} />
 		</li>);
 	const robaElement = Object.keys(nodesR).map(key => <li key={key}>id={nodesR[key].id} naz={nodesR[key].naz}</li>);
-	ReactDOM.render( 
+	ReactDOM.render(
 		<ul>
 		   {kontaElement}
 		   <button>======================================================================</button>
@@ -193,7 +193,7 @@ client.query({
 import { Navbar, Nav, NavItem, MenuItem, Grid, Row, Col } from 'react-bootstrap';
 
 /*
-ReactDOM.render( 
+ReactDOM.render(
   <Navbar className="navbar-top" fluid={true}>
      <Forms/>,
 	 <Lists/>,
@@ -284,34 +284,111 @@ Terminal.applyAddon(webLinks);
 Terminal.applyAddon(winptyCompat);
 
 let term: any;
+let config: any;
+
+if (document.addEventListener) {
+	document.addEventListener('DOMContentLoaded', (event) => {
+		// console.log('document loaded');
+	});
+}
+
+window.addEventListener('focus', (event) => {
+	// console.log(`window focus ${window.screen.width} ${window.screen.height} ${document.body.children.length} ${document.body.children[0].className} ${document.body.children[1]} ${document.body.children[2]} ${document.body.children[3]}}}`);
+	// const xterm = document.getElementsByClassName("xterm-screen").item(0) as HTMLDivElement
+	// term ? term.focus() : console.log('term element nije definisan?!');
+	// vscode.postMessage({
+	//	command: 'cli-set-focus'
+	// });
+	// const mainContainer = document.getElementById('workbench.main.container');
+	// console.log(`maincontainer ${mainContainer}`);
+	// mainContainer.style.visibility = "hidden";
+	// canvas
+	// const xtermTextLayer = document.getElementsByClassName("xterm-helper-textarea").item(0) as HTMLDivElement; //.style.display = 'none';
+	// if (xtermTextLayer) xtermTextLayer.focus();
+	// dom
+	// const xtermScreen = document.getElementsByClassName("xterm-screen").item(0) as HTMLDivElement; //.style.display = 'none';
+	// xtermScreen ? xtermScreen.focus() : console.log('xterm-screen nema !?');
+	// #terminal > div > div.xterm-screen > div > textarea
+	// <textarea class="xterm-helper-textarea" aria-label="Terminal input" aria-multiline="false" autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0"></textarea>
+	// term ? term.viewport.viewportElement.click() : console.log('no term element');
+	//if (term) {
+	// term.focus();
+	// const btn =	document.getElementById('btn_k_ins')
+	// if (btn) btn.click();
+	//}
+});
+
+window.addEventListener('pageshow', (event) => {
+	// console.log('window pageshow');
+});
 
 window.addEventListener('message', (event) => {
 	const message = (event as any).data; // The JSON data our extension sent
 
 	switch (message.command) {
+		case 'term-get-dimensions':
+			config = JSON.parse(message.data);
+			const html = document.body.parentElement;
+			const fm = new FontMeasurer(config, document.body);
+
+			const rowsCols = fm.evaluateColsAndRows(html.clientWidth, html.clientHeight);
+
+			const data = JSON.stringify({
+				width: html.clientWidth,
+				height: html.clientHeight,
+				rows: rowsCols.rows,
+				cols: rowsCols.cols
+				//charWidth: measure.charWidth,
+				//charHeight: measure.charHeight
+			});
+
+			vscode.postMessage({
+				command: 'cli-dimensions',
+				data
+			});
+			console.log(`${data}`);
+			break;
+
 		case 'term-create':
 			// console.log('message: term-create');
-			const xtermWrapper = document.createElement('div');
-			xtermWrapper.classList.add('terminal-wrapper');
-			xtermWrapper.innerHTML =
-				'Komande: <button id="btn_k_f5">F5</button>  <button id="btn_k_f8">F8</button>  <button id="btn_k_ins">INS/OVER</button>';
+			const headerWithWrapper = document.createElement('div');
+			// headerWithWrapper.classList.add('terminal-wrapper');
+			/*
+			headerWithWrapper.innerHTML =
+				'Komande: <button id="btn_k_f5">F5</button>  <button id="btn_k_f8">F8</button>  <button id="btn_k_ins">INS/OVER</button> <div id="terminal" class="terminal-wrapper"></div>';
+			*/
 
-			const xtermElement = document.createElement('div');
-			const container = document.getElementById('example');
-			xtermWrapper.appendChild(xtermElement);
-			container.appendChild(xtermWrapper);
-			
+			headerWithWrapper.innerHTML = '<div id="terminal" class="terminal-wrapper"></div>';
+
+
+			//const xtermElement = document.createElement('div');
+			const container = document.getElementById('root');
+			//.appendChild(xtermElement);
+			container.appendChild(headerWithWrapper);
+			const terminalElement = document.getElementById('terminal');
+
 			const termOptions = JSON.parse(message.data);
 			term = new Terminal(termOptions);
 			term.winptyCompatInit();
 
+			/*
 			term.on('key', (key: any, ev: any) => {
 				vscode.postMessage({
 					command: 'cli-input',
 					data: key
 				});
 			});
+			*/
 
+			// hvata sve evente - i keystrokes i mouse evente
+			term.on('data', (data: any) => {
+				vscode.postMessage({
+					command: 'cli-input',
+					data: data
+				});
+			});
+
+			/*
 			document.getElementById('btn_k_f5').onclick = (event: any) => {
 				vscode.postMessage({
 					command: 'cli-input',
@@ -333,23 +410,37 @@ window.addEventListener('message', (event) => {
 				});
 				term.focus();
 			};
+			*/
 
-			term.open(xtermElement);
+			term.open(terminalElement);
 			term.winptyCompatInit();
 			term.webLinksInit();
 			// term.fit();
 			// term.toggleFullScreen(true);
 			term.on('focus', () => {
-				// console.log( `xterm ima focus rows: ${term.cols} cols: ${term.rows}`);
+				// console.log( `xterm  ${term.getOption('termName')} ima focus rows: ${term.cols} cols: ${term.rows}`);
+				// console.log( `xterm ${term.getOption('termName')}: ${headerWithWrapper.clientWidth} ${headerWithWrapper.clientHeight}`);
+
+				//const computedStyle = window.getComputedStyle( iframe.width);
+				// const width = parseInt(computedStyle.getPropertyValue('width').replace('px', ''), 10);
+				// const height = parseInt(computedStyle.getPropertyValue('height').replace('px', ''), 10);
+
+				// term.element.click();
 				// vscode.postMessage({
 				// 	command: 'cli-input',
 				// 	// data: '\x1b[11~'  // K_F1
 				// 	data: '\x1b[24~' // K_F12
 				// });
+				// console.log('term on focus');
 				vscode.postMessage({
 					command: 'cli-focus'
 				});
 			});
+
+			term.on('title', (title: string) => {
+				console.log(`xterm title: ${title}`);
+			});
+
 			term.focus();
 			break;
 
@@ -357,11 +448,8 @@ window.addEventListener('message', (event) => {
 			if (term) term.write(message.data);
 			break;
 
-		//case 'term-cmd':
-		//	vscode.postMessage({
-		//		command: 'terminal-cmd',
-		//		data: message.data
-		//	});
+		// case 'term-focus':
+		//	term ? term.focus() : vscode.postMessage({ command: 'alert', data: "term-focus ne radi?!" });
 		//	break;
 	}
 });
@@ -380,3 +468,201 @@ term.setOption('cols', 100);
 // xterm.fit();
 
 // ReactDOM.render(<App />, document.getElementById("example"));
+
+interface ITerminalFont {
+	fontFamily: string;
+	fontSize: number;
+	letterSpacing: number;
+	lineHeight: number;
+	charWidth?: number;
+	charHeight?: number;
+}
+
+/*
+
+export type FontWeight = 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
+
+export interface ITerminalConfiguration {
+	shell: {
+		linux: string;
+		osx: string;
+		windows: string;
+	};
+	shellArgs: {
+		linux: string[];
+		osx: string[];
+		windows: string[];
+	};
+	macOptionIsMeta: boolean;
+	macOptionClickForcesSelection: boolean;
+	rendererType: 'auto' | 'canvas' | 'dom';
+	rightClickBehavior: 'default' | 'copyPaste' | 'selectWord';
+	cursorBlinking: boolean;
+	cursorStyle: string;
+	drawBoldTextInBrightColors: boolean;
+	fontFamily: string;
+	fontWeight: FontWeight;
+	fontWeightBold: FontWeight;
+	// fontLigatures: boolean;
+	fontSize: number;
+	letterSpacing: number;
+	lineHeight: number;
+	setLocaleVariables: boolean;
+	scrollback: number;
+	commandsToSkipShell: string[];
+	cwd: string;
+	confirmOnExit: boolean;
+	enableBell: boolean;
+	env: {
+		linux: { [key: string]: string };
+		osx: { [key: string]: string };
+		windows: { [key: string]: string };
+	};
+	showExitAlert: boolean;
+	experimentalBufferImpl: 'JsArray' | 'TypedArray';
+	splitCwd: 'workspaceRoot' | 'initial' | 'inherited';
+	windowsEnableConpty: boolean;
+}
+*/
+
+class Dimension {
+	public width: number;
+	public height: number;
+
+	constructor(width: number, height: number) {
+		this.width = width;
+		this.height = height;
+	}
+
+	static equals(a: Dimension | undefined, b: Dimension | undefined): boolean {
+		if (a === b) {
+			return true;
+		}
+		if (!a || !b) {
+			return false;
+		}
+		return a.width === b.width && a.height === b.height;
+	}
+}
+class FontMeasurer {
+	private _charMeasureElement?: HTMLElement;
+	private _container: HTMLElement;
+	private _lastFontMeasurement?: ITerminalFont;
+	// public config?: ITerminalConfiguration;
+	public config: any;
+
+	public constructor(config: any, container: HTMLElement) {
+		this._container = container;
+		this._createCharMeasureElementIfNecessary();
+
+		//fontFamily: string
+
+		//this.config = this._configurationService.getValue<ITerminalConfiguration>(TERMINAL_CONFIG_SECTION);
+
+		this.config = config;
+
+		//const fontFamily = this.config.fontFamily || this._configurationService.getValue<IEditorOptions>('editor').fontFamily || EDITOR_FONT_DEFAULTS.fontFamily;
+		//this.config.fontFamily = fontFamily;
+	}
+
+	private _createCharMeasureElementIfNecessary() {
+		// Create charMeasureElement if it hasn't been created or if it was orphaned by its parent
+		if (!this._charMeasureElement || !this._charMeasureElement.parentElement) {
+			this._charMeasureElement = document.createElement('div');
+			this._container.appendChild(this._charMeasureElement);
+		}
+	}
+
+	public configFontIsMonospace(): boolean {
+		const fontSize = 15;
+
+		const i_rect = this._getBoundingRectFor('i', this.config.fontFamily, fontSize);
+		const w_rect = this._getBoundingRectFor('w', this.config.fontFamily, fontSize);
+
+		const invalidBounds = !i_rect.width || !w_rect.width;
+		if (invalidBounds) {
+			// There is no reason to believe the font is not Monospace.
+			return true;
+		}
+		return i_rect.width === w_rect.width;
+	}
+
+	private _getBoundingRectFor(char: string, fontFamily: string, fontSize: number): ClientRect | DOMRect {
+		const style = this._charMeasureElement!.style;
+		style.display = 'inline-block';
+		style.fontFamily = fontFamily;
+		style.fontSize = fontSize + 'px';
+		style.lineHeight = 'normal';
+		this._charMeasureElement!.innerText = char;
+		const rect = this._charMeasureElement!.getBoundingClientRect();
+		style.display = 'none';
+
+		return rect;
+	}
+
+	public measureFont(): ITerminalFont {
+		this._createCharMeasureElementIfNecessary();
+
+		const fontSize = this.config.fontSize;
+		const letterSpacing = this.config.letterSpacing;
+		const lineHeight = this.config.lineHeight;
+
+		const rect = this._getBoundingRectFor('X', this.config.fontFamily, fontSize);
+
+		// Bounding client rect was invalid, use last font measurement if available.
+		if (this._lastFontMeasurement && !rect.width && !rect.height) {
+			return this._lastFontMeasurement;
+		}
+
+		this._lastFontMeasurement = {
+			fontFamily: this.config.fontFamily,
+			fontSize,
+			letterSpacing,
+			lineHeight,
+			charWidth: rect.width,
+			charHeight: Math.ceil(rect.height)
+		};
+		return this._lastFontMeasurement;
+	}
+
+	public evaluateColsAndRows(width: number, height: number): { rows: number, cols: number} {
+		// Ignore if dimensions are undefined or 0
+		if (!width || !height) {
+			return null;
+		}
+
+		const dimension = new Dimension(width, height);
+		if (!dimension) {
+			return null;
+		}
+
+		const font = this.measureFont();
+		if (!font.charWidth || !font.charHeight) {
+			return null;
+		}
+
+		// Because xterm.js converts from CSS pixels to actual pixels through
+		// the use of canvas, window.devicePixelRatio needs to be used here in
+		// order to be precise. font.charWidth/charHeight alone as insufficient
+		// when window.devicePixelRatio changes.
+		const scaledWidthAvailable = dimension.width * window.devicePixelRatio;
+		const scaledHeightAvailable = dimension.height * window.devicePixelRatio;
+		const scaledCharHeight = Math.ceil(font.charHeight * window.devicePixelRatio);
+
+		let scaledCharWidth: number;
+		let scaledLineHeight: number;
+		console.log(`rendererType: ${this.config.rendererType}`);
+		if (this.config.rendererType === 'dom') {
+			scaledCharWidth = font.charWidth * window.devicePixelRatio;
+			scaledLineHeight = Math.floor(scaledCharHeight);
+		} else {
+			scaledCharWidth = Math.floor(font.charWidth * window.devicePixelRatio) + font.letterSpacing;
+			scaledLineHeight = Math.floor(scaledCharHeight * font.lineHeight);
+		};
+
+		const cols = Math.max(Math.floor(scaledWidthAvailable / scaledCharWidth), 1);
+		const rows = Math.max(Math.floor(scaledHeightAvailable / scaledLineHeight), 1);
+
+		return { rows, cols };
+	}
+}

@@ -1,8 +1,12 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
+const LINE_HEIGHT = 0.92;
+const LETTER_SPACING = 0;
+const FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'";
+const RENDERER_TYPE = 'dom';  // 'dom' | 'canvas'
 
+export function activate(context: vscode.ExtensionContext) {
 	console.log('F18 ekstenzija aktivna :)');
 
 	context.subscriptions.push(
@@ -17,12 +21,17 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	);
 
-	vscode.commands.executeCommand('workbench.action.toggleFullScreen');
+	const fullScreen = vscode.workspace.getConfiguration('f18').get('fullScreen');
+
+	//NEVER_MEASURE_RENDER_TIME_STORAGE_KEY = 'terminal.integrated.neverMeasureRenderTime'
+
+	if (fullScreen) vscode.commands.executeCommand('workbench.action.toggleFullScreen');
+
 	vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
 	// activity bar always visible
 	if (!vscode.workspace.getConfiguration('workbench').get('activityBar.visible'))
-	   vscode.commands.executeCommand('workbench.action.toggleActivityBarVisibility');
+		vscode.commands.executeCommand('workbench.action.toggleActivityBarVisibility');
 
 	// const visibleSideBar = vscode.workspace.getConfiguration('workbench').get('sideBar.location');
 	// vscode.commands.executeCommand('workbench.action.toggleSidebarVisibility');
@@ -31,7 +40,6 @@ export function activate(context: vscode.ExtensionContext) {
 		const onStart = vscode.workspace.getConfiguration('f18').get('onStart');
 		vscode.commands.executeCommand(`f18.start.${onStart}`);
 	}, 700);
-
 }
 
 class F18Panel {
@@ -41,7 +49,8 @@ class F18Panel {
 	public static currentPanel: F18Panel | undefined;
 
 	public static createOrShow(extensionPath: string, cModul: string, cOrganizacija: string) {
-		const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
+		// const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
+		const column = undefined;
 
 		F18Panel.currentPanel = new F18Panel(cModul, cOrganizacija, extensionPath, column || vscode.ViewColumn.One);
 	}
@@ -59,6 +68,9 @@ class F18Panel {
 	private readonly panelNum: number;
 	private cols: number;
 	private rows: number;
+	private width: number;
+	private height: number;
+	private fontSize: number;
 
 	private constructor(cModul: string, cOrganizacija: string, extensionPath: string, column: vscode.ViewColumn) {
 		this.extensionPath = extensionPath;
@@ -67,71 +79,104 @@ class F18Panel {
 		this.f18Organizacija = cOrganizacija;
 		this.cols = 120;
 		this.rows = 40;
+		this.width = 0;
+		this.height = 0;
+		this.fontSize = 16;
+		if (vscode.workspace.getConfiguration('f18').get('fontSize') !== undefined) {
+			this.fontSize = vscode.workspace.getConfiguration('f18').get('fontSize') as number;
+			// vscode.window.showErrorMessage(`fontsize: ${this.fontSize}`);
+		}
 
 		this.panelNum = F18Panel.panelNum;
 		const currentPanelCaption = `F18 ${this.modul} - ${this.panelNum}`;
 		F18Panel.panelNum++;
 
-		this.panel = vscode.window.createWebviewPanel(F18Panel.viewType, currentPanelCaption, column, {
-			enableScripts: true, // Enable javascript in the webview
-			retainContextWhenHidden: true,
+		this.panel = vscode.window.createWebviewPanel(
+			F18Panel.viewType,
+			currentPanelCaption,
+			{ viewColumn: column, preserveFocus: false },
+			{
+				enableScripts: true, // Enable javascript in the webview
+				retainContextWhenHidden: true,
 
-			// And restric the webview to only loading content from our extension's `media` directory.
-			localResourceRoots: [
-				vscode.Uri.file(path.join(this.extensionPath, 'cli')),
-				vscode.Uri.file(path.join(this.extensionPath, 'build'))
-			]
-		});
+				// And restric the webview to only loading content from our extension's `media` directory.
+				localResourceRoots: [
+					vscode.Uri.file(path.join(this.extensionPath, 'cli')),
+					vscode.Uri.file(path.join(this.extensionPath, 'build'))
+				]
+			}
+		);
 		this.panel.webview.html = this._getHtmlForWebview();
 
-		this.terminal = vscode.window.createTerminal(currentPanelCaption);
+		this.terminal = vscode.window.createTerminal(currentPanelCaption, shell());
 		this.terminal.processId.then(
 			(processId) => {
 				// vscode.window.showInformationMessage( `kreiran terminal ${processId}`);
-				this.setupTerminal();
+				this.configureTerminal();
 			},
 			() => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
 		);
-
 	}
 
-
-	public setupTerminal() {
-
+	public configureTerminal() {
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programatically
 		this.panel.onDidDispose(() => this.dispose());
 
 		// Handle messages from the webview
-		this.panel.webview.onDidReceiveMessage(
-			(message: any) => {
-				switch (message.command) {
-					case 'alert':
-						vscode.window.showErrorMessage(message.data);
-						return;
-					case 'cli-focus':
-						// if (this.terminal) this.terminal.sendText(message.data);
+		this.panel.webview.onDidReceiveMessage((message: any) => {
+			switch (message.command) {
+				case 'alert':
+					vscode.window.showErrorMessage(message.data);
+					break;
+
+				case 'cli-dimensions':
+					this.computeDimensions(message.data);
+
+				case 'cli-focus':
+					// if (this.terminal) this.terminal.sendText(message.data);
+					// @ts-ignore
+					this.terminal.resize(this.cols, this.rows);
+					// vscode.window.showInformationMessage(`cli-focus: resize ${this.cols} x ${this.rows}`);
+					break;
+
+				case 'cli-input':
+					if (this.terminal) {
 						// @ts-ignore
-						this.terminal.resize(this.cols, this.rows);
-						vscode.window.showInformationMessage(`cli-focus: resize ${this.cols} x ${this.rows}`);
-
-
-						return;
-					case 'cli-input':
-
-					    if (this.terminal) {
-							// @ts-ignore
-							this.terminal.sendText(message.data, false);
-						}
-					    // console.log(`cli-input: ${message.data}`);
-				}
+						this.terminal.sendText(message.data, false);
+					}
+				// console.log(`cli-input: ${message.data}`);
 			}
-		);
+		});
 
+		const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
+		const configMerged = { ...config, rendererType: RENDERER_TYPE, fontFamily: FONT_FAMILY, letterSpacing: LETTER_SPACING, lineHeight: LINE_HEIGHT }
+
+		this.panel.webview.postMessage({
+			command: 'term-get-dimensions',
+			data: JSON.stringify(configMerged)
+		});
+	}
+
+	public computeDimensions(msg_data: string) {
+
+		const dims = JSON.parse(msg_data);
+		this.width = dims.width;
+		this.height = dims.height;
+
+		this.rows = dims.rows;
+		this.cols = dims.cols;
+		// vscode.window.showInformationMessage(`rows: ${this.rows}, cols: ${this.cols}`);
+
+		this.setupTerminal();
+	}
+
+	public setupTerminal() {
 		(this.terminal as any).onDidWriteData((data: string) => {
 			// console.log('onDidWriteData: ' + data);
 			this.doTerminalWrite(data);
 		});
+
 		// kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
 		this.terminal.show(true);
 		// @ts-ignore
@@ -141,19 +186,17 @@ class F18Panel {
 		let sendInitCmds: string;
 
 		if (is_windows()) {
-			sendInitCmds = `mode con: cols=${this.cols} lines=${this.rows} & cd ${this.extensionPath}\\win32 & F18.exe 2>${this.modul}_${this
-					.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this
-					.modul} & exit`
+			sendInitCmds = `mode con: cols=${this.cols} lines=${this.rows}`;
+			sendInitCmds += `& cd ${this.extensionPath}\\win32`;
+			// sendInitCmds += `& F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`
+			// sendInitCmds += '& exit';
 		} else {
-
-			sendInitCmds = `stty cols ${this.cols} rows ${this.rows} ; cd ${this.extensionPath}/linux ; ./F18 2>${this.modul}_${this
-					.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this
-					.modul} ; exit`
-
-			//sendInitCmds = `cd ${this.extensionPath}/linux ; ./F18 2>${this.modul}_${this
-			//		.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this
-			//		.modul} ; exit`
-
+			sendInitCmds = `stty cols ${this.cols} rows ${this.rows}`;
+			sendInitCmds += `; reset`;
+			sendInitCmds += `; cd ${this.extensionPath}/linux`;
+			sendInitCmds += `; ./F18 2>${this.modul}_${this
+				.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
+			sendInitCmds += '; exit';
 		}
 
 		vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
@@ -164,32 +207,32 @@ class F18Panel {
 		});
 
 		const termOptions = {
-			cols: 120,
-			rows: 40,
+			cols: this.cols,
+			rows: this.rows,
 			cursorBlink: true,
 			bellStyle: 'sound',
-			// cursorStyel: 'block',
-			rendererType: 'canvas',
-			// renderType: 'dom',
-			fontFamily: "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+			cursorStyle: 'block',
+			// cursorStyle: 'underline',
+			// cursorStyle: 'bar',
+			// rendererType: 'canvas',
+			rendererType: RENDERER_TYPE,
+			experimentalCharAtlas: 'dynamic',
+			fontFamily: FONT_FAMILY,
 
 			//fontSize: 12,
 			//letterSpacing: 0,
 			//lineHeight: 0.99
-
-			fontSize: 14,
-			letterSpacing: 0,
-			lineHeight: 0.90
+			fontSize: this.fontSize,
+			letterSpacing: LETTER_SPACING,
+			lineHeight: LINE_HEIGHT,
+			termName: `F18 ${this.modul} - ${this.panelNum}`
 		};
 		this.panel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
-		// this.panel.webview.postMessage({ command: 'term-cmd', data: sendInitCmds });
 
 		this.terminal.sendText(sendInitCmds);
 	}
 
-
 	public dispose() {
-
 		F18Panel.currentPanel = undefined;
 		if (this.terminal) this.terminal.dispose();
 
@@ -202,7 +245,6 @@ class F18Panel {
 		// 		x.dispose();
 		// 	}
 		// }
-
 	}
 
 	public doTerminalWrite(data: string) {
@@ -268,7 +310,6 @@ class F18Panel {
 			<body>
 				<noscript>You need to enable JavaScript to run this app.</noscript>
 				<div id="root"></div>
-				<div id="example"></div>
 				<script nonce="${nonce}" src="${scriptReact1Uri}"></script>
 				<script nonce="${nonce}" src="${scriptReact2Uri}"></script>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
@@ -290,4 +331,12 @@ function getNonce() {
 
 function is_windows() {
 	return process.platform === 'win32';
+}
+
+function shell() {
+	if (is_windows()) {
+		return 'cmd.exe';
+	} else {
+		return '/bin/bash';
+	}
 }
