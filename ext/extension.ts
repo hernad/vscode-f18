@@ -57,12 +57,16 @@ class F18Panel {
 	private readonly modul: string;
 	private readonly f18Organizacija: string;
 	private readonly panelNum: number;
+	private cols: number;
+	private rows: number;
 
 	private constructor(cModul: string, cOrganizacija: string, extensionPath: string, column: vscode.ViewColumn) {
 		this.extensionPath = extensionPath;
 
 		this.modul = cModul;
 		this.f18Organizacija = cOrganizacija;
+		this.cols = 120;
+		this.rows = 40;
 
 		this.panelNum = F18Panel.panelNum;
 		const currentPanelCaption = `F18 ${this.modul} - ${this.panelNum}`;
@@ -105,17 +109,21 @@ class F18Panel {
 					case 'alert':
 						vscode.window.showErrorMessage(message.data);
 						return;
-					// case 'terminal-cmd':
+					case 'cli-focus':
 						// if (this.terminal) this.terminal.sendText(message.data);
+						// @ts-ignore
+						this.terminal.resize(this.cols, this.rows);
+						vscode.window.showInformationMessage(`cli-focus: resize ${this.cols} x ${this.rows}`);
+
+
 						return;
-					case 'terminal-input':
+					case 'cli-input':
 
 					    if (this.terminal) {
 							// @ts-ignore
-							this.terminal.resize(120, 40);
 							this.terminal.sendText(message.data, false);
 						}
-					    // console.log(`terminal-input: ${message.data}`);
+					    // console.log(`cli-input: ${message.data}`);
 				}
 			}
 		);
@@ -127,28 +135,25 @@ class F18Panel {
 		// kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
 		this.terminal.show(true);
 		// @ts-ignore
-		this.terminal.resize(120, 40);
+		this.terminal.resize(this.cols, this.rows);
 		this.terminal.hide();
-
-		// vscode.window.showInformationMessage("resize 120 x 40");
 
 		let sendInitCmds: string;
 
 		if (is_windows()) {
-			// vscode.window.showInformationMessage(`run cd ${this.extensionPath}\\win32 & F18.exe & exit`);
-			// this.terminal.sendText(`mode con: cols=120 lines=40 & cd ${this.extensionPath}\exe & F18.exe 2>F18.err.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul} & exit`);
-			//this.terminal.sendText(
-			sendInitCmds = `mode con: cols=120 lines=40 & cd ${this.extensionPath}\\win32 & F18.exe 2>${this.modul}_${this
+			sendInitCmds = `mode con: cols=${this.cols} lines=${this.rows} & cd ${this.extensionPath}\\win32 & F18.exe 2>${this.modul}_${this
 					.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this
 					.modul} & exit`
-			//);
 		} else {
-			// vscode.window.showInformationMessage(`run cd ${this.extensionPath}\\linux ; F18`);
-			// this.terminal.sendText(
-			sendInitCmds = `stty cols 120 rows 40 ; cd ${this.extensionPath}/linux ; ./F18 2>${this.modul}_${this
+
+			sendInitCmds = `stty cols ${this.cols} rows ${this.rows} ; cd ${this.extensionPath}/linux ; ./F18 2>${this.modul}_${this
 					.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this
 					.modul} ; exit`
-			// );
+
+			//sendInitCmds = `cd ${this.extensionPath}/linux ; ./F18 2>${this.modul}_${this
+			//		.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this
+			//		.modul} ; exit`
+
 		}
 
 		vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
@@ -162,9 +167,9 @@ class F18Panel {
 			cols: 120,
 			rows: 40,
 			cursorBlink: true,
-			// bellStyle: 'sound',
+			bellStyle: 'sound',
 			// cursorStyel: 'block',
-			//rendererType: 'canvas',
+			rendererType: 'canvas',
 			// renderType: 'dom',
 			fontFamily: "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
 

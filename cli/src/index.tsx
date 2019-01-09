@@ -307,28 +307,28 @@ window.addEventListener('message', (event) => {
 
 			term.on('key', (key: any, ev: any) => {
 				vscode.postMessage({
-					command: 'terminal-input',
+					command: 'cli-input',
 					data: key
 				});
 			});
 
 			document.getElementById('btn_k_f5').onclick = (event: any) => {
 				vscode.postMessage({
-					command: 'terminal-input',
+					command: 'cli-input',
 					data: '\x1b[15~' // K_F5
 				});
 				term.focus();
 			};
 			document.getElementById('btn_k_f8').onclick = (event: any) => {
 				vscode.postMessage({
-					command: 'terminal-input',
+					command: 'cli-input',
 					data: '\x1b[18~' // K_F8
 				});
 				term.focus();
 			};
 			document.getElementById('btn_k_ins').onclick = (event: any) => {
 				vscode.postMessage({
-					command: 'terminal-input',
+					command: 'cli-input',
 					data: '\x1b[2~' // INS
 				});
 				term.focus();
@@ -341,10 +341,13 @@ window.addEventListener('message', (event) => {
 			// term.toggleFullScreen(true);
 			term.on('focus', () => {
 				// console.log( `xterm ima focus rows: ${term.cols} cols: ${term.rows}`);
+				// vscode.postMessage({
+				// 	command: 'cli-input',
+				// 	// data: '\x1b[11~'  // K_F1
+				// 	data: '\x1b[24~' // K_F12
+				// });
 				vscode.postMessage({
-					command: 'terminal-input',
-					// data: '\x1b[11~'  // K_F1
-					data: '\x1b[24~' // K_F12
+					command: 'cli-focus'
 				});
 			});
 			term.focus();
