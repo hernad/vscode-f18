@@ -175,12 +175,6 @@ class F18Panel {
 						// Response:	CSI Pl; Pc R
 						// Pl	No. of lines
 						// Pc	No. of columns
-
-
-						// const pattern = new RegExp('\\x1b\\[\\d+;\\d+R');
-						// console.log(pattern.test('\x1b[2;2R'));
-
-
 						if ( (new RegExp("\\x1b\\[\\d+;\\d+R")).test(message.data)) {
 						   //vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
 						} else {
@@ -220,19 +214,19 @@ class F18Panel {
 			sendInitCmds.push('if %errorlevel% neq 0 exit');
 
 			sendInitCmds.push(`cd ${this.extensionPath}\\win32`);
-			sendInitCmds.push(
-				`F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
-					.f18Organizacija} --${this.modul} & exit`
-			);
+			//sendInitCmds.push(
+			//	`F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
+			//		.f18Organizacija} --${this.modul} & exit`
+			//);
 		} else {
 			sendInitCmds.push(`stty cols ${this.cols} rows ${this.rows}`);
 			sendInitCmds.push(`if stty size | grep '${this.rows} ${this.cols}' ; then echo size-ok; else exit 1; fi`);
 			sendInitCmds.push(`cd ${this.extensionPath}/linux`);
 			sendInitCmds.push(`clear`);
-			sendInitCmds.push(
-				`./F18 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
-					.f18Organizacija} --${this.modul}; exit`
-			);
+			// sendInitCmds.push(
+			// 	`./F18 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
+			// 		.f18Organizacija} --${this.modul}; exit`
+			// );
 		}
 
 		vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {

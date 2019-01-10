@@ -6,4 +6,5 @@ cli/node_modules
 !cli/node_modules/react/umd/*.min.js
 !cli/node_modules/react-dom/umd/*.min.js
 !cli/node_modules/vscode-xterm/lib/xterm.css
-
+linux
+win32
