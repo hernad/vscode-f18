@@ -213,7 +213,8 @@ class F18Panel {
 			);
 			sendInitCmds.push('if %errorlevel% neq 0 exit');
 
-			sendInitCmds.push(`cd ${this.extensionPath}\\win32`);
+			// sendInitCmds.push(`cd ${this.extensionPath}\\win32`);
+			sendInitCmds.push(`cd ${this.extensionPath}`);
 			//sendInitCmds.push(
 			//	`F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
 			//		.f18Organizacija} --${this.modul} & exit`
