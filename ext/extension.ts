@@ -3,12 +3,11 @@ import * as vscode from 'vscode';
 
 const LINE_HEIGHT = 0.92;
 const LETTER_SPACING = 0;
-const RENDERER_TYPE = 'canvas';  // 'dom' | 'canvas'
+const RENDERER_TYPE = 'canvas'; // 'dom' | 'canvas'
 
-const DEFAULT_WINDOWS_FONT_FAMILY = 'Consolas, \'Courier New\', monospace';
+const DEFAULT_WINDOWS_FONT_FAMILY = "Consolas, 'Courier New', monospace";
 // const DEFAULT_MAC_FONT_FAMILY = 'Menlo, Monaco, \'Courier New\', monospace';
-const DEFAULT_LINUX_FONT_FAMILY = '\'Droid Sans Mono\', \'monospace\', monospace, \'Droid Sans Fallback\'';
-
+const DEFAULT_LINUX_FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'";
 
 // /home/hernad/vscode/src/vs/editor/common/config/commonEditorConfig.ts
 
@@ -51,7 +50,6 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 class F18Panel {
-
 	public static currentPanel: F18Panel | undefined;
 
 	public static create(extensionPath: string, cModul: string, cOrganizacija: string) {
@@ -68,7 +66,7 @@ class F18Panel {
 	private readonly extensionPath: string;
 	// private disposables: vscode.Disposable[] = [];
 
-	private terminal: vscode.Terminal;
+	private terminalInstance: vscode.Terminal;
 	private readonly modul: string;
 	private readonly f18Organizacija: string;
 	private readonly panelNum: number;
@@ -90,7 +88,6 @@ class F18Panel {
 		this.height = 0;
 		this.fontSize = 16;
 
-
 		const tmpFS = vscode.workspace.getConfiguration('f18').get('fontSize');
 		if (tmpFS !== undefined) {
 			this.fontSize = tmpFS as number;
@@ -99,7 +96,9 @@ class F18Panel {
 
 		this.fontFamily = is_windows() ? DEFAULT_WINDOWS_FONT_FAMILY : DEFAULT_LINUX_FONT_FAMILY;
 		const tmpFF = vscode.workspace.getConfiguration('editor').get('fontFamily');
-		tmpFF !== undefined ? this.fontFamily = tmpFF as string : vscode.window.showErrorMessage('config editor.fontFamily?!');
+		tmpFF !== undefined
+			? (this.fontFamily = tmpFF as string)
+			: vscode.window.showErrorMessage('config editor.fontFamily?!');
 
 		this.panelNum = F18Panel.panelNum;
 		const currentPanelCaption = `F18 ${this.modul} - ${this.panelNum}`;
@@ -122,17 +121,29 @@ class F18Panel {
 		);
 		this.panel.webview.html = this._getHtmlForWebview();
 
-		this.terminal = vscode.window.createTerminal(currentPanelCaption, shell());
-		this.terminal.processId.then(
+		this.terminalInstance = vscode.window.createTerminal(currentPanelCaption, shell());
+		this.terminalInstance.processId.then(
 			(processId) => {
 				// vscode.window.showInformationMessage( `kreiran terminal ${processId}`);
-				this.configureTerminal();
+				this.configurePanel();
+				const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
+				const configMerged = {
+					...config,
+					rendererType: RENDERER_TYPE,
+					fontFamily: this.fontFamily,
+					letterSpacing: LETTER_SPACING,
+					lineHeight: LINE_HEIGHT
+				};
+				this.panel.webview.postMessage({
+					command: 'term-get-dimensions',
+					data: JSON.stringify(configMerged)
+				});
 			},
 			() => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
 		);
 	}
 
-	public configureTerminal() {
+	public configurePanel() {
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programatically
 		this.panel.onDidDispose(() => this.dispose());
@@ -146,34 +157,41 @@ class F18Panel {
 
 				case 'cli-dimensions':
 					this.computeDimensions(message.data);
+					this.createTerminal();
+					break;
 
 				case 'cli-focus':
 					// if (this.terminal) this.terminal.sendText(message.data);
 					// @ts-ignore
-					this.terminal.resize(this.cols, this.rows);
+					this.terminalInstance.resize(this.cols, this.rows);
 					// vscode.window.showInformationMessage(`cli-focus: resize ${this.cols} x ${this.rows}`);
 					break;
 
 				case 'cli-input':
-					if (this.terminal) {
-						// @ts-ignore
-						this.terminal.sendText(message.data, false);
+					if (this.terminalInstance) {
+						// https://www.vt100.net/docs/vt510-rm/chapter4.html#T4-5
+
+						// Cursor Position Report	CSI 6 n	same	same	CPR
+						// Response:	CSI Pl; Pc R
+						// Pl	No. of lines
+						// Pc	No. of columns
+
+
+						// const pattern = new RegExp('\\x1b\\[\\d+;\\d+R');
+						// console.log(pattern.test('\x1b[2;2R'));
+
+
+						if ( (new RegExp("\\x1b\\[\\d+;\\d+R")).test(message.data)) {
+						   //vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
+						} else {
+							this.terminalInstance.sendText(message.data, false);
+						}
 					}
-				// console.log(`cli-input: ${message.data}`);
 			}
-		});
-
-		const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
-		const configMerged = { ...config, rendererType: RENDERER_TYPE, fontFamily: this.fontFamily, letterSpacing: LETTER_SPACING, lineHeight: LINE_HEIGHT }
-
-		this.panel.webview.postMessage({
-			command: 'term-get-dimensions',
-			data: JSON.stringify(configMerged)
 		});
 	}
 
 	public computeDimensions(msg_data: string) {
-
 		const dims = JSON.parse(msg_data);
 		this.width = dims.width;
 		this.height = dims.height;
@@ -181,41 +199,45 @@ class F18Panel {
 		this.rows = dims.rows;
 		this.cols = dims.cols;
 		// vscode.window.showInformationMessage(`rows: ${this.rows}, cols: ${this.cols}`);
-
-		this.setupTerminal();
 	}
 
-	public setupTerminal() {
-		(this.terminal as any).onDidWriteData((data: string) => {
-			// console.log('onDidWriteData: ' + data);
-			this.doTerminalWrite(data);
-		});
-
+	public createTerminal() {
 		// kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
-		this.terminal.show(true);
+		this.terminalInstance.show(true);
 		// @ts-ignore
-		this.terminal.resize(this.cols, this.rows);
-		this.terminal.hide();
+		this.terminalInstance.resize(this.cols, this.rows);
+		this.terminalInstance.hide();
 
-		let sendInitCmds: string;
+		let sendInitCmds: string[] = [];
 
 		if (is_windows()) {
-			sendInitCmds = `mode con: cols=${this.cols} lines=${this.rows}`;
-			sendInitCmds += '& cls';
-			sendInitCmds += `& cd ${this.extensionPath}\\win32`;
-			sendInitCmds += `& F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`
-			sendInitCmds += '& exit';
+			sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
+			sendInitCmds.push('cls');
+			// ako mode con: => ... Lines: 3000 => exit
+			sendInitCmds.push(
+				'powershell "$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }"'
+			);
+			sendInitCmds.push('if %errorlevel% neq 0 exit');
+
+			sendInitCmds.push(`cd ${this.extensionPath}\\win32`);
+			sendInitCmds.push(
+				`F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
+					.f18Organizacija} --${this.modul} & exit`
+			);
 		} else {
-			sendInitCmds = `stty cols ${this.cols} rows ${this.rows}`;
-			sendInitCmds += `; reset`;
-			sendInitCmds += `; cd ${this.extensionPath}/linux`;
-			sendInitCmds += `; ./F18 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
-			sendInitCmds += '; exit';
+			sendInitCmds.push(`stty cols ${this.cols} rows ${this.rows}`);
+			sendInitCmds.push(`if stty size | grep '${this.rows} ${this.cols}' ; then echo size-ok; else exit 1; fi`);
+			sendInitCmds.push(`cd ${this.extensionPath}/linux`);
+			sendInitCmds.push(`clear`);
+			sendInitCmds.push(
+				`./F18 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
+					.f18Organizacija} --${this.modul}; exit`
+			);
 		}
 
 		vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
 			// vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
-			if (this.terminal && terminal.name == this.terminal.name) {
+			if (this.terminalInstance && terminal.name == this.terminalInstance.name) {
 				this.panel.dispose();
 			}
 		});
@@ -243,12 +265,19 @@ class F18Panel {
 		};
 		this.panel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
 
-		this.terminal.sendText(sendInitCmds);
+		sendInitCmds.forEach((element) => {
+			this.terminalInstance.sendText(element);
+		});
+
+		(this.terminalInstance as any).onDidWriteData((data: string) => {
+			// console.log('onDidWriteData: ' + data);
+			this.panel.webview.postMessage({ command: 'term-write', data });
+		});
 	}
 
 	public dispose() {
 		F18Panel.currentPanel = undefined;
-		if (this.terminal) this.terminal.dispose();
+		if (this.terminalInstance) this.terminalInstance.dispose();
 
 		// Clean up our resources
 		this.panel.dispose();
@@ -259,12 +288,6 @@ class F18Panel {
 		// 		x.dispose();
 		// 	}
 		// }
-	}
-
-	public doTerminalWrite(data: string) {
-		// Send a message to the webview webview.
-		// You can send any JSON serializable data.
-		this.panel.webview.postMessage({ command: 'term-write', data });
 	}
 
 	private _getHtmlForWebview() {

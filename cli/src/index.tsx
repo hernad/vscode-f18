@@ -382,9 +382,10 @@ window.addEventListener('message', (event) => {
 
 			// hvata sve evente - i keystrokes i mouse evente
 			term.on('data', (data: any) => {
+				// console.log(`cli-input: ${data}`);
 				vscode.postMessage({
 					command: 'cli-input',
-					data: data
+					data
 				});
 			});
 
