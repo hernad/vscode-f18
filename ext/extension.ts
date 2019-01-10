@@ -3,21 +3,29 @@ import * as vscode from 'vscode';
 
 const LINE_HEIGHT = 0.92;
 const LETTER_SPACING = 0;
-const FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'";
-const RENDERER_TYPE = 'dom';  // 'dom' | 'canvas'
+const RENDERER_TYPE = 'canvas';  // 'dom' | 'canvas'
+
+const DEFAULT_WINDOWS_FONT_FAMILY = 'Consolas, \'Courier New\', monospace';
+// const DEFAULT_MAC_FONT_FAMILY = 'Menlo, Monaco, \'Courier New\', monospace';
+const DEFAULT_LINUX_FONT_FAMILY = '\'Droid Sans Mono\', \'monospace\', monospace, \'Droid Sans Fallback\'';
+
+
+// /home/hernad/vscode/src/vs/editor/common/config/commonEditorConfig.ts
+
+// EDITOR_FONT_DEFAULTS.fontFamily
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('F18 ekstenzija aktivna :)');
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('f18.start.pos', () => {
-			F18Panel.createOrShow(context.extensionPath, 'pos', 'proba_2018');
+			F18Panel.create(context.extensionPath, 'pos', 'proba_2018');
 		}),
 		vscode.commands.registerCommand('f18.start.fin', () => {
-			F18Panel.createOrShow(context.extensionPath, 'fin', 'proba_2018');
+			F18Panel.create(context.extensionPath, 'fin', 'proba_2018');
 		}),
 		vscode.commands.registerCommand('f18.start.kalk', () => {
-			F18Panel.createOrShow(context.extensionPath, 'kalk', 'proba_2018');
+			F18Panel.create(context.extensionPath, 'kalk', 'proba_2018');
 		})
 	);
 
@@ -39,16 +47,14 @@ export function activate(context: vscode.ExtensionContext) {
 	setTimeout(() => {
 		const onStart = vscode.workspace.getConfiguration('f18').get('onStart');
 		vscode.commands.executeCommand(`f18.start.${onStart}`);
-	}, 700);
+	}, 1000);
 }
 
 class F18Panel {
-	/**
-	 * Track the currently panel. Only allow a single panel to exist at a time.
-	 */
+
 	public static currentPanel: F18Panel | undefined;
 
-	public static createOrShow(extensionPath: string, cModul: string, cOrganizacija: string) {
+	public static create(extensionPath: string, cModul: string, cOrganizacija: string) {
 		// const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 		const column = undefined;
 
@@ -70,6 +76,7 @@ class F18Panel {
 	private rows: number;
 	private width: number;
 	private height: number;
+	private fontFamily: string;
 	private fontSize: number;
 
 	private constructor(cModul: string, cOrganizacija: string, extensionPath: string, column: vscode.ViewColumn) {
@@ -82,10 +89,18 @@ class F18Panel {
 		this.width = 0;
 		this.height = 0;
 		this.fontSize = 16;
-		if (vscode.workspace.getConfiguration('f18').get('fontSize') !== undefined) {
-			this.fontSize = vscode.workspace.getConfiguration('f18').get('fontSize') as number;
+
+
+		const tmpFS = vscode.workspace.getConfiguration('f18').get('fontSize');
+		if (tmpFS !== undefined) {
+			this.fontSize = tmpFS as number;
 			// vscode.window.showErrorMessage(`fontsize: ${this.fontSize}`);
 		}
+
+		this.fontFamily = is_windows() ? DEFAULT_WINDOWS_FONT_FAMILY : DEFAULT_LINUX_FONT_FAMILY;
+		const tmp = vscode.workspace.getConfiguration('editor').get('fontFamily');
+		if (tmp !== undefined) this.fontFamily = tmp as string;
+
 
 		this.panelNum = F18Panel.panelNum;
 		const currentPanelCaption = `F18 ${this.modul} - ${this.panelNum}`;
@@ -150,7 +165,7 @@ class F18Panel {
 		});
 
 		const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
-		const configMerged = { ...config, rendererType: RENDERER_TYPE, fontFamily: FONT_FAMILY, letterSpacing: LETTER_SPACING, lineHeight: LINE_HEIGHT }
+		const configMerged = { ...config, rendererType: RENDERER_TYPE, fontFamily: this.fontFamily, letterSpacing: LETTER_SPACING, lineHeight: LINE_HEIGHT }
 
 		this.panel.webview.postMessage({
 			command: 'term-get-dimensions',
@@ -187,15 +202,15 @@ class F18Panel {
 
 		if (is_windows()) {
 			sendInitCmds = `mode con: cols=${this.cols} lines=${this.rows}`;
+			sendInitCmds += '& cls';
 			sendInitCmds += `& cd ${this.extensionPath}\\win32`;
-			// sendInitCmds += `& F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`
-			// sendInitCmds += '& exit';
+			sendInitCmds += `& F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`
+			sendInitCmds += '& exit';
 		} else {
 			sendInitCmds = `stty cols ${this.cols} rows ${this.rows}`;
 			sendInitCmds += `; reset`;
 			sendInitCmds += `; cd ${this.extensionPath}/linux`;
-			sendInitCmds += `; ./F18 2>${this.modul}_${this
-				.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
+			sendInitCmds += `; ./F18 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
 			sendInitCmds += '; exit';
 		}
 
@@ -217,7 +232,7 @@ class F18Panel {
 			// rendererType: 'canvas',
 			rendererType: RENDERER_TYPE,
 			experimentalCharAtlas: 'dynamic',
-			fontFamily: FONT_FAMILY,
+			fontFamily: this.fontFamily,
 
 			//fontSize: 12,
 			//letterSpacing: 0,
@@ -322,7 +337,7 @@ class F18Panel {
 
 function getNonce() {
 	let text = '';
-	const possible = 'AF18DEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012ea890';
+	const possible = 'AF18DEFGHIJK3-XQvabcdefghijklmnopqrstuvwxyz012ea890';
 	for (let i = 0; i < 32; i++) {
 		text += possible.charAt(Math.floor(Math.random() * possible.length));
 	}
