@@ -98,9 +98,8 @@ class F18Panel {
 		}
 
 		this.fontFamily = is_windows() ? DEFAULT_WINDOWS_FONT_FAMILY : DEFAULT_LINUX_FONT_FAMILY;
-		const tmp = vscode.workspace.getConfiguration('editor').get('fontFamily');
-		if (tmp !== undefined) this.fontFamily = tmp as string;
-
+		const tmpFF = vscode.workspace.getConfiguration('editor').get('fontFamily');
+		tmpFF !== undefined ? this.fontFamily = tmpFF as string : vscode.window.showErrorMessage('config editor.fontFamily?!');
 
 		this.panelNum = F18Panel.panelNum;
 		const currentPanelCaption = `F18 ${this.modul} - ${this.panelNum}`;
