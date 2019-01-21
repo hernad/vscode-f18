@@ -92,14 +92,13 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
                 readStream.on('end', () => {
                     // console.log("<EOF>");
                    progress.report({ increment, message: `unzipped: ${entry.fileName} : ${entry.uncompressedSize}` });
-                   setTimeout( () => {
+                   //debug
+                   //setTimeout( () => {
                      zipfile.readEntry();
-                   }, 300);
+                   //}, 500);
 
                 });
     
-                //stream.pipe(process.stdout);
-
                 let writeStream = fs.createWriteStream(path.join(destDir, entry.fileName));
 				incrementHandleCount();
                 writeStream.on('close', decrementHandleCount);

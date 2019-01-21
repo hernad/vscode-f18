@@ -57,7 +57,7 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
     //const destDir = path.join(tmpdir(), generateUuid());
     const destDir = path.join(Global.context.extensionPath, '..', options.packageName);
 
-    // vscode.window.showInformationMessage(destDir);
+    vscode.window.showInformationMessage(destDir);
 
     Helper.mkdirp(destDir, () => {
         //vscode.window.showInformationMessage(`destDir: ${destDir}`);
