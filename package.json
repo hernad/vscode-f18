@@ -1,81 +1,92 @@
 {
-  "name": "f18-klijent",
-  "version": "0.0.34",
-  "description": "F18 klijent",
-  "engines": {
-    "vscode": "^1.31.0"
-  },
-  "keywords": [
-    "F18", "eShell"
-  ],
-  "publisher": "bout",
-  "activationEvents": [
-    "*"
-  ],
-  "main": "./build/ext/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "f18.start.pos",
-        "title": "start POS",
-        "category": "F18"
-      },
-      {
-        "command": "f18.start.fin",
-        "title": "start FIN",
-        "category": "F18"
-      },
-      {
-        "command": "f18.start.kalk",
-        "title": "start KALK",
-        "category": "F18"
-      }
-    ],
-    "configuration": [
+	"name": "f18-klijent",
+	"version": "0.0.34",
+	"description": "F18 klijent",
+	"engines": {
+		"vscode": "^1.30.0"
+	},
+	"keywords": [
+		"F18",
+		"eShell"
+	],
+	"publisher": "bout",
+	"activationEvents": [
+		"*"
+	],
+	"main": "./build/ext/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "f18.start.pos",
+				"title": "start POS",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.fin",
+				"title": "start FIN",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.kalk",
+				"title": "start KALK",
+				"category": "F18"
+			}
+		],
+		"configuration": [
 			{
 				"title": "F18 podešenja",
 				"properties": {
 					"f18.onStart": {
-            "description": "F18 modul koji se inicijalno pokreće",
+						"description": "F18 modul koji se inicijalno pokreće",
 						"type": "string",
-            "default": "fin",
-            "enum": ["", "fin", "kalk", "pos"]
-          },
-          "f18.fullScreen": {
-            "description": "Koristiti čitav ekran",
-						"type": "boolean",
-            "default": true
+						"default": "fin",
+						"enum": [
+							"",
+							"fin",
+							"kalk",
+							"pos"
+						]
 					},
-          "f18.fontSize": {
-            "description": "F18 font veličina",
+					"f18.fullScreen": {
+						"description": "Koristiti čitav ekran",
+						"type": "boolean",
+						"default": true
+					},
+					"f18.fontSize": {
+						"description": "F18 font veličina",
 						"type": "number",
-            "default": 16
-          }
+						"default": 16
+					}
 				}
 			}
 		]
-  },
-  "dependencies": {
-    "vscode": "^1.1.26"
-  },
-  "scripts": {
-    "node_modules": "cd cli && yarn && cd .. && yarn",
-    "build": "cd cli && webpack && cd .. && tsc -p tsconfig.json",
-    "vscode:prepublish": "cd cli && webpack && cd .. && tsc -p tsconfig.json",
-    "postinstall": "node ./node_modules/vscode/bin/install"
-  },
-  "devDependencies": {
-    "@types/jest": "^22.2.3",
-    "@types/node": "^10.1.2",
-    "@types/react": "^16.7.12",
-    "@types/react-dom": "^16.0.11",
-    "awesome-typescript-loader": "^5.2.1",
-    "shelljs": "^0.8.3",
-    "source-map-loader": "^0.2.4",
-    "typescript": "^3.2.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hernad/vscode-f18"
-  }
+	},
+	"dependencies": {
+		"vscode": "^1.1.26"
+	},
+	"scripts": {
+		"node_modules": "cd cli && yarn && cd .. && yarn",
+		"build": "cd cli && webpack && cd .. && tsc -p tsconfig.json",
+		"vscode:prepublish": "cd cli && webpack && cd .. && tsc -p tsconfig.json",
+		"postinstall": "node ./node_modules/vscode/bin/install"
+	},
+	"devDependencies": {
+		"@types/jest": "^22.2.3",
+		"@types/node": "^10.1.2",
+		"@types/react": "^16.7.12",
+		"@types/react-dom": "^16.0.11",
+		"awesome-typescript-loader": "^5.2.1",
+		"shelljs": "^0.8.3",
+		"source-map-loader": "^0.2.4",
+		"typescript": "^3.2.1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hernad/vscode-f18"
+	},
+	"__metadata": {
+		"id": "c4d5e082-cad8-4946-9c01-282a049f8afd",
+		"publisherDisplayName": "bring.out doo Sarajevo",
+		"publisherId": "c96dd534-07ec-488e-ba11-b474391a086c"
+	}
 }
