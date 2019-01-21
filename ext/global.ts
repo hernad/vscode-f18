@@ -2,9 +2,8 @@
 import * as keytarType from 'keytar';
 import * as yauzlType from 'yauzl';
 // import * as httpType from 'http-proxy-agent';
+// @ts-ignore
 import * as httpsType from 'https-proxy-agent';
-
-
 import { Constants } from './constants'
 import * as vscode from 'vscode';
 
@@ -126,7 +125,7 @@ export class Global {
   //public static httpProxyAgent: typeof httpType = getCoreNodeModule('http-proxy-agent');
   public static httpsProxyAgent: typeof httpsType = getCoreNodeModule('https-proxy-agent');
   
-  public static context: vscode.ExtensionContext = null;
+  public static context: vscode.ExtensionContext;
 
   public static get Configuration(): vscode.WorkspaceConfiguration {
     return vscode.workspace.getConfiguration(Constants.ExtensionId);

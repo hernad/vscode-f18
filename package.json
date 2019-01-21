@@ -73,10 +73,12 @@
 	},
 	"devDependencies": {
 		"@types/jest": "^22.2.3",
+		"@types/keytar": "^4.0.1",
 		"@types/node": "^10.1.2",
 		"@types/react": "^16.7.12",
 		"@types/react-dom": "^16.0.11",
 		"@types/rimraf": "^2.0.2",
+		"@types/yauzl": "^2.9.1",
 		"awesome-typescript-loader": "^5.2.1",
 		"shelljs": "^0.8.3",
 		"source-map-loader": "^0.2.4",

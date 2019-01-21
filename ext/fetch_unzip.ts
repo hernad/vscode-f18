@@ -7,7 +7,6 @@ import { Helper } from './helper';
 import { Fetcher } from './fetcher';
 import { unzip } from './unzip';
 
-
 /*
  
 const options = {
@@ -29,7 +28,6 @@ export function vscodeFetchUnzip( options: any = {}) {
 
         progress.report({ increment: 0 });
 
-
         var p = new Promise((resolve, reject) => {
             //resolve = () => { vscode.window.showInformationMessage('resolve funkcija!!')};
             token.onCancellationRequested(() => {
@@ -50,8 +48,6 @@ export function vscodeFetchUnzip( options: any = {}) {
         });
 
         return p;
-
-
     });
 }
 
