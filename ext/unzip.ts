@@ -13,7 +13,7 @@ type revisionInfoType = { revision: string, executablePath: string, folderPath: 
 
 const yauzl = Global.yauzl;
 
-let yauzlOpen = promisify(yauzl.open);
+let yauzlOpen = Helper.promisify(yauzl.open);
 
 // https://github.com/thejoshwolfe/yauzl/blob/master/examples/unzip.js
 
@@ -34,7 +34,7 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
 
      // vscode.window.showInformationMessage(destDir);
 
-     mkdirp(destDir,() => {
+     Helper.mkdirp(destDir,() => {
          //vscode.window.showInformationMessage(`destDir: ${destDir}`);
      });
  
@@ -127,7 +127,7 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
     // progress.report({ increment: 100, message: "End" });
 
     // vscode.window.showInformationMessage(`number of entries: ${zipfile.entryCount}`);
-    let openReadStream = promisify(zipfile.openReadStream.bind(zipfile));
+    let openReadStream = Helper.promisify(zipfile.openReadStream.bind(zipfile));
     //let openReadStream = promisify(zipfile.openReadStream);
     
     let count = 0;
@@ -136,7 +136,7 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
     
     //zipfile.on('error')
 
-    zipfile.on('entry', async(entry) => {
+    zipfile.on('entry', async(entry: any) => {
         
         let increment = Math.round(1/zipfile.entryCount * 100);
 
@@ -147,13 +147,13 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
             // vscode.window.showInformationMessage( `/ directory:  ${entry.fileName}`);
             progress.report({ increment, message: `dir: ${entry.fileName}` });
 
-			mkdirp(path.join(destDir, entry.fileName), async () => {
+			Helper.mkdirp(path.join(destDir, entry.fileName), async () => {
                 // if (err) throw err;
                 zipfile.readEntry();
 			});
 		} else {
 			// ensure parent directory exists
-			mkdirp(path.join(destDir, path.dirname(entry.fileName)), async () => {
+			Helper.mkdirp(path.join(destDir, path.dirname(entry.fileName)), async () => {
                 // vscode.window.showInformationMessage(`file: ${entry.fileName}`);
                 
                 let readStream: any = await openReadStream(entry);
@@ -172,86 +172,8 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
 				incrementHandleCount();
                 writeStream.on('close', decrementHandleCount);
                 
-                //let filter = new Transform();
-				//filter._transform = function(chunk, encoding, cb) {
-				//	//byteCount += chunk.length;
-				//	cb(null, chunk);
-                //};
-                    
-                    // filter._flush
-					//filter._final = function(cb) {
-						// clearInterval(progressInterval);
-						// reportString('');
-						// delete the "..."
-						// process.stdout.write('\b \b\b \b\b \b\n');
-						//cb();
-                        //setTimeout(() => {
-                        //    console.log('cek 2sec');
-                        //    zipfile.readEntry();
-                        //}, 2000);
-					//};
-
-                //readStream.pipe(filter).pipe(writeStream);
                 readStream.pipe(writeStream);
                     
-                /*
-				zipfile.openReadStream(entry, function(err, readStream) {
-					if (err) throw err;
-					// report progress through large files
-					var byteCount = 0;
-                    var totalBytes = entry.uncompressedSize;
-                    // progress.report({ increment, message: `file: ${entry.fileName} : ${entry.uncompressedSize}` });
-
-
-					// var lastReportedString = byteCount + '/' + totalBytes + '  0%';
-					// process.stdout.write(entry.fileName + '...' + lastReportedString);
-                    // vscode.window.showInformationMessage(entry.fileName + '...' + lastReportedString);
-                    
-                    
-                    // function reportString(msg) {
-					// 	var clearString = '';
-					// 	for (var i = 0; i < lastReportedString.length; i++) {
-					// 		clearString += '\b';
-					// 		if (i >= msg.length) {
-					// 			clearString += ' \b';
-					// 		}
-					// 	}
-					// 	process.stdout.write(clearString + msg);
-					// 	lastReportedString = msg;
-                    // }
-                    
-                    
-					// report progress at 60Hz
-					// var progressInterval = setInterval(function() {
-					//	reportString(byteCount + '/' + totalBytes + '  ' + ((byteCount / totalBytes * 100) | 0) + '%');
-                    //}, 1000 / 60);
-                    
-					let filter = new Transform();
-					filter._transform = function(chunk, encoding, cb) {
-						byteCount += chunk.length;
-						cb(null, chunk);
-                    };
-                    
-                    // filter._flush
-					filter._final = function(cb) {
-						// clearInterval(progressInterval);
-						// reportString('');
-						// delete the "..."
-						// process.stdout.write('\b \b\b \b\b \b\n');
-						cb();
-                        setTimeout(() => {
-                            console.log('cek 2sec');
-                            zipfile.readEntry();
-                        }, 2000);
-					};
-
-					// pump file contents
-					var writeStream = fs.createWriteStream(entry.fileName);
-					incrementHandleCount();
-					writeStream.on('close', decrementHandleCount);
-					readStream.pipe(filter).pipe(writeStream);
-                });
-                */
 			});
 		}
     });

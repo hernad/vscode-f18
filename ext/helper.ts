@@ -16,6 +16,9 @@
 
 // https://github.com/GoogleChrome/puppeteer/blob/master/lib/helper.js
 
+import * as fs from 'fs';
+import * as path from 'path';
+
 const { TimeoutError } = require('./errors');
 
 //const debugError = require('debug')(`puppeteer:error`);
@@ -102,12 +105,12 @@ export class Helper {
 	}
 
 
-   /**
-   * @param {!NodeJS.EventEmitter} emitter
-   * @param {(string|symbol)} eventName
-   * @param {function(?):void} handler
-   * @return {{emitter: !NodeJS.EventEmitter, eventName: (string|symbol), handler: function(?)}}
-   */
+	/**
+	* @param {!NodeJS.EventEmitter} emitter
+	* @param {(string|symbol)} eventName
+	* @param {function(?):void} handler
+	* @return {{emitter: !NodeJS.EventEmitter, eventName: (string|symbol), handler: function(?)}}
+	*/
 	static addEventListener(emitter: any, eventName: any, handler: any) {
 		emitter.on(eventName, handler);
 		return { emitter, eventName, handler };
@@ -162,6 +165,20 @@ export class Helper {
 		return promisified;
 	}
 
+
+	/*
+	static promisify(api: any) {
+		return function(...args) {
+			return new Promise(function(resolve, reject) {
+				api(...args, function(err, response) {
+					if (err) return reject(err);
+					resolve(response);
+				});
+			});
+		};
+	}
+	*/
+
 	/**
    * @param {!NodeJS.EventEmitter} emitter
    * @param {(string|symbol)} eventName
@@ -186,7 +203,7 @@ export class Helper {
 			}, timeout);
 		}
 		function cleanup() {
-			Helper.removeEventListeners([ listener ]);
+			Helper.removeEventListeners([listener]);
 			clearTimeout(eventTimeout);
 		}
 		return promise;
@@ -205,11 +222,26 @@ export class Helper {
 		const timeoutPromise = new Promise((resolve, x) => (reject = x));
 		const timeoutTimer = setTimeout(() => reject(timeoutError), timeout);
 		try {
-			return await Promise.race([ promise, timeoutPromise ]);
+			return await Promise.race([promise, timeoutPromise]);
 		} finally {
 			clearTimeout(timeoutTimer);
 		}
 	}
+
+
+	static mkdirp(dir: string, cb: any) {
+		if (dir === '.') return cb();
+		fs.stat(dir, function (err) {
+			if (err == null) return cb(); // already exists
+
+			var parent = path.dirname(dir);
+			Helper.mkdirp(parent, function () {
+				process.stdout.write(dir.replace(/\/$/, '') + '/\n');
+				fs.mkdir(dir, cb);
+			});
+		});
+	}
+
 }
 
 export function assert(value: any, message: string) {
