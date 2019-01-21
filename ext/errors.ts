@@ -22,5 +22,4 @@ class CustomError extends Error {
   }
 }
 
-
 export class TimeoutError extends CustomError { }

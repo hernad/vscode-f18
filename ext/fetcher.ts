@@ -4,17 +4,13 @@ import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Global } from './global';
-
-// const extract = require('extract-zip');
 import * as util from 'util';
 import * as URL from 'url';
 import * as removeRecursive from 'rimraf';
-import * as vscode from 'vscode';
 
-import { exec } from 'child_process';
+//import { exec } from 'child_process';
 
 const { Helper, assert } = require('./helper');
-
 const ProxyAgent = Global.httpsProxyAgent;
 
 // @ts-ignore
@@ -27,37 +23,20 @@ const mkdirAsync = Helper.promisify(fs.mkdir.bind(fs));
 const unlinkAsync = Helper.promisify(fs.unlink.bind(fs));
 
 
-
 type progressCallbackType = (num1: number, num2: number) => void;
 type revisionInfoType = { revision: string, executablePath: string, folderPath: string, local: boolean, url: string, zipPath: string };
 
-/*
-function archiveName(platform: string, revision:string): string {
-	if (platform === 'linux') return 'chrome-linux';
-	if (platform === 'mac') return 'chrome-mac';
-	if (platform === 'win32' || platform === 'win64') {
-		// Windows archive name changed at r591479.
-		return parseInt(revision, 10) > 591479 ? 'chrome-win' : 'chrome-win32';
-	}
-	return null;
-}
-*/
-
-function existsAsync(filePath: any) {
+function existsAsync(filePath: any): Promise<any> {
 	let fulfill: any = null;
 	const promise = new Promise((x) => (fulfill = x));
 	fs.access(filePath, (err) => fulfill(!err));
 	return promise;
 }
 
-
 function downloadURL(host: string, platform: string, packageName: string, revision:string): string {
-
 	// https://dl.bintray.com/bringout/F18/F18-linux-x64_20190119.2.zip
-	return util.format('%s/%s/%s-%s_%s.zip', host, packageName, packageName, platform, revision);
-		
+	return util.format('%s/%s/%s-%s_%s.zip', host, packageName, packageName, platform, revision);	
 }
-
 
 function httpRequest(url: string, method: string, response: any) {
 
@@ -120,8 +99,6 @@ function downloadFile(url: string, destinationPath: string, progressCallback: pr
 	}
 }
 
-
-
 export class Fetcher {
 	private _downloadsFolder: string;
 	private _downloadHost: string;
@@ -167,7 +144,6 @@ export class Fetcher {
 	public async download(revision: string, progressCallback: progressCallbackType): Promise<revisionInfoType> {
 		const url = downloadURL(this._downloadHost, this._platform, this._packageName, revision);
 
-		
 
 		const {folderPath, executablePath} = this.revisionInfo(revision);
 		if (await existsAsync(folderPath) && await existsAsync(executablePath)) // revision already exists
@@ -203,7 +179,7 @@ export class Fetcher {
 	}
 	
 	// lista lokalnih verzija
-	async localRevisions(): Promise<string[]> {
+	public async localRevisions(): Promise<string[]> {
 		if (!await existsAsync(this._downloadsFolder)) return [];
 		const fileNames = await readdirAsync(this._downloadsFolder);
 		return fileNames
@@ -213,7 +189,7 @@ export class Fetcher {
 	}
 
 	
-	async remove(revision: string) {
+	public async remove(revision: string) {
 		const folderPath = this._getFolderPath(revision);
 		assert(await existsAsync(folderPath), `Failed to remove: revision ${revision} is not downloaded`);
 		await new Promise((fulfill) => {
@@ -223,7 +199,7 @@ export class Fetcher {
 	}
 
 
-	revisionInfo(revision: string): revisionInfoType {
+	public revisionInfo(revision: string): revisionInfoType {
 		const folderPath = this._getFolderPath(revision);
 		
 		
@@ -231,7 +207,6 @@ export class Fetcher {
 		executablePath = path.join(folderPath, this._packageName);  // F18-windows-linux-x64_20199119.2/F18
 
 		if (this._platform === 'windows-x86' || this._platform === 'windows-x64')
-			// executablePath = path.join(folderPath, archiveName(this._platform, revision), this._packageName + '.exe');
 			executablePath += '.exe';
 		
 

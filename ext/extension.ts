@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { Global } from './global';
 
 const LINE_HEIGHT = 0.92;
 const LETTER_SPACING = 0;
@@ -15,6 +16,8 @@ const DEFAULT_LINUX_FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'D
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('F18 ekstenzija aktivna :)');
+
+	Global.context = context;
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('f18.start.pos', () => {
@@ -175,8 +178,8 @@ class F18Panel {
 						// Response:	CSI Pl; Pc R
 						// Pl	No. of lines
 						// Pc	No. of columns
-						if ( (new RegExp("\\x1b\\[\\d+;\\d+R")).test(message.data)) {
-						   //vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
+						if ((new RegExp("\\x1b\\[\\d+;\\d+R")).test(message.data)) {
+							//vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
 						} else {
 							this.terminalInstance.sendText(message.data, false);
 						}
