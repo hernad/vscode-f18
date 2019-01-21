@@ -62,6 +62,7 @@
 		]
 	},
 	"dependencies": {
+		"rimraf": "^2.6.3",
 		"vscode": "^1.1.26"
 	},
 	"scripts": {
@@ -75,6 +76,7 @@
 		"@types/node": "^10.1.2",
 		"@types/react": "^16.7.12",
 		"@types/react-dom": "^16.0.11",
+		"@types/rimraf": "^2.0.2",
 		"awesome-typescript-loader": "^5.2.1",
 		"shelljs": "^0.8.3",
 		"source-map-loader": "^0.2.4",
