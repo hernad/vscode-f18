@@ -18,9 +18,9 @@ const options = {
  fetchUnzip(options);
 
 */
-export function vscodeFetchUnzip( options: any = {}) {
+export function vscodeFetchUnzip( options: any = {}): Thenable<{}> {
 
-    vscode.window.withProgress({
+    return vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: "Download & Unzip",
         cancellable: true
