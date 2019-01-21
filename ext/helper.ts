@@ -21,13 +21,14 @@ const { TimeoutError } = require('./errors');
 //const debugError = require('debug')(`puppeteer:error`);
 
 /** @type {?Map<string, boolean>} */
-let apiCoverage = null;
+let apiCoverage: any = null;
 
 /**
  * @param {!Object} classType
  * @param {string=} publicName
  */
-function traceAPICoverage(classType, publicName) {
+/*
+function traceAPICoverage(classType: any, publicName: any) {
 	if (!apiCoverage) return;
 
 	let className = publicName || classType.prototype.constructor.name;
@@ -42,7 +43,7 @@ function traceAPICoverage(classType, publicName) {
 		)
 			continue;
 		apiCoverage.set(`${className}.${methodName}`, false);
-		Reflect.set(classType.prototype, methodName, function(...args) {
+		Reflect.set(classType.prototype, methodName, function(...args: any[]) {
 			apiCoverage.set(`${className}.${methodName}`, true);
 			return method.call(this, ...args);
 		});
@@ -53,12 +54,13 @@ function traceAPICoverage(classType, publicName) {
 		//for (const event of Object.values(classType.Events))
 		for (const event of events) apiCoverage.set(`${className}.emit(${JSON.stringify(event)})`, false);
 		const method = Reflect.get(classType.prototype, 'emit');
-		Reflect.set(classType.prototype, 'emit', function(event, ...args) {
+		Reflect.set(classType.prototype, 'emit', function(event: any, ...args: any[]) {
 			if (this.listenerCount(event)) apiCoverage.set(`${className}.emit(${JSON.stringify(event)})`, true);
 			return method.call(this, event, ...args);
 		});
 	}
 }
+*/
 
 export class Helper {
 	/**
@@ -66,7 +68,7 @@ export class Helper {
    * @param {!Array<*>} args
    * @return {string}
    */
-	static evaluationString(fun, ...args): string {
+	static evaluationString(fun: any, ...args: any[]): string {
 		if (Helper.isString(fun)) {
 			assert(args.length === 0, 'Cannot evaluate a string with arguments');
 			return /** @type {string} */ fun;
@@ -77,7 +79,7 @@ export class Helper {
      * @param {*} arg
      * @return {string}
      */
-		function serializeArgument(arg) {
+		function serializeArgument(arg: any) {
 			if (Object.is(arg, undefined)) return 'undefined';
 			return JSON.stringify(arg);
 		}
@@ -87,7 +89,7 @@ export class Helper {
    * @param {!Protocol.Runtime.ExceptionDetails} exceptionDetails
    * @return {string}
    */
-	static getExceptionMessage(exceptionDetails) {
+	static getExceptionMessage(exceptionDetails: any) {
 		if (exceptionDetails.exception)
 			return exceptionDetails.exception.description || exceptionDetails.exception.value;
 		let message = exceptionDetails.text;
@@ -105,7 +107,7 @@ export class Helper {
    * @param {!Protocol.Runtime.RemoteObject} remoteObject
    * @return {*}
    */
-	static valueFromRemoteObject(remoteObject) {
+	static valueFromRemoteObject(remoteObject: any) {
 		assert(!remoteObject.objectId, 'Cannot extract value when objectId is given');
 		if (remoteObject.unserializableValue) {
 			switch (remoteObject.unserializableValue) {
@@ -128,9 +130,9 @@ export class Helper {
    * @param {!Puppeteer.CDPSession} client
    * @param {!Protocol.Runtime.RemoteObject} remoteObject
    */
-	static async releaseObject(client, remoteObject) {
+	static async releaseObject(client: any, remoteObject: any) {
 		if (!remoteObject.objectId) return;
-		await client.send('Runtime.releaseObject', { objectId: remoteObject.objectId }).catch((error) => {
+		await client.send('Runtime.releaseObject', { objectId: remoteObject.objectId }).catch((error: any) => {
 			// Exceptions might happen in case of a page been navigated or closed.
 			// Swallow these since they are harmless and we don't leak anything in this case.
 			//debugError(error);
@@ -141,7 +143,8 @@ export class Helper {
    * @param {!Object} classType
    * @param {string=} publicName
    */
-	static tracePublicAPI(classType, publicName) {
+  /*
+	static tracePublicAPI(classType: any, publicName: any) {
 		for (const methodName of Reflect.ownKeys(classType.prototype)) {
 			const method = Reflect.get(classType.prototype, methodName);
 			if (
@@ -152,9 +155,9 @@ export class Helper {
 				method.constructor.name !== 'AsyncFunction'
 			)
 				continue;
-			Reflect.set(classType.prototype, methodName, function(...args) {
-				const syncStack = new Error();
-				return method.call(this, ...args).catch((e) => {
+			Reflect.set(classType.prototype, methodName, function(...args: any[]) {
+				const syncStack: any = new Error();
+				return method.call(this, ...args).catch((e: any) => {
 					const stack = syncStack.stack.substring(syncStack.stack.indexOf('\n') + 1);
 					const clientStack = stack.substring(stack.indexOf('\n'));
 					if (!e.stack.includes(clientStack)) e.stack += '\n  -- ASYNC --\n' + stack;
@@ -163,8 +166,9 @@ export class Helper {
 			});
 		}
 
-		traceAPICoverage(classType, publicName);
+		//traceAPICoverage(classType, publicName);
 	}
+*/
 
 	/**
    * @param {!NodeJS.EventEmitter} emitter
@@ -172,7 +176,7 @@ export class Helper {
    * @param {function(?):void} handler
    * @return {{emitter: !NodeJS.EventEmitter, eventName: (string|symbol), handler: function(?)}}
    */
-	static addEventListener(emitter, eventName, handler) {
+	static addEventListener(emitter: any, eventName: any, handler: any) {
 		emitter.on(eventName, handler);
 		return { emitter, eventName, handler };
 	}
@@ -180,7 +184,7 @@ export class Helper {
 	/**
    * @param {!Array<{emitter: !NodeJS.EventEmitter, eventName: (string|symbol), handler: function(?):void}>} listeners
    */
-	static removeEventListeners(listeners) {
+	static removeEventListeners(listeners: any) {
 		for (const listener of listeners) listener.emitter.removeListener(listener.eventName, listener.handler);
 		listeners.splice(0, listeners.length);
 	}
@@ -200,7 +204,7 @@ export class Helper {
    * @param {!Object} obj
    * @return {boolean}
    */
-	static isString(obj) {
+	static isString(obj: any) {
 		return typeof obj === 'string' || obj instanceof String;
 	}
 
@@ -208,14 +212,14 @@ export class Helper {
    * @param {!Object} obj
    * @return {boolean}
    */
-	static isNumber(obj) {
+	static isNumber(obj: any) {
 		return typeof obj === 'number' || obj instanceof Number;
 	}
 
-	static promisify(nodeFunction) {
-		function promisified(...args) {
+	static promisify(nodeFunction: any) {
+		function promisified(...args: any[]) {
 			return new Promise((resolve, reject) => {
-				function callback(err, ...result) {
+				function callback(err: any, ...result: any[]) {
 					if (err) return reject(err);
 					if (result.length === 1) return resolve(result[0]);
 					return resolve(result);
@@ -232,13 +236,13 @@ export class Helper {
    * @param {function} predicate
    * @return {!Promise}
    */
-	static waitForEvent(emitter, eventName, predicate, timeout) {
-		let eventTimeout, resolveCallback, rejectCallback;
+	static waitForEvent(emitter: any, eventName: any, predicate: any, timeout: any) {
+		let eventTimeout: any, resolveCallback: any, rejectCallback: any;
 		const promise = new Promise((resolve, reject) => {
 			resolveCallback = resolve;
 			rejectCallback = reject;
 		});
-		const listener = Helper.addEventListener(emitter, eventName, (event) => {
+		const listener = Helper.addEventListener(emitter, eventName, (event: any) => {
 			if (!predicate(event)) return;
 			cleanup();
 			resolveCallback(event);
@@ -263,8 +267,8 @@ export class Helper {
    * @param {number} timeout
    * @return {!Promise<T>}
    */
-	static async waitWithTimeout(promise, taskName, timeout) {
-		let reject;
+	static async waitWithTimeout(promise: any, taskName: any, timeout: number) {
+		let reject: any;
 		const timeoutError = new TimeoutError(`waiting for ${taskName} failed: timeout ${timeout}ms exceeded`);
 		const timeoutPromise = new Promise((resolve, x) => (reject = x));
 		const timeoutTimer = setTimeout(() => reject(timeoutError), timeout);
