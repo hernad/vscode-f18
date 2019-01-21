@@ -23,44 +23,6 @@ const { TimeoutError } = require('./errors');
 /** @type {?Map<string, boolean>} */
 let apiCoverage: any = null;
 
-/**
- * @param {!Object} classType
- * @param {string=} publicName
- */
-/*
-function traceAPICoverage(classType: any, publicName: any) {
-	if (!apiCoverage) return;
-
-	let className = publicName || classType.prototype.constructor.name;
-	className = className.substring(0, 1).toLowerCase() + className.substring(1);
-	for (const methodName of Reflect.ownKeys(classType.prototype)) {
-		const method = Reflect.get(classType.prototype, methodName);
-		if (
-			methodName === 'constructor' ||
-			typeof methodName !== 'string' ||
-			methodName.startsWith('_') ||
-			typeof method !== 'function'
-		)
-			continue;
-		apiCoverage.set(`${className}.${methodName}`, false);
-		Reflect.set(classType.prototype, methodName, function(...args: any[]) {
-			apiCoverage.set(`${className}.${methodName}`, true);
-			return method.call(this, ...args);
-		});
-	}
-
-	if (classType.Events) {
-		const events = Object.keys(classType.Events).map((key) => classType.Events[key]);
-		//for (const event of Object.values(classType.Events))
-		for (const event of events) apiCoverage.set(`${className}.emit(${JSON.stringify(event)})`, false);
-		const method = Reflect.get(classType.prototype, 'emit');
-		Reflect.set(classType.prototype, 'emit', function(event: any, ...args: any[]) {
-			if (this.listenerCount(event)) apiCoverage.set(`${className}.emit(${JSON.stringify(event)})`, true);
-			return method.call(this, event, ...args);
-		});
-	}
-}
-*/
 
 export class Helper {
 	/**
@@ -139,38 +101,8 @@ export class Helper {
 		});
 	}
 
-	/**
-   * @param {!Object} classType
-   * @param {string=} publicName
-   */
-  /*
-	static tracePublicAPI(classType: any, publicName: any) {
-		for (const methodName of Reflect.ownKeys(classType.prototype)) {
-			const method = Reflect.get(classType.prototype, methodName);
-			if (
-				methodName === 'constructor' ||
-				typeof methodName !== 'string' ||
-				methodName.startsWith('_') ||
-				typeof method !== 'function' ||
-				method.constructor.name !== 'AsyncFunction'
-			)
-				continue;
-			Reflect.set(classType.prototype, methodName, function(...args: any[]) {
-				const syncStack: any = new Error();
-				return method.call(this, ...args).catch((e: any) => {
-					const stack = syncStack.stack.substring(syncStack.stack.indexOf('\n') + 1);
-					const clientStack = stack.substring(stack.indexOf('\n'));
-					if (!e.stack.includes(clientStack)) e.stack += '\n  -- ASYNC --\n' + stack;
-					throw e;
-				});
-			});
-		}
 
-		//traceAPICoverage(classType, publicName);
-	}
-*/
-
-	/**
+   /**
    * @param {!NodeJS.EventEmitter} emitter
    * @param {(string|symbol)} eventName
    * @param {function(?):void} handler
