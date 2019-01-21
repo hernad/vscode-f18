@@ -6,7 +6,7 @@ import { Transform } from 'stream';
 import { inc } from 'semver';
 import { tmpdir } from 'os';
 import { generateUuid } from './uuid';
-import { BinaryFetcher } from './binary_fetcher';
+import { Fetcher } from './fetcher';
 import { Helper } from './helper';
 
 type revisionInfoType = { revision: string, executablePath: string, folderPath: string, local: boolean, url: string, zipPath: string };
@@ -27,7 +27,7 @@ export function unzipError() {
     
 }
 
-export async function download(options: any = {}, progress: vscode.Progress<{}>, resolve, error) {
+export async function download(options: any = {}, progress: vscode.Progress<{}>, resolve: any, error: any) {
 
      //const destDir = path.join(tmpdir(), generateUuid());
      const destDir = path.join(Global.context.extensionPath, '..', options.packageName);
@@ -40,7 +40,7 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
  
      // https://dl.bintray.com/bringout/F18/F18-linux-x64_20190119.2.zip
 
-     const fetcher = new BinaryFetcher(destDir, {path: destDir, ...options});
+     const fetcher = new Fetcher(destDir, {path: destDir, ...options});
  
      let revisionInfo = fetcher.revisionInfo(options.revision);
  
@@ -95,7 +95,7 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
  
 }
 
-export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Progress<{}>, resolve, error) {
+export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Progress<{}>, resolve: any, error: any) {
     
     //vscode.window.showInformationMessage(path.dirname(__filename));
     const destDir = revisionInfo.folderPath;
@@ -272,117 +272,3 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
 
 }
 
-
-function handleZipFile(err, zipfile) {
-	if (err) throw err;
-
-    // vscode.window.showInformationMessage(`number of entries: ${zipfile.entryCount}`);
-    
-	// track when we've closed all our file handles
-    let handleCount = 0;
-    
-	function incrementHandleCount() {
-		handleCount++;
-	}
-    
-    function decrementHandleCount() {
-		handleCount--;
-		if (handleCount === 0) {
-			// vscode.window.showInformationMessage('all input and output handles closed');
-		}
-	}
-
-	incrementHandleCount();
-	zipfile.on('close', function() {
-		console.log('closed input file');
-		decrementHandleCount();
-	});
-
-	zipfile.readEntry();
-	zipfile.on('entry', function(entry: any) {
-		if (/\/$/.test(entry.fileName)) {
-			// vscode.window.showInformationMessage( `/ directory:  ${entry.fileName}`);
-			mkdirp(entry.fileName, function() {
-				if (err) throw err;
-				zipfile.readEntry();
-			});
-		} else {
-			// ensure parent directory exists
-			mkdirp(path.dirname(entry.fileName), function() {
-                // vscode.window.showInformationMessage(`file: ${entry.fileName}`);
-				zipfile.openReadStream(entry, function(err: any, readStream: any) {
-					if (err) throw err;
-					// report progress through large files
-					var byteCount = 0;
-					var totalBytes = entry.uncompressedSize;
-					var lastReportedString = byteCount + '/' + totalBytes + '  0%';
-					process.stdout.write(entry.fileName + '...' + lastReportedString);
-                    // vscode.window.showInformationMessage(entry.fileName + '...' + lastReportedString);
-                    
-                    function reportString(msg: string) {
-						var clearString = '';
-						for (var i = 0; i < lastReportedString.length; i++) {
-							clearString += '\b';
-							if (i >= msg.length) {
-								clearString += ' \b';
-							}
-						}
-						process.stdout.write(clearString + msg);
-						lastReportedString = msg;
-                    }
-                    
-					// report progress at 60Hz
-					var progressInterval = setInterval(function() {
-						reportString(byteCount + '/' + totalBytes + '  ' + ((byteCount / totalBytes * 100) | 0) + '%');
-                    }, 1000 / 60);
-                    
-					var filter = new Transform();
-					filter._transform = function(chunk, encoding, cb) {
-						byteCount += chunk.length;
-						cb(null, chunk);
-                    };
-                    
-                    // filter._flush
-					filter._final = function(cb) {
-						clearInterval(progressInterval);
-						reportString('');
-						// delete the "..."
-						process.stdout.write('\b \b\b \b\b \b\n');
-						cb();
-						zipfile.readEntry();
-					};
-
-					// pump file contents
-					var writeStream = fs.createWriteStream(entry.fileName);
-					incrementHandleCount();
-					writeStream.on('close', decrementHandleCount);
-					readStream.pipe(filter).pipe(writeStream);
-				});
-			});
-		}
-	});
-}
-
-function promisify(api: any) {
-	return function(...args: any[]) {
-		return new Promise(function(resolve, reject) {
-			api(...args, function(err: any, response: any) {
-				if (err) return reject(err);
-				resolve(response);
-			});
-		});
-	};
-}
-
-function mkdirp(dir: string, cb: any) {
-	if (dir === '.') return cb();
-	fs.stat(dir, function(err) {
-		if (err == null) return cb(); // already exists
-
-		var parent = path.dirname(dir);
-		mkdirp(parent, function() {
-			process.stdout.write(dir.replace(/\/$/, '') + '/\n');
-			fs.mkdir(dir, cb);
-		});
-	});
-}
