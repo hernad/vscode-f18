@@ -6,7 +6,7 @@ import { Global } from './global';
 import { execHashList, revision } from './constants';
 
 
-const LINE_HEIGHT = 0.92;
+const LINE_HEIGHT = 0.91;
 const LETTER_SPACING = 0;
 const RENDERER_TYPE = 'canvas'; // 'dom' | 'canvas'
 
