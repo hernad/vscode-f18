@@ -5,7 +5,7 @@ export class Constants {
   // public static GlobalStateKey = 'postgresql.connections';
 }
 
-export const revision = '20190119.2';
+export const revision = '20190122.1';
 
 //   tmp/F18
 // 
