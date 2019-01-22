@@ -7,9 +7,19 @@ export class Constants {
 
 export const revision = '20190119.2';
 
+//   tmp/F18
+// 
+// F18-linux-x86_20190122.1.zip
+//   tmp/F18
+
+// F18-windows-x86_20190122.1.zip
+//   tmp/F18.exe
+// F18-windows-x64_20190122.1.zip
+//   tmp/F18.exe
+
 export const execHashList: any = {
-  'linux-x86': '1',
-  'linux-x64':   '3667176c82abe1db6223721ebc3d214f',
-  'windows-x64': 'de9c26706dc2204e038dbd6597bc54d8',
-  'windows-x86': '41875b5c15c656b03f86dde84a217ada'
+  'linux-x64': '0dae8d0235c15a023e005afa56f72827',
+  'linux-x86': '93f0808120051c18f762f164f5b89811',
+  'windows-x64': '6a8842721497d68f0003e79198f8a3f4',
+  'windows-x86': 'c55fa7723fa2a4bea52831e38db0e220'
 };

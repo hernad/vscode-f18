@@ -269,7 +269,7 @@ export class F18Panel {
         // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3  
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so ]]; then ln -sf /lib64/libpcre.so ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
 
-        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}${cmdSeparator} exit`;
+        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}${cmdSeparator} exit`;
         // console.log(runExe);
         // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}`;
 

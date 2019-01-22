@@ -125,8 +125,6 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
             vscode.window.showErrorMessage(`cannot download revision ${options.revision} ?!`);
     });
 
-
-
     md5File(revisionInfo.execPath)
         .then((hash: any) => {
             console.log(`The MD5 sum of ${revisionInfo.execPath} is: ${hash}`);
@@ -140,7 +138,5 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
         .catch(() => {
             fetcherDownload();
         });
-
-
 
 }
