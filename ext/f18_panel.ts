@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 import { vscodeFetchUnzip } from './fetch_unzip';
 import { Helper } from './helper';
 import { Global } from './global';
+import { execHashList, revision } from './constants';
+
 
 const LINE_HEIGHT = 0.92;
 const LETTER_SPACING = 0;
@@ -26,7 +28,6 @@ export class F18Panel {
     public static create(extensionPath: string, cModul: string, cOrganizacija: string) {
         // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
         const column = undefined;
-
 
         F18Panel.F18 = new F18Panel(cModul, cOrganizacija, extensionPath, column || vscode.ViewColumn.One);
 
@@ -154,9 +155,10 @@ export class F18Panel {
             host: 'https://dl.bintray.com/bringout',
             packageName: 'F18',
             // platform: 'windows-x64'
-            revision: '20190119.2',
+            revision,
             cleanup: true,
-            execPath: (Helper.is_windows() ? 'F18.exe' : 'F18')
+            execPath: (Helper.is_windows() ? 'F18.exe' : 'F18'),
+            execHash: execHashList[Helper.os_platform()]
         };
 
         const createTerminalInstance = () => {
@@ -182,6 +184,7 @@ export class F18Panel {
                 () => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
             );
         }
+
 
         if (!F18Panel.isDownloadedBinary) {
             vscodeFetchUnzip(fetchOptions).then(() => {
@@ -266,7 +269,7 @@ export class F18Panel {
         // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3  
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so ]]; then ln -sf /lib64/libpcre.so ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
 
-        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul} ${cmdSeparator} exit`;
+        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}${cmdSeparator} exit`;
         // const runExe = `echo ${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}`;
 
         let sendInitCmds: string[] = [];

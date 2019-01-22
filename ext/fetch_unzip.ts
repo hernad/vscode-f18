@@ -6,6 +6,7 @@ import { Global } from './global';
 import { Helper } from './helper';
 import { Fetcher } from './fetcher';
 import { unzip } from './unzip';
+import * as md5File from 'md5-file/promise';
 
 /*
  
@@ -57,7 +58,7 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
     //const destDir = path.join(tmpdir(), generateUuid());
     const destDir = path.join(Global.context.extensionPath, '..', options.packageName);
 
-    vscode.window.showInformationMessage(destDir);
+    // vscode.window.showInformationMessage(destDir);
 
     Helper.mkdirp(destDir, () => {
         //vscode.window.showInformationMessage(`destDir: ${destDir}`);
@@ -68,10 +69,13 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
     const fetcher = new Fetcher(destDir, { path: destDir, ...options });
     let revisionInfo = fetcher.revisionInfo(options.revision);
 
+    Global.execPath = revisionInfo.execPath;
+    Global.folderPath = revisionInfo.folderPath;
+
     let progressBar = null;
     let lastDownloadedBytes = 0;
 
-    fetcher.canDownload(options.revision).then((canDownload: boolean) => {
+    const fetcherDownload = () => fetcher.canDownload(options.revision).then((canDownload: boolean) => {
         if (canDownload) {
             progress.report({ message: "Start download" });
             fetcher.download(revisionInfo.revision, (downloadedBytes: number, totalBytes: number) => {
@@ -97,15 +101,11 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
                     const downloadZip = revisionInfo.zipPath;
                     if (downloadZip === '') {
                         // progress.report({increment: 100});
-                        Global.execPath = revisionInfo.execPath;
-                        Global.folderPath = revisionInfo.folderPath;
                         resolve({ message: 'no download', revisionInfo });
                     } else {
                         unzip(revisionInfo, progress, resolve, error).then(() => {
                             // vscode.window.showInformationMessage(`Lokalne verzije: ${localRevisions.join(' ')}`);
                             localRevisions = localRevisions.filter(revision => revision !== revisionInfo.revision);
-                            Global.execPath = revisionInfo.execPath;
-                            Global.folderPath = revisionInfo.folderPath;
                             if (revisionInfo.cleanup) {
                                 const cleanupOldVersions = localRevisions.map(revision => fetcher.remove(revision));
                                 return Promise.all([...cleanupOldVersions]);
@@ -123,6 +123,24 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
                 });
         } else
             vscode.window.showErrorMessage(`cannot download revision ${options.revision} ?!`);
-    })
+    });
+
+
+
+    md5File(revisionInfo.execPath)
+        .then((hash: any) => {
+            console.log(`The MD5 sum of ${revisionInfo.execPath} is: ${hash}`);
+            if (hash !== revisionInfo.execHash) {
+                Promise.resolve(fetcher.remove(revisionInfo.revision));
+                fetcherDownload();
+            }
+            else resolve({ message: 'hash OK', revisionInfo });
+
+        })
+        .catch(() => {
+            fetcherDownload();
+        });
+
+
 
 }

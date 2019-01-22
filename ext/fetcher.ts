@@ -31,6 +31,7 @@ export class Fetcher {
 	private _zipPath: string;
 	private _cleanup: boolean; // Remove old revisions.
 	private _executablePath: string;
+	private _execHash: string;
 
 	constructor(projectRoot: string, options: any = {}) {
 		this._downloadsFolder = options.path || path.join(projectRoot, '.local');
@@ -39,19 +40,12 @@ export class Fetcher {
 		this._packageName = options.packageName || 'F18';
 		this._zipPath = '';
 		this._cleanup = options.cleanup || true;
-		this._executablePath = options.execPath || this._packageName; 
+		this._executablePath = options.execPath || this._packageName;
+		this._execHash = options.execHash || '0';
 
 		if (!this._platform) {
-			const platform = os.platform();
-			if (platform === 'darwin') this._platform = 'mac';
-			else if (platform === 'linux') 
-			    this._platform = (os.arch() === 'x64') ? 'linux-x64' : 'linux-x86';
-			else if (platform === 'win32') 
-			   this._platform = (os.arch() === 'x64') ? 'windows-x64' : 'windows-x86';
-			else
-			   assert(this._platform, 'Unsupported platform: ' + os.platform());
+			this._platform = Helper.os_platform();
 		}
-		// assert(supportedPlatforms.includes(this._platform), 'Unsupported platform: ' + this._platform);
 	}
 
 	public canDownload(revision: string): Promise<boolean|any> {
@@ -141,7 +135,7 @@ export class Fetcher {
 		// else throw new Error('Unsupported platform: ' + this._platform);
 		const url = downloadURL(this._downloadHost, this._platform, this._packageName, revision);
 		const local = fs.existsSync(folderPath);
-		return { revision, execPath, folderPath, local, url, zipPath: this._zipPath, cleanup: this._cleanup };
+		return { revision, execPath, folderPath, local, url, zipPath: this._zipPath, cleanup: this._cleanup, execHash: this._execHash };
 	}
 
 

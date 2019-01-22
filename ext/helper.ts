@@ -18,6 +18,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 
 const { TimeoutError } = require('./errors');
 
@@ -244,7 +245,21 @@ export class Helper {
 	static is_windows() {
 		return process.platform === 'win32';
 	}
-	
+
+	static os_platform(): string {
+		let platform: string = os.platform();
+
+		if (platform === 'darwin') platform = 'mac';
+		else if (platform === 'linux')
+			platform = (os.arch() === 'x64') ? 'linux-x64' : 'linux-x86';
+		else if (platform === 'win32')
+			platform = (os.arch() === 'x64') ? 'windows-x64' : 'windows-x86';
+		else
+			assert(platform, 'Unsupported platform: ' + os.platform());
+
+		return platform;
+	}
+
 }
 
 export function assert(value: any, message: string) {

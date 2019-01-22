@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "0.0.36",
+	"version": "0.0.37",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -68,6 +68,8 @@
 		]
 	},
 	"dependencies": {
+		"@types/md5-file": "^4.0.0",
+		"md5-file": "^4.0.0",
 		"proxy-from-env": "^1.0.0",
 		"rimraf": "^2.6.3",
 		"vscode": "^1.1.26"
