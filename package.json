@@ -27,6 +27,11 @@
 				"category": "F18"
 			},
 			{
+				"command": "f18.start.fakt",
+				"title": "start FAKT",
+				"category": "F18"
+			},
+			{
 				"command": "f18.start.kalk",
 				"title": "start KALK",
 				"category": "F18"
@@ -44,6 +49,7 @@
 							"",
 							"fin",
 							"kalk",
+							"fakt",
 							"pos"
 						]
 					},

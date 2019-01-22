@@ -29,8 +29,9 @@ export function unzipError() {
 export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Progress<{}>, resolve: any, error: any) {
     
     //vscode.window.showInformationMessage(path.dirname(__filename));
-    const destDir = revisionInfo.folderPath;
+    progress.report({ message: "Start unzip" });
 
+    const destDir = revisionInfo.folderPath;
     try {
        zipfile = await yauzlOpen(revisionInfo.zipPath, { lazyEntries: true });
     } catch {

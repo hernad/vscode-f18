@@ -30,6 +30,7 @@ export class Fetcher {
 	private _packageName: string;
 	private _zipPath: string;
 	private _cleanup: boolean; // Remove old revisions.
+	private _executablePath: string;
 
 	constructor(projectRoot: string, options: any = {}) {
 		this._downloadsFolder = options.path || path.join(projectRoot, '.local');
@@ -37,7 +38,8 @@ export class Fetcher {
 		this._platform = options.platform || '';
 		this._packageName = options.packageName || 'F18';
 		this._zipPath = '';
-		this._cleanup = options.cleanup || true; 
+		this._cleanup = options.cleanup || true;
+		this._executablePath = options.execPath || this._packageName; 
 
 		if (!this._platform) {
 			const platform = os.platform();
@@ -71,8 +73,8 @@ export class Fetcher {
 		const url = downloadURL(this._downloadHost, this._platform, this._packageName, revision);
 
 
-		const {folderPath, executablePath} = this.revisionInfo(revision);
-		if (await existsAsync(folderPath) && await existsAsync(executablePath)) // revision already exists
+		const {folderPath, execPath} = this.revisionInfo(revision);
+		if (await existsAsync(folderPath) && await existsAsync(execPath)) // revision already exists
 		{
 			this._zipPath = '';
 		    return this.revisionInfo(revision);
@@ -129,17 +131,17 @@ export class Fetcher {
 		const folderPath = this._getFolderPath(revision);
 		
 		
-		let executablePath = '';
-		executablePath = path.join(folderPath, this._packageName);  // F18-windows-linux-x64_20199119.2/F18
+		let execPath = '';
+		execPath = path.join(folderPath, this._executablePath);  // F18-windows-linux-x64_20199119.2/F18
 
 		if (this._platform === 'windows-x86' || this._platform === 'windows-x64')
-			executablePath += '.exe';
+			execPath += '.exe';
 		
 
 		// else throw new Error('Unsupported platform: ' + this._platform);
 		const url = downloadURL(this._downloadHost, this._platform, this._packageName, revision);
 		const local = fs.existsSync(folderPath);
-		return { revision, executablePath, folderPath, local, url, zipPath: this._zipPath, cleanup: this._cleanup };
+		return { revision, execPath, folderPath, local, url, zipPath: this._zipPath, cleanup: this._cleanup };
 	}
 
 

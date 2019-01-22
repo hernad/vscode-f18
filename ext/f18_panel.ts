@@ -1,6 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { vscodeFetchUnzip } from './fetch_unzip';
+import { Helper } from './helper';
+import { Global } from './global';
 
 const LINE_HEIGHT = 0.92;
 const LETTER_SPACING = 0;
@@ -16,24 +18,76 @@ const DEFAULT_LINUX_FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'D
 
 export class F18Panel {
 
-    public static currentPanel: F18Panel | undefined;
+    public static F18: F18Panel | undefined;
     public static isDownloadedBinary: boolean = false;
+    public static firstTerminal: boolean = true;
+    public static instances: F18Panel[] = [];
 
     public static create(extensionPath: string, cModul: string, cOrganizacija: string) {
         // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
         const column = undefined;
 
-        F18Panel.currentPanel = new F18Panel(cModul, cOrganizacija, extensionPath, column || vscode.ViewColumn.One);
+
+        F18Panel.F18 = new F18Panel(cModul, cOrganizacija, extensionPath, column || vscode.ViewColumn.One);
+
+        vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
+            // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
+
+            F18Panel.instances.forEach((f18Panel: F18Panel) => {
+                if (f18Panel.panelCaption === terminal.name) {
+                    f18Panel.terminalDisposed = true; // ovaj terminal je vec u procesu zatvaranja
+                    f18Panel.webPanel.dispose();
+                }
+
+            });
+            const filtered = F18Panel.instances.filter((f18Panel: F18Panel) => {
+                return f18Panel.panelCaption !== terminal.name;
+            });
+
+            F18Panel.instances = filtered;
+
+
+        });
     }
 
-    private static readonly viewType = 'F18';
-    private static panelNum = 1;
+    /*
 
-    private readonly panel: vscode.WebviewPanel;
+    function selectTerminal(): Thenable<vscode.Terminal> {
+        interface TerminalQuickPickItem extends vscode.QuickPickItem {
+            terminal: vscode.Terminal;
+        }
+        const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
+        const items: TerminalQuickPickItem[] = terminals.map(t => {
+            return {
+                label: `name: ${t.name}`,
+                terminal: t
+            };
+        });
+        return vscode.window.showQuickPick(items).then(item => {
+            return item.terminal;
+        });
+    }
+
+    function ensureTerminalExists(): boolean {
+        if ((<any>vscode.window).terminals.length === 0) {
+            vscode.window.showErrorMessage('No active terminals');
+            return false;
+        }
+        return true;
+    }
+
+    */
+
+
+    private static readonly viewType = 'F18';
+    private static currentPanelNum = 1;
+
+    public readonly panelCaption: string;
+    private readonly webPanel: vscode.WebviewPanel;
     private readonly extensionPath: string;
     // private disposables: vscode.Disposable[] = [];
 
-    private terminalInstance: vscode.Terminal | any;
+    private terminalInstance?: vscode.Terminal;
     private readonly modul: string;
     private readonly f18Organizacija: string;
     private readonly panelNum: number;
@@ -43,6 +97,8 @@ export class F18Panel {
     private height: number;
     private fontFamily: string;
     private fontSize: number;
+    private terminalDisposed: boolean;
+    private webPanelDisposed: boolean;
 
     private constructor(cModul: string, cOrganizacija: string, extensionPath: string, column: vscode.ViewColumn) {
         this.extensionPath = extensionPath;
@@ -54,6 +110,8 @@ export class F18Panel {
         this.width = 0;
         this.height = 0;
         this.fontSize = 16;
+        this.terminalDisposed = false;
+        this.webPanelDisposed = false;
 
         const tmpFS = vscode.workspace.getConfiguration('f18').get('fontSize');
         if (tmpFS !== undefined) {
@@ -61,19 +119,19 @@ export class F18Panel {
             // vscode.window.showErrorMessage(`fontsize: ${this.fontSize}`);
         }
 
-        this.fontFamily = is_windows() ? DEFAULT_WINDOWS_FONT_FAMILY : DEFAULT_LINUX_FONT_FAMILY;
+        this.fontFamily = Helper.is_windows() ? DEFAULT_WINDOWS_FONT_FAMILY : DEFAULT_LINUX_FONT_FAMILY;
         const tmpFF = vscode.workspace.getConfiguration('editor').get('fontFamily');
         tmpFF !== undefined
             ? (this.fontFamily = tmpFF as string)
             : vscode.window.showErrorMessage('config editor.fontFamily?!');
 
-        this.panelNum = F18Panel.panelNum;
-        const currentPanelCaption = `F18 ${this.modul} - ${this.panelNum}`;
-        F18Panel.panelNum++;
+        this.panelNum = F18Panel.currentPanelNum;
+        this.panelCaption = `F18 ${this.modul} - ${this.panelNum}`;
+        F18Panel.currentPanelNum++;
 
-        this.panel = vscode.window.createWebviewPanel(
+        this.webPanel = vscode.window.createWebviewPanel(
             F18Panel.viewType,
-            currentPanelCaption,
+            this.panelCaption,
             { viewColumn: column, preserveFocus: false },
             {
                 enableScripts: true, // Enable javascript in the webview
@@ -86,22 +144,27 @@ export class F18Panel {
                 ]
             }
         );
+        this.webPanelDisposed = false;
 
-        this.panel.webview.html = this._getHtmlForWebview();
+        F18Panel.instances.push(this);
+
+        this.webPanel.webview.html = this._getHtmlForWebview();
 
         const fetchOptions = {
             host: 'https://dl.bintray.com/bringout',
             packageName: 'F18',
             // platform: 'windows-x64'
             revision: '20190119.2',
-            cleanup: true
+            cleanup: true,
+            execPath: (Helper.is_windows() ? 'F18.exe' : 'F18')
         };
 
         const createTerminalInstance = () => {
-            this.terminalInstance = vscode.window.createTerminal(currentPanelCaption, shell());
+            this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
             this.terminalInstance.processId.then(
                 (processId: number) => {
                     console.log(`kreiran terminal ${processId}`);
+                    this.terminalDisposed = false;
                     this.configurePanel();
                     const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
                     const configMerged = {
@@ -111,7 +174,7 @@ export class F18Panel {
                         letterSpacing: LETTER_SPACING,
                         lineHeight: LINE_HEIGHT
                     };
-                    this.panel.webview.postMessage({
+                    this.webPanel.webview.postMessage({
                         command: 'term-get-dimensions',
                         data: JSON.stringify(configMerged)
                     });
@@ -132,12 +195,21 @@ export class F18Panel {
 
 
     public configurePanel() {
-        // Listen for when the panel is disposed
-        // This happens when the user closes the panel or when the panel is closed programatically
-        this.panel.onDidDispose(() => this.dispose());
+
+        this.webPanel.onDidDispose(() => {
+
+            if (this.webPanelDisposed) return;
+
+            // ovo se desi kada nasilno ugasimo tab (kada ne izadjemo iz F18 regularno)
+            if (!this.terminalDisposed && this.terminalInstance) {
+                this.terminalInstance.dispose();
+                this.terminalDisposed = true;
+            }
+            this.webPanelDisposed = true;
+        });
 
         // Handle messages from the webview
-        this.panel.webview.onDidReceiveMessage((message: any) => {
+        this.webPanel.webview.onDidReceiveMessage((message: any) => {
             switch (message.command) {
                 case 'alert':
                     vscode.window.showErrorMessage(message.data);
@@ -149,8 +221,8 @@ export class F18Panel {
                     break;
 
                 case 'cli-focus':
-                    if (this.terminalInstance.resize)
-                        this.terminalInstance.resize(this.cols, this.rows);
+                    if (this.terminalInstance!.resize)
+                        this.terminalInstance!.resize(this.cols, this.rows);
                     // vscode.window.showInformationMessage(`cli-focus: resize ${this.cols} x ${this.rows}`);
                     break;
 
@@ -184,14 +256,21 @@ export class F18Panel {
 
     public createTerminal() {
         // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
-        this.terminalInstance.show(true);
-        if (this.terminalInstance.resize)
-            this.terminalInstance.resize(this.cols, this.rows);
-        this.terminalInstance.hide();
+        this.terminalInstance!.show(true);
+        if (this.terminalInstance!.resize)
+            this.terminalInstance!.resize(this.cols, this.rows);
+        this.terminalInstance!.hide();
+
+        const cmdSeparator = Helper.is_windows() ? '&' : ';';
+
+        // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3  
+        const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so ]]; then ln -sf /lib64/libpcre.so ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
+
+        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul} ${cmdSeparator} exit`;
 
         let sendInitCmds: string[] = [];
 
-        if (is_windows()) {
+        if (Helper.is_windows()) {
             sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
             sendInitCmds.push('cls');
             // ako mode con: => ... Lines: 3000 => exit
@@ -199,70 +278,59 @@ export class F18Panel {
                 'powershell "$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }"'
             );
             sendInitCmds.push('if %errorlevel% neq 0 exit');
-
-            // sendInitCmds.push(`cd ${this.extensionPath}\\win32`);
-            sendInitCmds.push(`cd ${this.extensionPath}`);
-            //sendInitCmds.push(
-            //	`F18.exe 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
-            //		.f18Organizacija} --${this.modul} & exit`
-            //);
+            sendInitCmds.push(`cd ${Global.folderPath}`);
         } else {
             sendInitCmds.push(`stty cols ${this.cols} rows ${this.rows}`);
             sendInitCmds.push(`if stty size | grep '${this.rows} ${this.cols}' ; then echo size-ok; else exit 1; fi`);
-            sendInitCmds.push(`cd ${this.extensionPath}/linux`);
-            sendInitCmds.push(`clear`);
-            // sendInitCmds.push(
-            // 	`./F18 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this
-            // 		.f18Organizacija} --${this.modul}; exit`
-            // );
-        }
-
-        vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
-            // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
-            if (this.terminalInstance && terminal.name == this.terminalInstance.name) {
-                this.panel.dispose();
+            sendInitCmds.push(`cd ${Global.folderPath}`);
+            if (F18Panel.firstTerminal) {
+                sendInitCmds.push(linuxFixes);
+                F18Panel.firstTerminal = false;
             }
-        });
+            sendInitCmds.push(`export LD_LIBRARY_PATH=${Global.folderPath}`);
+            sendInitCmds.push(`clear`);
+        }
+        sendInitCmds.push(runExe);
+
 
         const termOptions = {
             cols: this.cols,
             rows: this.rows,
             cursorBlink: true,
             bellStyle: 'sound',
-            cursorStyle: 'block',
-            // cursorStyle: 'underline',
-            // cursorStyle: 'bar',
-            // rendererType: 'canvas',
+            cursorStyle: 'block', // cursorStyle: 'underline','bar',
             rendererType: RENDERER_TYPE,
             experimentalCharAtlas: 'dynamic',
             fontFamily: this.fontFamily,
-
-            //fontSize: 12,
-            //letterSpacing: 0,
-            //lineHeight: 0.99
             fontSize: this.fontSize,
             letterSpacing: LETTER_SPACING,
             lineHeight: LINE_HEIGHT,
-            termName: `F18 ${this.modul} - ${this.panelNum}`
+            termName: this.panelCaption
         };
-        this.panel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
+        this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
 
         sendInitCmds.forEach((element) => {
-            this.terminalInstance.sendText(element);
+            this.terminalInstance!.sendText(element);
         });
 
         (this.terminalInstance as any).onDidWriteData((data: string) => {
             // console.log('onDidWriteData: ' + data);
-            this.panel.webview.postMessage({ command: 'term-write', data });
+            this.webPanel.webview.postMessage({ command: 'term-write', data });
         });
     }
 
+    /*
     public dispose() {
-        F18Panel.currentPanel = undefined;
-        if (this.terminalInstance) this.terminalInstance.dispose();
 
-        // Clean up our resources
-        this.panel.dispose();
+        if (!this.terminalDisposed && this.terminalInstance) {
+            this.terminalDisposed = true;
+            this.terminalInstance.dispose();
+        }
+
+        if (!this.webPanelDisposed && this.webPanel) {
+            this.webPanelDisposed = true;
+            this.webPanel.dispose();
+        }
 
         // while (this.disposables.length) {
         // 	const x = this.disposables.pop();
@@ -270,7 +338,10 @@ export class F18Panel {
         // 		x.dispose();
         // 	}
         // }
+        F18Panel.F18 = undefined;
     }
+    */
+    
 
     private _getHtmlForWebview() {
         // const manifest = require(path.join(this.extensionPath, 'out', 'asset-manifest.json'));
@@ -348,12 +419,8 @@ function getNonce() {
     return text;
 }
 
-function is_windows() {
-    return process.platform === 'win32';
-}
-
 function shell() {
-    if (is_windows()) {
+    if (Helper.is_windows()) {
         return 'cmd.exe';
     } else {
         return '/bin/bash';

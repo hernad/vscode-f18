@@ -126,6 +126,8 @@ export class Global {
   public static httpsProxyAgent: typeof httpsType = getCoreNodeModule('https-proxy-agent');
   
   public static context: vscode.ExtensionContext;
+  public static execPath: string;
+  public static folderPath: string;
 
   public static get Configuration(): vscode.WorkspaceConfiguration {
     return vscode.workspace.getConfiguration(Constants.ExtensionId);

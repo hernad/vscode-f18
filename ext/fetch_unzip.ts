@@ -40,7 +40,7 @@ export function vscodeFetchUnzip(options: any = {}): Thenable<{}> {
         });
 
         p.then((params: any) => {
-            if (fs.existsSync(params.revisionInfo.executablePath)) fs.chmodSync(params.revisionInfo.executablePath, 0o755);
+            if (fs.existsSync(params.revisionInfo.execPath)) fs.chmodSync(params.revisionInfo.execPath, 0o755);
             if (fs.existsSync(params.revisionInfo.zipPath)) fs.unlinkSync(params.revisionInfo.zipPath);
             // vscode.window.showInformationMessage('kraj resolve funkcije after unzip!');
             progress.report({ increment: 100, message: params.message });
@@ -66,7 +66,6 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
     // https://dl.bintray.com/bringout/F18/F18-linux-x64_20190119.2.zip
 
     const fetcher = new Fetcher(destDir, { path: destDir, ...options });
-
     let revisionInfo = fetcher.revisionInfo(options.revision);
 
     let progressBar = null;
@@ -93,24 +92,29 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
             })
                 .then((revisionInfoNew) => revisionInfo = revisionInfoNew)
                 .then(() => fetcher.localRevisions())
-                .then((localRevisions: string[]): Promise<any> => {
+                .then((localRevisions: string[]) => {
                     // vscode.window.showInformationMessage('Downloaded to: ' + revisionInfo.folderPath);
                     const downloadZip = revisionInfo.zipPath;
                     if (downloadZip === '') {
                         // progress.report({increment: 100});
+                        Global.execPath = revisionInfo.execPath;
+                        Global.folderPath = revisionInfo.folderPath;
                         resolve({ message: 'no download', revisionInfo });
                     } else {
-                        progress.report({ message: "Start unzip" });
-                        unzip(revisionInfo, progress, resolve, error);
+                        unzip(revisionInfo, progress, resolve, error).then(() => {
+                            // vscode.window.showInformationMessage(`Lokalne verzije: ${localRevisions.join(' ')}`);
+                            localRevisions = localRevisions.filter(revision => revision !== revisionInfo.revision);
+                            Global.execPath = revisionInfo.execPath;
+                            Global.folderPath = revisionInfo.folderPath;
+                            if (revisionInfo.cleanup) {
+                                const cleanupOldVersions = localRevisions.map(revision => fetcher.remove(revision));
+                                return Promise.all([...cleanupOldVersions]);
+                            } else {
+                                return new Promise(() => { });
+                            }
+                        });
                     }
-                    // vscode.window.showInformationMessage(`Lokalne verzije: ${localRevisions.join(' ')}`);
-                    localRevisions = localRevisions.filter(revision => revision !== revisionInfo.revision);
-                    if (revisionInfo.cleanup) {
-                        const cleanupOldVersions = localRevisions.map(revision => fetcher.remove(revision));
-                        return Promise.all([...cleanupOldVersions]);
-                    } else {
-                        return new Promise(() => { });
-                    }
+
                 })
                 .catch((error) => {
                     vscode.window.showErrorMessage(`ERROR: Failed to download revision ${options.revision} : ${error}!?`);

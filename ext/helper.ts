@@ -228,7 +228,6 @@ export class Helper {
 		}
 	}
 
-
 	static mkdirp(dir: string, cb: any) {
 		if (dir === '.') return cb();
 		fs.stat(dir, function (err) {
@@ -242,6 +241,10 @@ export class Helper {
 		});
 	}
 
+	static is_windows() {
+		return process.platform === 'win32';
+	}
+	
 }
 
 export function assert(value: any, message: string) {

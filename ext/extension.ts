@@ -16,6 +16,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}),
 		vscode.commands.registerCommand('f18.start.kalk', () => {
 			F18Panel.create(context.extensionPath, 'kalk', 'proba_2018');
+		}),
+		vscode.commands.registerCommand('f18.start.fakt', () => {
+			F18Panel.create(context.extensionPath, 'fakt', 'proba_2018');
 		})
 	);
 
