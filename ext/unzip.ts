@@ -8,8 +8,7 @@ import * as path from 'path';
 // import { generateUuid } from './uuid';
 // import { Fetcher } from './fetcher';
 import { Helper } from './helper';
-
-type revisionInfoType = { revision: string, executablePath: string, folderPath: string, local: boolean, url: string, zipPath: string };
+import { revisionInfoType } from './types';
 
 const yauzl = Global.yauzl;
 

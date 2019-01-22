@@ -7,6 +7,7 @@ import { Global } from './global';
 import * as util from 'util';
 import * as URL from 'url';
 import * as removeRecursive from 'rimraf';
+import { revisionInfoType, progressCallbackType } from './types';
 
 //import { exec } from 'child_process';
 
@@ -22,89 +23,13 @@ const readdirAsync = Helper.promisify(fs.readdir.bind(fs));
 const mkdirAsync = Helper.promisify(fs.mkdir.bind(fs));
 const unlinkAsync = Helper.promisify(fs.unlink.bind(fs));
 
-
-type progressCallbackType = (num1: number, num2: number) => void;
-type revisionInfoType = { revision: string, executablePath: string, folderPath: string, local: boolean, url: string, zipPath: string };
-
-function existsAsync(filePath: any): Promise<any> {
-	let fulfill: any = null;
-	const promise = new Promise((x) => (fulfill = x));
-	fs.access(filePath, (err) => fulfill(!err));
-	return promise;
-}
-
-function downloadURL(host: string, platform: string, packageName: string, revision:string): string {
-	// https://dl.bintray.com/bringout/F18/F18-linux-x64_20190119.2.zip
-	return util.format('%s/%s/%s-%s_%s.zip', host, packageName, packageName, platform, revision);	
-}
-
-function httpRequest(url: string, method: string, response: any) {
-
-	const options: any = URL.parse(url);
-	options.method = method;
-
-	const proxyURL = getProxyForUrl(url);
-	if (proxyURL) {
-		const parsedProxyURL: any = URL.parse(proxyURL);
-		parsedProxyURL.secureProxy = parsedProxyURL.protocol === 'https:';
-
-		options.agent = new ProxyAgent(parsedProxyURL);
-		options.rejectUnauthorized = false;
-	}
-
-	const requestCallback = (res: any) => {
-		if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location)
-			httpRequest(res.headers.location, method, response);
-		else response(res);
-	};
-	const request =
-		options.protocol === 'https:'
-			? require('https').request(options, requestCallback)
-			: require('http').request(options, requestCallback);
-	request.end();
-	return request;
-}
-
-function downloadFile(url: string, destinationPath: string, progressCallback: progressCallbackType) : Promise<any> {
-	let fulfill: any, reject: any;
-	let downloadedBytes = 0;
-	let totalBytes = 0;
-
-	const promise = new Promise((x, y) => {
-		fulfill = x;
-		reject = y;
-	});
-
-	const request = httpRequest(url, 'GET', (response: any) => {
-		if (response.statusCode !== 200) {
-			const error = new Error(`Download failed: server returned code ${response.statusCode}. URL: ${url}`);
-			// consume response data to free up memory
-			response.resume();
-			reject(error);
-			return;
-		}
-		const file = fs.createWriteStream(destinationPath);
-		file.on('finish', () => fulfill());
-		file.on('error', (error) => reject(error));
-		response.pipe(file);
-		totalBytes = parseInt /** @type {string} */(response.headers['content-length'], 10);
-		if (progressCallback) response.on('data', onData);
-	});
-	request.on('error', (error: any) => reject(error));
-	return promise;
-
-	function onData(chunk: any) {
-		downloadedBytes += chunk.length;
-		progressCallback(downloadedBytes, totalBytes);
-	}
-}
-
 export class Fetcher {
 	private _downloadsFolder: string;
 	private _downloadHost: string;
 	private _platform: string;
 	private _packageName: string;
 	private _zipPath: string;
+	private _cleanup: boolean; // Remove old revisions.
 
 	constructor(projectRoot: string, options: any = {}) {
 		this._downloadsFolder = options.path || path.join(projectRoot, '.local');
@@ -112,6 +37,7 @@ export class Fetcher {
 		this._platform = options.platform || '';
 		this._packageName = options.packageName || 'F18';
 		this._zipPath = '';
+		this._cleanup = options.cleanup || true; 
 
 		if (!this._platform) {
 			const platform = os.platform();
@@ -213,7 +139,7 @@ export class Fetcher {
 		// else throw new Error('Unsupported platform: ' + this._platform);
 		const url = downloadURL(this._downloadHost, this._platform, this._packageName, revision);
 		const local = fs.existsSync(folderPath);
-		return { revision, executablePath, folderPath, local, url, zipPath: this._zipPath };
+		return { revision, executablePath, folderPath, local, url, zipPath: this._zipPath, cleanup: this._cleanup };
 	}
 
 
@@ -224,4 +150,77 @@ export class Fetcher {
 
 
 
+}
+
+function existsAsync(filePath: any): Promise<any> {
+	let fulfill: any = null;
+	const promise = new Promise((x) => (fulfill = x));
+	fs.access(filePath, (err) => fulfill(!err));
+	return promise;
+}
+
+function downloadURL(host: string, platform: string, packageName: string, revision:string): string {
+	// https://dl.bintray.com/bringout/F18/F18-linux-x64_20190119.2.zip
+	return util.format('%s/%s/%s-%s_%s.zip', host, packageName, packageName, platform, revision);	
+}
+
+function httpRequest(url: string, method: string, response: any) {
+
+	const options: any = URL.parse(url);
+	options.method = method;
+
+	const proxyURL = getProxyForUrl(url);
+	if (proxyURL) {
+		const parsedProxyURL: any = URL.parse(proxyURL);
+		parsedProxyURL.secureProxy = parsedProxyURL.protocol === 'https:';
+
+		options.agent = new ProxyAgent(parsedProxyURL);
+		options.rejectUnauthorized = false;
+	}
+
+	const requestCallback = (res: any) => {
+		if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location)
+			httpRequest(res.headers.location, method, response);
+		else response(res);
+	};
+	const request =
+		options.protocol === 'https:'
+			? require('https').request(options, requestCallback)
+			: require('http').request(options, requestCallback);
+	request.end();
+	return request;
+}
+
+function downloadFile(url: string, destinationPath: string, progressCallback: progressCallbackType) : Promise<any> {
+	let fulfill: any, reject: any;
+	let downloadedBytes = 0;
+	let totalBytes = 0;
+
+	const promise = new Promise((x, y) => {
+		fulfill = x;
+		reject = y;
+	});
+
+	const request = httpRequest(url, 'GET', (response: any) => {
+		if (response.statusCode !== 200) {
+			const error = new Error(`Download failed: server returned code ${response.statusCode}. URL: ${url}`);
+			// consume response data to free up memory
+			response.resume();
+			reject(error);
+			return;
+		}
+		const file = fs.createWriteStream(destinationPath);
+		file.on('finish', () => fulfill());
+		file.on('error', (error) => reject(error));
+		response.pipe(file);
+		totalBytes = parseInt /** @type {string} */(response.headers['content-length'], 10);
+		if (progressCallback) response.on('data', onData);
+	});
+	request.on('error', (error: any) => reject(error));
+	return promise;
+
+	function onData(chunk: any) {
+		downloadedBytes += chunk.length;
+		progressCallback(downloadedBytes, totalBytes);
+	}
 }

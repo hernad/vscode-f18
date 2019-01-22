@@ -93,7 +93,8 @@ export class F18Panel {
             host: 'https://dl.bintray.com/bringout',
             packageName: 'F18',
             // platform: 'windows-x64'
-            revision: '20190119.2'
+            revision: '20190119.2',
+            cleanup: true
         };
 
         const createTerminalInstance = () => {

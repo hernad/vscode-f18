@@ -18,7 +18,7 @@ const options = {
  fetchUnzip(options);
 
 */
-export function vscodeFetchUnzip( options: any = {}): Thenable<{}> {
+export function vscodeFetchUnzip(options: any = {}): Thenable<{}> {
 
     return vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
@@ -105,9 +105,12 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
                     }
                     // vscode.window.showInformationMessage(`Lokalne verzije: ${localRevisions.join(' ')}`);
                     localRevisions = localRevisions.filter(revision => revision !== revisionInfo.revision);
-                    // Remove revisions.
-                    const cleanupOldVersions = localRevisions.map(revision => fetcher.remove(revision));
-                    return Promise.all([...cleanupOldVersions]);
+                    if (revisionInfo.cleanup) {
+                        const cleanupOldVersions = localRevisions.map(revision => fetcher.remove(revision));
+                        return Promise.all([...cleanupOldVersions]);
+                    } else {
+                        return new Promise(() => { });
+                    }
                 })
                 .catch((error) => {
                     vscode.window.showErrorMessage(`ERROR: Failed to download revision ${options.revision} : ${error}!?`);
