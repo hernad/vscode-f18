@@ -270,7 +270,8 @@ export class F18Panel {
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so ]]; then ln -sf /lib64/libpcre.so ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
 
         const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}${cmdSeparator} exit`;
-        // const runExe = `echo ${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}`;
+        // console.log(runExe);
+        // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}`;
 
         let sendInitCmds: string[] = [];
 
@@ -298,7 +299,6 @@ export class F18Panel {
             sendInitCmds.push(`clear`);
         }
         sendInitCmds.push(runExe);
-
 
         const termOptions = {
             cols: this.cols,
