@@ -221,8 +221,8 @@ export class F18Panel {
                     break;
 
                 case 'cli-focus':
-                    if (this.terminalInstance!.resize)
-                        this.terminalInstance!.resize(this.cols, this.rows);
+                    // @ts-ignore
+                    if (this.terminalInstance!.resize) this.terminalInstance!.resize(this.cols, this.rows);
                     // vscode.window.showInformationMessage(`cli-focus: resize ${this.cols} x ${this.rows}`);
                     break;
 
@@ -257,8 +257,8 @@ export class F18Panel {
     public createTerminal() {
         // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
         this.terminalInstance!.show(true);
-        if (this.terminalInstance!.resize)
-            this.terminalInstance!.resize(this.cols, this.rows);
+        // @ts-ignore
+        if (this.terminalInstance!.resize) this.terminalInstance!.resize(this.cols, this.rows);
         this.terminalInstance!.hide();
 
         const cmdSeparator = Helper.is_windows() ? '&' : ';';
@@ -266,7 +266,8 @@ export class F18Panel {
         // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3  
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so ]]; then ln -sf /lib64/libpcre.so ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
 
-        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul} ${cmdSeparator} exit`;
+        // const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul} ${cmdSeparator} exit`;
+        const runExe = `echo ${Global.execPath} 2>${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}`;
 
         let sendInitCmds: string[] = [];
 
@@ -279,6 +280,9 @@ export class F18Panel {
             );
             sendInitCmds.push('if %errorlevel% neq 0 exit');
             sendInitCmds.push(`cd ${Global.folderPath}`);
+            sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
+            sendInitCmds.push(`cls`);
+
         } else {
             sendInitCmds.push(`stty cols ${this.cols} rows ${this.rows}`);
             sendInitCmds.push(`if stty size | grep '${this.rows} ${this.cols}' ; then echo size-ok; else exit 1; fi`);
