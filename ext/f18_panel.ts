@@ -47,6 +47,8 @@ export class F18Panel {
 
             F18Panel.instances = filtered;
 
+            if (F18Panel.instances.length == 0)
+                F18Panel.currentPanelNum = 1;
 
         });
     }
@@ -184,7 +186,6 @@ export class F18Panel {
                 () => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
             );
         }
-
 
         if (!F18Panel.isDownloadedBinary) {
             vscodeFetchUnzip(fetchOptions).then(() => {

@@ -19,6 +19,15 @@ export function activate(context: vscode.ExtensionContext) {
 		}),
 		vscode.commands.registerCommand('f18.start.fakt', () => {
 			F18Panel.create(context.extensionPath, 'fakt', 'proba_2018');
+		}),
+		vscode.commands.registerCommand('f18.start.os', () => {
+			F18Panel.create(context.extensionPath, 'os', 'proba_2018');
+		}),
+		vscode.commands.registerCommand('f18.start.ld', () => {
+			F18Panel.create(context.extensionPath, 'ld', 'proba_2018');
+		}),
+		vscode.commands.registerCommand('f18.start.epdv', () => {
+			F18Panel.create(context.extensionPath, 'epdv', 'proba_2018');
 		})
 	);
 

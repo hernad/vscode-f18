@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "0.1.0",
+	"version": "0.2.1",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -35,7 +35,23 @@
 				"command": "f18.start.kalk",
 				"title": "start KALK",
 				"category": "F18"
+			},
+			{
+				"command": "f18.start.epdv",
+				"title": "start ePDV",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.os",
+				"title": "start OS",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.ld",
+				"title": "start LD",
+				"category": "F18"
 			}
+		
 		],
 		"configuration": [
 			{
@@ -50,7 +66,10 @@
 							"fin",
 							"kalk",
 							"fakt",
-							"pos"
+							"pos",
+							"epdv",
+							"os",
+							"ld"
 						]
 					},
 					"f18.fullScreen": {
