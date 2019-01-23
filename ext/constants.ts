@@ -5,7 +5,7 @@ export class Constants {
   public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
-export const revision = '20190123.1';
+export const revision = '20190123.2';
 
 export const execHashList: any = {
   'linux-x64': 'c50a26f28978b8536c49d4407094e7c1',
