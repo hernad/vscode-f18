@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "0.3.0",
+	"version": "0.7.0",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -12,6 +12,9 @@
 	"publisher": "bout",
 	"activationEvents": [
 		"*"
+	],
+	"extensionDependencies": [
+		"bout.postgres"
 	],
 	"main": "./build/ext/extension.js",
 	"contributes": {
@@ -51,7 +54,6 @@
 				"title": "start LD",
 				"category": "F18"
 			}
-		
 		],
 		"configuration": [
 			{
@@ -60,7 +62,7 @@
 					"f18.onStart": {
 						"description": "F18 modul koji se inicijalno pokreće",
 						"type": "string",
-						"default": "fin",
+						"default": "",
 						"enum": [
 							"",
 							"fin",
@@ -87,8 +89,8 @@
 		]
 	},
 	"dependencies": {
-		"@types/md5-file": "^4.0.0",
 		"md5-file": "^4.0.0",
+		"pg": "^7.8.0",
 		"proxy-from-env": "^1.0.0",
 		"rimraf": "^2.6.3",
 		"vscode": "^1.1.26"
@@ -103,7 +105,9 @@
 	"devDependencies": {
 		"@types/jest": "^22.2.3",
 		"@types/keytar": "^4.0.1",
+		"@types/md5-file": "^4.0.0",
 		"@types/node": "^10.1.2",
+		"@types/pg": "^7.4.11",
 		"@types/react": "^16.7.12",
 		"@types/react-dom": "^16.0.11",
 		"@types/rimraf": "^2.0.2",

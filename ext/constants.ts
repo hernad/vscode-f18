@@ -3,6 +3,9 @@
 export class Constants {
   public static ExtensionId = 'f18-klijent';
   // public static GlobalStateKey = 'postgresql.connections';
+
+  public static PostgresExtensionId = 'postgres';
+  public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
 export const revision = '20190122.1';

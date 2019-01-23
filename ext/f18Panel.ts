@@ -1,9 +1,11 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { vscodeFetchUnzip } from './fetch_unzip';
+import { vscodeFetchUnzip } from './fetchUnzip';
 import { Helper } from './helper';
 import { Global } from './global';
 import { execHashList, revision } from './constants';
+import { IConnection } from './IConnection';
+import { isContext } from 'vm';
 
 const LINE_HEIGHT = 0.91;
 const LETTER_SPACING = 0;
@@ -24,11 +26,11 @@ export class F18Panel {
     public static firstTerminal: boolean = true;
     public static instances: F18Panel[] = [];
 
-    public static create(extensionPath: string, cModul: string, cOrganizacija: string) {
+    public static create(extensionPath: string, modulF18: string, connection: IConnection) {
         // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
         const column = undefined;
 
-        F18Panel.F18 = new F18Panel(cModul, cOrganizacija, extensionPath, column || vscode.ViewColumn.One);
+        F18Panel.F18 = new F18Panel(modulF18, connection, extensionPath, column || vscode.ViewColumn.One);
 
         vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
             // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
@@ -90,7 +92,7 @@ export class F18Panel {
 
     private terminalInstance?: vscode.Terminal;
     private readonly modul: string;
-    private readonly f18Organizacija: string;
+    private readonly connection: IConnection;
     private readonly panelNum: number;
     private cols: number;
     private rows: number;
@@ -101,11 +103,11 @@ export class F18Panel {
     private terminalDisposed: boolean;
     private webPanelDisposed: boolean;
 
-    private constructor(cModul: string, cOrganizacija: string, extensionPath: string, column: vscode.ViewColumn) {
+    private constructor(cModul: string, connection: IConnection, extensionPath: string, column: vscode.ViewColumn) {
         this.extensionPath = extensionPath;
 
         this.modul = cModul;
-        this.f18Organizacija = cOrganizacija;
+        this.connection = connection;
         this.cols = 120;
         this.rows = 40;
         this.width = 0;
@@ -268,9 +270,9 @@ export class F18Panel {
         // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3  
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so ]]; then ln -sf /lib64/libpcre.so ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
 
-        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}${cmdSeparator} exit`;
+        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul}${cmdSeparator} exit`;
         // console.log(runExe);
-        // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad d ${this.f18Organizacija} --${this.modul}`;
+        // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
 
         let sendInitCmds: string[] = [];
 

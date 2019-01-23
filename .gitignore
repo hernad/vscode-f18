@@ -22,3 +22,5 @@ yarn-error.log*
 build
 cli/node_modules
 cli/yarn.lock
+
+cli/out

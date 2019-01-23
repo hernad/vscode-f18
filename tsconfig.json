@@ -9,8 +9,7 @@
 			"dom"
         ],
         "sourceMap": true,
-        "rootDir": ".",
-        "strict": true
+        "rootDir": "."
 	},
 	"include": [
 		"ext"
