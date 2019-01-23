@@ -14,17 +14,22 @@ export function activate(context: vscode.ExtensionContext) {
 	//	vscode.window.showInformationMessage(dist)
 	//});
 
+	context.subscriptions.push(
+		vscode.commands.registerCommand('f18.start.cmd', () => {
+			F18Panel.create(context.extensionPath, 'cmd', undefined);
+		})
+	)
 
 	const postgresExtension = vscode.extensions.getExtension('bout.postgres');
 	postgresExtension.activate().then(() => {
 		const postgresApi = postgresExtension.exports;
 		// console.log( `postgresql API: ${importedApi.sum(1, 1)} ${importedApi.context()}`);
 		Global.contextPostgres = postgresApi.context();
-		console.log('step: 0');
+		// console.log('step: 0');
 		return(1);
 	}).then((result)=>{
 
-		console.log(`step ${result}`);
+		// console.log(`step ${result}`);
 		PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
 			console.log(connection.database);
 
@@ -53,6 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 		});
 	});
+
 
 	const fullScreen = vscode.workspace.getConfiguration('f18').get('fullScreen');
 

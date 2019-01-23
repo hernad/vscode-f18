@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "0.8.2",
+	"version": "0.9.0",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -53,6 +53,11 @@
 				"command": "f18.start.ld",
 				"title": "start LD",
 				"category": "F18"
+			},
+			{
+				"command": "f18.start.cmd",
+				"title": "start cmd prompt",
+				"category": "Developer"
 			}
 		],
 		"configuration": [

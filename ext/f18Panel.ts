@@ -270,9 +270,14 @@ export class F18Panel {
         // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3  
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so ]]; then ln -sf /lib64/libpcre.so ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
 
-        const runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul}${cmdSeparator} exit`;
+        let runExe: string;
+        if (this.modul !== 'cmd')
+           runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul}${cmdSeparator} exit`;
         // console.log(runExe);
         // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
+
+        const f18HomePath = path.join(Global.folderPath, '..', 'data' );
+        Helper.mkdirp(f18HomePath, null);
 
         let sendInitCmds: string[] = [];
 
@@ -286,7 +291,9 @@ export class F18Panel {
             sendInitCmds.push('if %errorlevel% neq 0 exit');
             sendInitCmds.push(`cd ${Global.folderPath}`);
             sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
-            sendInitCmds.push(`cls`);
+            sendInitCmds.push(`set F18_HOME=${f18HomePath}`);
+            sendInitCmds.push(`cd %F18_HOME%`);
+            (this.modul !== 'cmd') ? sendInitCmds.push('cls') : sendInitCmds.push('echo %CD%');
 
         } else {
             sendInitCmds.push(`stty cols ${this.cols} rows ${this.rows}`);
@@ -297,9 +304,13 @@ export class F18Panel {
                 F18Panel.firstTerminal = false;
             }
             sendInitCmds.push(`export LD_LIBRARY_PATH=${Global.folderPath}`);
-            sendInitCmds.push(`clear`);
+            sendInitCmds.push(`export F18_HOME=${f18HomePath}`);
+            sendInitCmds.push(`cd $F18_HOME`);
+            (this.modul !== 'cmd') ? sendInitCmds.push('clear') : sendInitCmds.push('pwd');
         }
-        sendInitCmds.push(runExe);
+        
+        if (this.modul !== 'cmd')
+           sendInitCmds.push(runExe);
 
         const termOptions = {
             cols: this.cols,
@@ -405,7 +416,7 @@ export class F18Panel {
 				<title>F18 screen</title>
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
 				<link rel="stylesheet" type="text/css" href="${xtermStyleUri}">
-				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000 https://w5xlvm3vzz.lp.gql.zone/graphql; img-src vscode-resource: https: http:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
+				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000; img-src vscode-resource: https: http:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
 				<base href="${vscode.Uri.file(this.extensionPath).with({ scheme: 'vscode-resource' })}/">
 			</head>
 

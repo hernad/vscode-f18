@@ -438,7 +438,7 @@ window.addEventListener('message', (event) => {
 			});
 
 			term.on('title', (title: string) => {
-				console.log(`xterm title: ${title}`);
+				// console.log(`xterm title: ${title}`);
 			});
 
 			term.focus();
