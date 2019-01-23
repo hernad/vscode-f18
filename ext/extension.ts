@@ -3,17 +3,21 @@ import { Global } from './global';
 import { F18Panel } from './f18Panel';
 import { PostgresConnection } from './postgresConnection';
 import { IConnection } from './IConnection';
+// import { Helper } from './helper';
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('F18 ekstenzija aktivna :)');
 
 	Global.context = context;
-	//Global.contextPostgres =
-	let postgresApi;
+
+	//Helper.linux_distribution().then((dist: string) => {
+	//	vscode.window.showInformationMessage(dist)
+	//});
+
 
 	const postgresExtension = vscode.extensions.getExtension('bout.postgres');
 	postgresExtension.activate().then(() => {
-		postgresApi = postgresExtension.exports;
+		const postgresApi = postgresExtension.exports;
 		// console.log( `postgresql API: ${importedApi.sum(1, 1)} ${importedApi.context()}`);
 		Global.contextPostgres = postgresApi.context();
 		console.log('step: 0');

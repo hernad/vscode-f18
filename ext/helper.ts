@@ -260,6 +260,52 @@ export class Helper {
 		return platform;
 	}
 
+	static nfcall(fn: Function, ...args: any[]): Promise<any>;
+	static nfcall<T>(fn: Function, ...args: any[]): Promise<T>;
+	static nfcall(fn: Function, ...args: any[]): any {
+		return new Promise((c, e) => fn(...args, (err: any, result: any) => err ? e(err) : c(result)));
+	}
+
+	static stat(path: string): Promise<fs.Stats> {
+		return Helper.nfcall(fs.stat, path);
+	}
+
+	static fileExists(path: string): Promise<boolean> {
+		return Helper.stat(path).then(stat => stat.isFile(), () => false);
+	}
+
+	static readFile(path: string): Promise<Buffer>;
+	static readFile(path: string, encoding: string): Promise<string>;
+	static readFile(path: string, encoding?: string): Promise<Buffer | string> {
+		return Helper.nfcall(fs.readFile, path, encoding);
+	}
+
+	static linux_distribution(): Promise<string> {
+
+		//if (os.platform() === 'linux') {
+		const file = '/etc/os-release';
+
+		return Helper.fileExists(file).then( (exists) => {
+			if (!exists) {
+				return 'distrib-error0';
+			}
+			return Promise.resolve(
+				Helper.readFile(file)
+					.then(b => {
+						const contents = b.toString();
+						if (/NAME="?Fedora"?/.test(contents)) {
+							return 'Fedora';
+						} else if (/NAME="?Ubuntu"?/.test(contents)) {
+							return 'Ubuntu';
+						}
+						return 'unknown-distribution';
+					}, () => "distrib-error1"))
+
+		}, () => "distrib-error2");
+
+
+	}
+
 }
 
 export function assert(value: any, message: string) {

@@ -5,9 +5,9 @@ import { Helper } from './helper';
 import { Global } from './global';
 import { execHashList, revision } from './constants';
 import { IConnection } from './IConnection';
-import { isContext } from 'vm';
+// import { isContext } from 'vm';
 
-const LINE_HEIGHT = 0.91;
+const LINE_HEIGHT = 0.915;
 const LETTER_SPACING = 0;
 const RENDERER_TYPE = 'canvas'; // 'dom' | 'canvas'
 
