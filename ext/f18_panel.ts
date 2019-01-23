@@ -5,7 +5,6 @@ import { Helper } from './helper';
 import { Global } from './global';
 import { execHashList, revision } from './constants';
 
-
 const LINE_HEIGHT = 0.91;
 const LETTER_SPACING = 0;
 const RENDERER_TYPE = 'canvas'; // 'dom' | 'canvas'
@@ -80,7 +79,6 @@ export class F18Panel {
     }
 
     */
-
 
     private static readonly viewType = 'F18';
     private static currentPanelNum = 1;
@@ -365,20 +363,24 @@ export class F18Panel {
         // const mode = 'development';
         const mode = 'production.min';
 
+        /*
         const reactScript1 = `node_modules/react/umd/react.${mode}.js`;
         const reactScript2 = `node_modules/react-dom/umd/react-dom.${mode}.js`;
-
+    
         //<script src="./node_modules/react/umd/react.development.js"></script>
         //<script src="./node_modules/react-dom/umd/react-dom.development.js"></script>
+        */
 
         const scriptPathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'build', mainScript));
         const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
 
+        /*
         const scriptReact1OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', reactScript1));
         const scriptReact1Uri = scriptReact1OnDisk.with({ scheme: 'vscode-resource' });
 
         const scriptReact2OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', reactScript2));
         const scriptReact2Uri = scriptReact2OnDisk.with({ scheme: 'vscode-resource' });
+        */
 
         const xermStylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', xtermStyle));
         const xtermStyleUri = xermStylePathOnDisk.with({ scheme: 'vscode-resource' });
@@ -407,13 +409,17 @@ export class F18Panel {
 
 			<body>
 				<noscript>You need to enable JavaScript to run this app.</noscript>
-				<div id="root"></div>
-				<script nonce="${nonce}" src="${scriptReact1Uri}"></script>
-				<script nonce="${nonce}" src="${scriptReact2Uri}"></script>
+                <div id="root"></div>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
-			</html>`;
-        // console.log(strHtml);
+            </html>`;
+            
+            /*
+                hernad: react-out
+				<script nonce="${nonce}" src="${scriptReact1Uri}"></script>
+                <script nonce="${nonce}" src="${scriptReact2Uri}"></script>
+            */
+ 
         return strHtml;
     }
 }

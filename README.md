@@ -1,3 +1,3 @@
 # F18 klijent
 
-F18 eShell klijent v31
+F18 eShell klijent (FIN, KALK, FAKT, OS, LD, ePDV, POS)

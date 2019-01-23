@@ -1,3 +1,5 @@
+/*
+hernad: react-out
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -19,6 +21,7 @@ class MyCompoment extends React.Component {
 		);
 	}
 }
+*/
 
 /*
 const numbers = [1, 2, 3];
@@ -27,6 +30,7 @@ for (const num of numbers) {
 }
 */
 
+/*
 const propDugmeNaslov = 'P2 Dugme from Var';
 const myThirdElement = <MySection.Third ptext={propDugmeNaslov} />;
 
@@ -74,20 +78,8 @@ class MyContainer extends React.Component<{}, IMyContainerState> {
 		);
 	}
 }
-
-/*
-const myCompInstance = ReactDOM.render(
-    myThirdElement,
-	document.getElementById('example')
-);
-
-setTimeout(() => {
-	(myCompInstance as React.Component).setState({
-		heading: "React OK",
-		content: "Done"
-	});
-}, 1000);
 */
+
 
 /*
 import { PermissionProvider } from './components/PermissionContext';
@@ -131,6 +123,8 @@ ReactDOM.render(<InheritedComponent />, document.getElementById('example'));
 // import 'bootstrap/dist/css/bootstrap.css';
 // import './components/BootApp.css';
 
+/*
+hernad: apollo-out
 import ApolloClient from 'apollo-boost';
 
 import Forms from './components/BootForms';
@@ -142,6 +136,7 @@ const client = new ApolloClient({
 });
 
 import gql from 'graphql-tag';
+*/
 
 /*
 ReactDOM.render(
@@ -190,7 +185,10 @@ client.query({
 //  .then(result => console.log((result as any).data.allKontos.nodes));
 */
 
+/*
+hernad: react-bootstrap out
 import { Navbar, Nav, NavItem, MenuItem, Grid, Row, Col } from 'react-bootstrap';
+*/
 
 /*
 ReactDOM.render(
@@ -205,14 +203,13 @@ ReactDOM.render(
 
 // const domInstance = ReactDOM.findDOMNode(myCompInstance);
 
+/* 
+hernad: react-out
 import { ApolloProvider } from 'react-apollo';
-// @ts-ignore
-// import { Terminal as XTermTerminal } from "vscode-xterm";
+*/
 
-// import { Terminal } from 'vscode-xterm';
-//import { Terminal } from '';
 
-/// <reference path="vscode-xterm/typings/xterm.d.ts"/>
+/// <reference path="../node_modules/vscode-xterm/typings/xterm.d.ts"/>
 
 import { Terminal } from 'vscode-xterm/lib/public/Terminal';
 // import * as attach from 'xterm/lib/addons/attach/attach';
@@ -234,6 +231,7 @@ import * as winptyCompat from 'vscode-xterm/lib/addons/winptyCompat/winptyCompat
 import { Query } from 'react-apollo';
 // import gql from "graphql-tag";
 
+/* hernad: apollo graphql out"
 const ExchangeRates = () => (
 	<Query
 		query={gql`
@@ -270,6 +268,7 @@ const App = () => (
 		</div>
 	</ApolloProvider>
 );
+*/
 
 // @ts-ignore
 const vscode = acquireVsCodeApi();
@@ -455,18 +454,10 @@ window.addEventListener('message', (event) => {
 	}
 });
 
-/*
-term.setOption('cursorBlink', true);
-term.setOption('cursorStyle', 'block');
-term.setOption('rows', 40);
-term.setOption('cols', 100);
-*/
-
 // (document.getElementsByClassName("xterm-helpers").item(0) as HTMLDivElement).style.visibility = "hidden";;
 // (document.getElementsByClassName("xterm-helper-textarea").item(0) as HTMLDivElement).style.display = 'none';
 //(document.getElementsByClassName("xterm-char-measure-element").item(0) as HTMLDivElement).style.display = 'none';
 
-// xterm.fit();
 
 // ReactDOM.render(<App />, document.getElementById("example"));
 
