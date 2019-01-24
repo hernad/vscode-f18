@@ -393,6 +393,11 @@ export class F18Panel {
 
         let sendInitCmds: string[] = [];
 
+        sendInitCmds.push("");
+        sendInitCmds.push("");
+        sendInitCmds.push("");
+
+        
         if (Helper.is_windows()) {
             sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
             sendInitCmds.push('cls');
@@ -421,6 +426,8 @@ export class F18Panel {
             (this.modul !== 'cmd') ? sendInitCmds.push('clear') : sendInitCmds.push('pwd');
         }
 
+    
+       
         if (this.modul !== 'cmd')
             sendInitCmds.push(runExe);
 

@@ -38,7 +38,7 @@ export class PostgresConnection {
     }
 
     let defaultDatabase = Global.PostgresConfiguration.get<string>("defaultDatabase");
-    /*
+  
     if (defaultDatabase) {
       const conn = await Database.createConnection(connection, 'postgres');
 
@@ -54,8 +54,8 @@ export class PostgresConnection {
         connection = Database.getConnectionWithDB(connection, defaultDatabase);
       }
     }
-    */
-   
+
+
     // console.log(`get default connection ${connection.database}`);
     return connection;
 
