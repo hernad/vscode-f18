@@ -35,20 +35,25 @@ function modulExists(modul: string) {
 process.on('uncaughtException', function (error: Error) {
     // vscode.window.showErrorMessage(error.message)
     console.log(`uncaughtExceptionF18: ${error.message}`);
+    globalHandler(error);
 });
 
 
 process.on('unhandledRejection', function (reason: Error, p) {
-
     // vscode.window.showErrorMessage(`promise unhandled rejection ${reason}`);
+    globalHandler(reason);
 
+});
+
+
+function globalHandler(error: Error) {
     F18Panel.instances.forEach((f18Panel: F18Panel) => {
-        if (reason.message.includes(f18Panel.panelCaption)) {
+        if (error.message.includes(f18Panel.panelCaption)) {
             f18Panel.webPanel.dispose();
 
             // ako je neuspjesno kreirana instanca, ponovi
             const regex = /F18 (\w+) - \d+/;
-            const caption = reason.message;
+            const caption = error.message;
             const modul = caption.replace(regex, "$1")
             if (modulExists(modul)) {
                 console.log(`unhandledRejection novi pokusaj kreiranja: ${modul}`);
@@ -58,9 +63,7 @@ process.on('unhandledRejection', function (reason: Error, p) {
 
         }
     });
-
-});
-
+}
 
 export class F18Panel {
 
