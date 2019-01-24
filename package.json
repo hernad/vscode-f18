@@ -20,6 +20,11 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "f18.selectDatabase",
+				"title": "Odaberi bazu",
+				"category": "F18"
+			},
+			{
 				"command": "f18.start.pos",
 				"title": "start POS",
 				"category": "F18"
@@ -83,6 +88,11 @@
 						"description": "Koristiti čitav ekran",
 						"type": "boolean",
 						"default": true
+					},
+					"f18.selectDatabaseOnStart": {
+						"description": "Upit za odabir baze pri prvom pokretanju",
+						"type": "boolean",
+						"default": false
 					},
 					"f18.fontSize": {
 						"description": "F18 font veličina",

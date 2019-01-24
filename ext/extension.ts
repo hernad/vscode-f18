@@ -3,6 +3,7 @@ import { Global } from './global';
 import { F18Panel } from './f18Panel';
 import { PostgresConnection } from './postgresConnection';
 import { IConnection } from './IConnection';
+import { isContext } from 'vm';
 // import { Helper } from './helper';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -16,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('f18.start.cmd', () => {
-			F18Panel.create(context.extensionPath, 'cmd', undefined);
+			F18Panel.create(context.extensionPath, 'cmd');
 		})
 	)
 
@@ -31,29 +32,32 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// console.log(`step ${result}`);
 		PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
-			console.log(connection.database);
-
+			// console.log(connection.database);
+			
 			context.subscriptions.push(
+				vscode.commands.registerCommand('f18.selectDatabase',
+					() => vscode.commands.executeCommand('postgres.selectDatabase').then(() => console.log('selected database'))
+				),
 				vscode.commands.registerCommand('f18.start.pos', () => {
-					F18Panel.create(context.extensionPath, 'pos', connection);
+					F18Panel.create(context.extensionPath, 'pos');
 				}),
 				vscode.commands.registerCommand('f18.start.fin', () => {
-					F18Panel.create(context.extensionPath, 'fin', connection);
+					F18Panel.create(context.extensionPath, 'fin');
 				}),
 				vscode.commands.registerCommand('f18.start.kalk', () => {
-					F18Panel.create(context.extensionPath, 'kalk', connection);
+					F18Panel.create(context.extensionPath, 'kalk');
 				}),
 				vscode.commands.registerCommand('f18.start.fakt', () => {
-					F18Panel.create(context.extensionPath, 'fakt', connection);
+					F18Panel.create(context.extensionPath, 'fakt');
 				}),
 				vscode.commands.registerCommand('f18.start.os', () => {
-					F18Panel.create(context.extensionPath, 'os', connection);
+					F18Panel.create(context.extensionPath, 'os');
 				}),
 				vscode.commands.registerCommand('f18.start.ld', () => {
-					F18Panel.create(context.extensionPath, 'ld', connection);
+					F18Panel.create(context.extensionPath, 'ld');
 				}),
 				vscode.commands.registerCommand('f18.start.epdv', () => {
-					F18Panel.create(context.extensionPath, 'epdv', connection);
+					F18Panel.create(context.extensionPath, 'epdv');
 				})
 			);
 		});

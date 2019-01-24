@@ -5,6 +5,8 @@ import { Helper } from './helper';
 import { Global } from './global';
 import { execHashList, revision } from './constants';
 import { IConnection } from './IConnection';
+import { PostgresConnection } from './postgresConnection';
+
 // import { isContext } from 'vm';
 
 const LINE_HEIGHT = 0.915;
@@ -26,11 +28,11 @@ export class F18Panel {
     public static firstTerminal: boolean = true;
     public static instances: F18Panel[] = [];
 
-    public static create(extensionPath: string, modulF18: string, connection: IConnection) {
+    public static create(extensionPath: string, modulF18: string) {
         // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
         const column = undefined;
 
-        F18Panel.F18 = new F18Panel(modulF18, connection, extensionPath, column || vscode.ViewColumn.One);
+        F18Panel.F18 = new F18Panel(modulF18, extensionPath, column || vscode.ViewColumn.One);
 
         vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
             // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
@@ -86,13 +88,13 @@ export class F18Panel {
     private static currentPanelNum = 1;
 
     public readonly panelCaption: string;
-    private readonly webPanel: vscode.WebviewPanel;
+    private webPanel: vscode.WebviewPanel;
     private readonly extensionPath: string;
     // private disposables: vscode.Disposable[] = [];
 
     private terminalInstance?: vscode.Terminal;
     private readonly modul: string;
-    private readonly connection: IConnection;
+    private connection: IConnection;
     private readonly panelNum: number;
     private cols: number;
     private rows: number;
@@ -103,11 +105,10 @@ export class F18Panel {
     private terminalDisposed: boolean;
     private webPanelDisposed: boolean;
 
-    private constructor(cModul: string, connection: IConnection, extensionPath: string, column: vscode.ViewColumn) {
+    private constructor(cModul: string, extensionPath: string, column: vscode.ViewColumn) {
         this.extensionPath = extensionPath;
 
         this.modul = cModul;
-        this.connection = connection;
         this.cols = 120;
         this.rows = 40;
         this.width = 0;
@@ -132,69 +133,83 @@ export class F18Panel {
         this.panelCaption = `F18 ${this.modul} - ${this.panelNum}`;
         F18Panel.currentPanelNum++;
 
-        this.webPanel = vscode.window.createWebviewPanel(
-            F18Panel.viewType,
-            this.panelCaption,
-            { viewColumn: column, preserveFocus: false },
-            {
-                enableScripts: true, // Enable javascript in the webview
-                retainContextWhenHidden: true,
+        const getConnectionThenRun = () => PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
+            this.connection = connection;
 
-                // And restric the webview to only loading content from our extension's `media` directory.
-                localResourceRoots: [
-                    vscode.Uri.file(path.join(this.extensionPath, 'cli')),
-                    vscode.Uri.file(path.join(this.extensionPath, 'build'))
-                ]
-            }
-        );
-        this.webPanelDisposed = false;
+            this.webPanel = vscode.window.createWebviewPanel(
+                F18Panel.viewType,
+                this.panelCaption,
+                { viewColumn: column, preserveFocus: false },
+                {
+                    enableScripts: true, // Enable javascript in the webview
+                    retainContextWhenHidden: true,
 
-        F18Panel.instances.push(this);
-
-        this.webPanel.webview.html = this._getHtmlForWebview();
-
-        const fetchOptions = {
-            host: 'https://dl.bintray.com/bringout',
-            packageName: 'F18',
-            // platform: 'windows-x64'
-            revision,
-            cleanup: true,
-            execPath: (Helper.is_windows() ? 'F18.exe' : 'F18'),
-            execHash: execHashList[Helper.os_platform()]
-        };
-
-        const createTerminalInstance = () => {
-            this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
-            this.terminalInstance.processId.then(
-                (processId: number) => {
-                    console.log(`kreiran terminal ${processId}`);
-                    this.terminalDisposed = false;
-                    this.configurePanel();
-                    const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
-                    const configMerged = {
-                        ...config,
-                        rendererType: RENDERER_TYPE,
-                        fontFamily: this.fontFamily,
-                        letterSpacing: LETTER_SPACING,
-                        lineHeight: LINE_HEIGHT
-                    };
-                    this.webPanel.webview.postMessage({
-                        command: 'term-get-dimensions',
-                        data: JSON.stringify(configMerged)
-                    });
-                },
-                () => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
+                    // And restric the webview to only loading content from our extension's `media` directory.
+                    localResourceRoots: [
+                        vscode.Uri.file(path.join(this.extensionPath, 'cli')),
+                        vscode.Uri.file(path.join(this.extensionPath, 'build'))
+                    ]
+                }
             );
-        }
+            this.webPanelDisposed = false;
 
-        if (!F18Panel.isDownloadedBinary) {
-            vscodeFetchUnzip(fetchOptions).then(() => {
-                F18Panel.isDownloadedBinary = true;
+            F18Panel.instances.push(this);
+
+            this.webPanel.webview.html = this._getHtmlForWebview();
+
+            const fetchOptions = {
+                host: 'https://dl.bintray.com/bringout',
+                packageName: 'F18',
+                // platform: 'windows-x64'
+                revision,
+                cleanup: true,
+                execPath: (Helper.is_windows() ? 'F18.exe' : 'F18'),
+                execHash: execHashList[Helper.os_platform()]
+            };
+
+            const createTerminalInstance = () => {
+                this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
+                this.terminalInstance.processId.then(
+                    (processId: number) => {
+                        console.log(`kreiran terminal ${processId}`);
+                        this.terminalDisposed = false;
+                        this.configurePanel();
+                        const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
+                        const configMerged = {
+                            ...config,
+                            rendererType: RENDERER_TYPE,
+                            fontFamily: this.fontFamily,
+                            letterSpacing: LETTER_SPACING,
+                            lineHeight: LINE_HEIGHT
+                        };
+                        this.webPanel.webview.postMessage({
+                            command: 'term-get-dimensions',
+                            data: JSON.stringify(configMerged)
+                        });
+                    },
+                    () => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
+                );
+            }
+
+            if (!F18Panel.isDownloadedBinary) {
+                vscodeFetchUnzip(fetchOptions).then(() => {
+                    F18Panel.isDownloadedBinary = true;
+                    createTerminalInstance();
+                });
+            } else {
                 createTerminalInstance();
-            });
-        } else {
-            createTerminalInstance();
-        }
+            }
+
+        });
+
+        const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
+        if (!F18Panel.isDownloadedBinary && runSelect)
+            vscode.commands.executeCommand('f18.selectDatabase')
+                .then(() => setTimeout(getConnectionThenRun, 770)); // timeout potreban da se propagira promjena konfiguracije
+        else
+            getConnectionThenRun();
+
+
     }
 
 
@@ -272,12 +287,12 @@ export class F18Panel {
 
         let runExe: string;
         if (this.modul !== 'cmd')
-           runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul}${cmdSeparator} exit`;
+            runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul}${cmdSeparator} exit`;
         // console.log(runExe);
         // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
 
-        const f18HomePath = path.join(Global.folderPath, '..', 'data' );
-        Helper.mkdirp(f18HomePath, null);
+        const f18HomePath = path.join(Global.folderPath, '..', 'data');
+        Helper.mkdirp(f18HomePath, () => {});
 
         let sendInitCmds: string[] = [];
 
@@ -308,9 +323,9 @@ export class F18Panel {
             sendInitCmds.push(`cd $F18_HOME`);
             (this.modul !== 'cmd') ? sendInitCmds.push('clear') : sendInitCmds.push('pwd');
         }
-        
+
         if (this.modul !== 'cmd')
-           sendInitCmds.push(runExe);
+            sendInitCmds.push(runExe);
 
         const termOptions = {
             cols: this.cols,
@@ -360,7 +375,7 @@ export class F18Panel {
         F18Panel.F18 = undefined;
     }
     */
-    
+
 
     private _getHtmlForWebview() {
         // const manifest = require(path.join(this.extensionPath, 'out', 'asset-manifest.json'));
@@ -426,13 +441,13 @@ export class F18Panel {
 				<script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
             </html>`;
-            
-            /*
-                hernad: react-out
-				<script nonce="${nonce}" src="${scriptReact1Uri}"></script>
-                <script nonce="${nonce}" src="${scriptReact2Uri}"></script>
-            */
- 
+
+        /*
+            hernad: react-out
+            <script nonce="${nonce}" src="${scriptReact1Uri}"></script>
+            <script nonce="${nonce}" src="${scriptReact2Uri}"></script>
+        */
+
         return strHtml;
     }
 }
