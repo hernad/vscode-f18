@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "0.9.1",
+	"version": "1.0.0",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
