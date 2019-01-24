@@ -243,7 +243,7 @@ export class F18Panel {
                                 })
                                 dimOrPing();
                             }
-                        }, 50);
+                        }, 300);
 
                         dimOrPing();
                         
