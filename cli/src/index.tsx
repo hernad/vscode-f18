@@ -331,9 +331,19 @@ window.addEventListener('message', (event) => {
 		case 'ping':
 		    vscode.postMessage({
 			   command: 'pong'
-		    });
+			});
+			break;
+			
 		case 'term-get-dimensions':
-			config = JSON.parse(message.data);
+		    try {
+			   config = JSON.parse(message.data);
+			} catch {
+			   console.log(`message data get-dimensions error ${message.data}`);
+			   vscode.postMessage({
+				  command: 'dimensions-error',
+				  data: message.data
+			   });
+			}
 			const html = document.body.parentElement;
 			const fm = new FontMeasurer(config, document.body);
 

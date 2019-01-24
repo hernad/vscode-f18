@@ -190,6 +190,7 @@ export class F18Panel {
                             command: 'ping'
                         });
 
+                       
                         const postDimMsg = () => {
                             if (!this.webPanelIsLive) {
                                 vscode.window.showErrorMessage('web panel nije inicijaliziran?!');
@@ -213,6 +214,17 @@ export class F18Panel {
                                 setTimeout(postDimMsg, 500);
                             }
                         }, 200);
+                    
+                        /* dummy varijanta
+                        setTimeout(() => {
+                            console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
+                            this.webPanel.webview.postMessage({
+                                command: 'term-get-dimensions',
+                                data: JSON.stringify(configMerged)
+                            })
+                        }, 200);
+                        */
+
                     },
                     () => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
                 );
@@ -266,6 +278,11 @@ export class F18Panel {
 
                 case 'quit':
                     vscode.window.showErrorMessage(message.data);
+                    this.webPanel.dispose();
+                    break;
+
+                case 'dimensions-error':
+                    vscode.window.showErrorMessage(`received message data: ${message.data}`);
                     this.webPanel.dispose();
                     break;
 
