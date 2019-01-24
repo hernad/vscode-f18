@@ -24,11 +24,6 @@ const DEFAULT_LINUX_FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'D
 // https://stackoverflow.com/questions/35550855/best-way-to-handle-exception-globally-in-node-js-with-express-4
 
 
-process.on('uncaughtException', function (error: Error) {
-    // vscode.window.showErrorMessage(error.message)
-    console.log(error.message);
-});
-
 
 function modulExists(modul: string) {
 
@@ -36,6 +31,12 @@ function modulExists(modul: string) {
         findIndex((el) => el === modul) > 0
 
 }
+
+process.on('uncaughtException', function (error: Error) {
+    // vscode.window.showErrorMessage(error.message)
+    console.log(`uncaughtExceptionF18: ${error.message}`);
+});
+
 
 process.on('unhandledRejection', function (reason: Error, p) {
 
