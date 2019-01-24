@@ -158,6 +158,7 @@ export class F18Panel {
                 }
             );
             this.webPanelDisposed = false;
+            this.configurePanel();
 
             F18Panel.instances.push(this);
 
@@ -180,7 +181,6 @@ export class F18Panel {
                     (processId: number) => {
                         console.log(`kreiran terminal ${processId}`);
                         this.terminalDisposed = false;
-                        this.configurePanel();
                         const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
                         const configMerged = {
                             ...config,
@@ -190,9 +190,11 @@ export class F18Panel {
                             lineHeight: LINE_HEIGHT
                         };
 
+                        /*
                         this.webPanel.webview.postMessage({
                             command: 'ping'
                         });
+                        */
 
                         /*
                         const postDimMsg = () => {
@@ -229,8 +231,8 @@ export class F18Panel {
                         sendDimensionsWhile();
                         */
 
-                        // dummy varijanta
-                        const dimOrPing = () => setTimeout(() => {
+          
+                        const dim = () => setTimeout(() => {
                             console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
                             if (this.webPanelIsLive) {
                                 this.webPanel.webview.postMessage({
@@ -238,14 +240,11 @@ export class F18Panel {
                                     data: JSON.stringify(configMerged)
                                 })
                             } else {
-                                this.webPanel.webview.postMessage({
-                                    command: 'ping'
-                                })
-                                dimOrPing();
+                                dim();
                             }
                         }, 300);
 
-                        dimOrPing();
+                        dim();
                         
 
                     },
@@ -294,6 +293,11 @@ export class F18Panel {
             switch (message.command) {
                 case 'pong':
                     this.webPanelIsLive = true;
+                    break;
+
+                case 'ready':
+                    this.webPanelIsLive = true;
+                    break;
 
                 case 'alert':
                     vscode.window.showErrorMessage(message.data);
@@ -506,7 +510,7 @@ export class F18Panel {
 				<title>F18 screen</title>
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
 				<link rel="stylesheet" type="text/css" href="${xtermStyleUri}">
-				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000; img-src vscode-resource: https: http:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
+				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000; img-src vscode-resource: https: http:; script-src 'unsafe-eval' 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline' http: https: data:;">
 				<base href="${vscode.Uri.file(this.extensionPath).with({ scheme: 'vscode-resource' })}/">
 			</head>
 

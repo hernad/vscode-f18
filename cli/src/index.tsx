@@ -288,7 +288,10 @@ let config: any;
 
 if (document.addEventListener) {
 	document.addEventListener('DOMContentLoaded', (event) => {
-		// console.log('document loaded');
+		vscode.postMessage({
+				command: 'ready'
+		});
+		console.log('document loaded - post msg ready');
 	});
 }
 
@@ -329,21 +332,21 @@ window.addEventListener('message', (event) => {
 
 	switch (message.command) {
 		case 'ping':
-		    console.log('dosao ping :)');
-		    vscode.postMessage({
-			   command: 'pong'
+			console.log('dosao ping :)');
+			vscode.postMessage({
+				command: 'pong'
 			});
 			break;
 
 		case 'term-get-dimensions':
-		    try {
-			   config = JSON.parse(message.data);
+			try {
+				config = JSON.parse(message.data);
 			} catch {
-			   console.log(`message data get-dimensions error ${message.data}`);
-			   vscode.postMessage({
-				  command: 'dimensions-error',
-				  data: message.data
-			   });
+				console.log(`message data get-dimensions error ${message.data}`);
+				vscode.postMessage({
+					command: 'dimensions-error',
+					data: message.data
+				});
 			}
 			const html = document.body.parentElement;
 			const fm = new FontMeasurer(config, document.body);
