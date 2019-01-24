@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 // import { Global } from './global';
 
 export class OutputChannel {
-  private static outputChannel = vscode.window.createOutputChannel('PostgreSQL');
+  private static outputChannel = vscode.window.createOutputChannel('F18');
 
   public static show(): void {
     OutputChannel.outputChannel.show(true);

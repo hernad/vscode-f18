@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('f18.start.cmd', () => {
-			F18Panel.create(context.extensionPath, 'cmd');
+			F18Panel.create('cmd');
 		})
 	)
 
@@ -39,25 +39,25 @@ export function activate(context: vscode.ExtensionContext) {
 					() => vscode.commands.executeCommand('postgres.selectDatabase').then(() => console.log('selected database'))
 				),
 				vscode.commands.registerCommand('f18.start.pos', () => {
-					F18Panel.create(context.extensionPath, 'pos');
+					F18Panel.create('pos');
 				}),
 				vscode.commands.registerCommand('f18.start.fin', () => {
-					F18Panel.create(context.extensionPath, 'fin');
+					F18Panel.create('fin');
 				}),
 				vscode.commands.registerCommand('f18.start.kalk', () => {
-					F18Panel.create(context.extensionPath, 'kalk');
+					F18Panel.create('kalk');
 				}),
 				vscode.commands.registerCommand('f18.start.fakt', () => {
-					F18Panel.create(context.extensionPath, 'fakt');
+					F18Panel.create('fakt');
 				}),
 				vscode.commands.registerCommand('f18.start.os', () => {
-					F18Panel.create(context.extensionPath, 'os');
+					F18Panel.create('os');
 				}),
 				vscode.commands.registerCommand('f18.start.ld', () => {
-					F18Panel.create(context.extensionPath, 'ld');
+					F18Panel.create('ld');
 				}),
 				vscode.commands.registerCommand('f18.start.epdv', () => {
-					F18Panel.create(context.extensionPath, 'epdv');
+					F18Panel.create('epdv');
 				})
 			);
 		});
@@ -80,8 +80,9 @@ export function activate(context: vscode.ExtensionContext) {
 	// vscode.commands.executeCommand('workbench.action.toggleSidebarVisibility');
 
 	setTimeout(() => {
-		const onStart = vscode.workspace.getConfiguration('f18').get('onStart');
-		vscode.commands.executeCommand(`f18.start.${onStart}`);
+		const onStart: string = vscode.workspace.getConfiguration('f18').get('onStart');
+		if (onStart.trim() !== '')
+		    vscode.commands.executeCommand(`f18.start.${onStart}`);
 	}, 1000);
 }
 

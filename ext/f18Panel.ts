@@ -21,21 +21,59 @@ const DEFAULT_LINUX_FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'D
 
 // EDITOR_FONT_DEFAULTS.fontFamily
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+// https://stackoverflow.com/questions/35550855/best-way-to-handle-exception-globally-in-node-js-with-express-4
+
+
+process.on('uncaughtException', function (error: Error) {
+    // vscode.window.showErrorMessage(error.message)
+    console.log(error.message);
+});
+
+
+function modulOk(modul: string) {
+
+    return ['fin', 'kalk', 'fakt', 'os', 'ld', 'pos', 'epdv', 'cmd'].
+        findIndex((el) => el === modul) > 0
+
 }
+
+process.on('unhandledRejection', function (reason: Error, p) {
+    
+    // vscode.window.showErrorMessage(`promise unhandled rejection ${reason}`);
+
+    F18Panel.instances.forEach((f18Panel: F18Panel) => {
+        if (reason.message.includes(f18Panel.panelCaption)) {
+            f18Panel.webPanel.dispose();
+
+            // ako je neuspjesno kreirana instanca, ponovi
+            const regex = /F18 (\w+) - \d+/;
+            const caption = reason.message;
+            const modul = caption.replace(regex, "$1")
+            if (modulOk(modul))
+                F18Panel.create(modul);
+            console.log();
+
+
+
+        }
+    });
+
+});
+
+
 export class F18Panel {
 
     public static F18: F18Panel | undefined;
     public static isDownloadedBinary: boolean = false;
     public static firstTerminal: boolean = true;
     public static instances: F18Panel[] = [];
+    public webPanel: vscode.WebviewPanel;
 
-    public static create(extensionPath: string, modulF18: string) {
+    public static create(modulF18: string) {
         // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
         const column = undefined;
 
-        F18Panel.F18 = new F18Panel(modulF18, extensionPath, column || vscode.ViewColumn.One);
+        F18Panel.F18 = new F18Panel(modulF18, column || vscode.ViewColumn.One);
 
         vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
             // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
@@ -91,7 +129,6 @@ export class F18Panel {
     private static currentPanelNum = 1;
 
     public readonly panelCaption: string;
-    private webPanel: vscode.WebviewPanel;
     private webPanelIsLive: boolean;
     private readonly extensionPath: string;
     // private disposables: vscode.Disposable[] = [];
@@ -110,9 +147,10 @@ export class F18Panel {
     private webPanelDisposed: boolean;
 
 
-    private constructor(cModul: string, extensionPath: string, column: vscode.ViewColumn) {
-        this.extensionPath = extensionPath;
 
+    private constructor(cModul: string, column: vscode.ViewColumn) {
+
+        this.extensionPath = Global.context.extensionPath;
         this.modul = cModul;
         this.cols = 120;
         this.rows = 40;
@@ -130,7 +168,7 @@ export class F18Panel {
         }
 
         this.fontFamily = Helper.is_windows() ? DEFAULT_WINDOWS_FONT_FAMILY : DEFAULT_LINUX_FONT_FAMILY;
-        const tmpFF = vscode.workspace.getConfiguration('editor').get('fontFamily');
+        const tmpFF = vscode.workspace.getConfiguration('editor', null).get('fontFamily');
         tmpFF !== undefined
             ? (this.fontFamily = tmpFF as string)
             : vscode.window.showErrorMessage('config editor.fontFamily?!');
@@ -177,88 +215,62 @@ export class F18Panel {
             const createTerminalInstance = () => {
 
                 this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
-                this.terminalInstance.processId.then(
-                    (processId: number) => {
-                        console.log(`kreiran terminal ${processId}`);
-                        this.terminalDisposed = false;
-                        const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
-                        const configMerged = {
-                            ...config,
-                            rendererType: RENDERER_TYPE,
-                            fontFamily: this.fontFamily,
-                            letterSpacing: LETTER_SPACING,
-                            lineHeight: LINE_HEIGHT
-                        };
+                this.terminalInstance.processId
+                    .then(
+                        (processId: number) => {
+                            console.log(`kreiran terminal ${processId}`);
+                            this.terminalDisposed = false;
+                            const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
+                            const configMerged = {
+                                ...config,
+                                rendererType: RENDERER_TYPE,
+                                fontFamily: this.fontFamily,
+                                letterSpacing: LETTER_SPACING,
+                                lineHeight: LINE_HEIGHT
+                            };
 
-                        /*
-                        this.webPanel.webview.postMessage({
-                            command: 'ping'
-                        });
-                        */
+                            let count = 0;
+                            const dim = () => setTimeout(() => {
+                                console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
+                                if (this.webPanelIsLive) {
+                                    this.webPanel.webview.postMessage({
+                                        command: 'term-get-dimensions',
+                                        data: JSON.stringify(configMerged)
+                                    })
+                                } else {
+                                    count++;
+                                    if (count > 3)
+                                       throw new Error(this.panelCaption)
+                                    else
+                                        dim();
+                                }
+                            }, 300);
 
-                        /*
-                        const postDimMsg = () => {
-                            if (!this.webPanelIsLive) {
-                                vscode.window.showErrorMessage('web panel nije inicijaliziran?!');
-                                this.webPanel.dispose();
-                                return;
-                            }
-                            this.webPanel.webview.postMessage({
-                                command: 'term-get-dimensions',
-                                data: JSON.stringify(configMerged)
-                            });
-                        };
+                            dim();
 
+                            // test handliranja greske
+                            // if (this.panelCaption.includes('2'))
+                            //    throw new Error(this.panelCaption);
 
-                        const sendDimensionsWhile = async () => {
-
-                            // console.log('Taking a break...');
-                            // await sleep(200);
-                            // console.log('Two seconds later');
-
-                            while (!this.webPanelIsLive) {
-                                // webview se jos nije inicijalizovao, ponovi ping
-                                console.log('ping...')
-                                this.webPanel.webview.postMessage({
-                                    command: 'ping'
-                                });
-                                await (200);
-                            }
-                            postDimMsg();
+                        },
+                        () => {
+                            console.log(`terminal ${this.panelCaption} se ne može kreirati?!`);
+                            throw new Error(this.panelCaption);
                         }
-                        
-
-                        sendDimensionsWhile();
-                        */
-
-          
-                        const dim = () => setTimeout(() => {
-                            console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
-                            if (this.webPanelIsLive) {
-                                this.webPanel.webview.postMessage({
-                                    command: 'term-get-dimensions',
-                                    data: JSON.stringify(configMerged)
-                                })
-                            } else {
-                                dim();
-                            }
-                        }, 300);
-
-                        dim();
-                        
-
-                    },
-                    () => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
-                );
+                    );
             }
 
-            if (!F18Panel.isDownloadedBinary) {
-                vscodeFetchUnzip(fetchOptions).then(() => {
-                    F18Panel.isDownloadedBinary = true;
+            try {
+                if (!F18Panel.isDownloadedBinary) {
+                    vscodeFetchUnzip(fetchOptions).then(() => {
+                        F18Panel.isDownloadedBinary = true;
+                        createTerminalInstance();
+                    });
+                } else {
                     createTerminalInstance();
-                });
-            } else {
-                createTerminalInstance();
+                }
+            } catch (e) {
+                vscode.window.showErrorMessage(`imamo proooblem ${e}`);
             }
 
         });
@@ -291,12 +303,14 @@ export class F18Panel {
         // Handle messages from the webview
         this.webPanel.webview.onDidReceiveMessage((message: any) => {
             switch (message.command) {
+
                 case 'pong':
                     this.webPanelIsLive = true;
                     break;
 
                 case 'ready':
-                    this.webPanelIsLive = true;
+                    // pingaj webview to check its correctness
+                    this.webPanel.webview.postMessage({ command: 'ping' });
                     break;
 
                 case 'alert':

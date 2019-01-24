@@ -288,6 +288,7 @@ let config: any;
 
 if (document.addEventListener) {
 	document.addEventListener('DOMContentLoaded', (event) => {
+		if (!vscode.postMessage) console.log('postMessage error 0');
 		vscode.postMessage({
 				command: 'ready'
 		});
@@ -331,8 +332,10 @@ window.addEventListener('message', (event) => {
 	//if (!vscode.postMessage)
 
 	switch (message.command) {
+	
 		case 'ping':
 			console.log('dosao ping :)');
+			if (!vscode.postMessage) console.log('postMessage error 5');
 			vscode.postMessage({
 				command: 'pong'
 			});
@@ -362,11 +365,13 @@ window.addEventListener('message', (event) => {
 				//charHeight: measure.charHeight
 			});
 
+			console.log(`cli-dimensions: ${data}`);
+			if (!vscode.postMessage) console.log('postMessage error 6');
 			vscode.postMessage({
 				command: 'cli-dimensions',
 				data
 			});
-			console.log(`${data}`);
+			
 			break;
 
 		case 'term-create':
@@ -402,6 +407,7 @@ window.addEventListener('message', (event) => {
 			// hvata sve evente - i keystrokes i mouse evente
 			term.on('data', (data: any) => {
 				// console.log(`cli-input: ${data}`);
+				if (!vscode.postMessage) console.log('postMessage error 1');
 				vscode.postMessage({
 					command: 'cli-input',
 					data
@@ -452,6 +458,7 @@ window.addEventListener('message', (event) => {
 				// 	data: '\x1b[24~' // K_F12
 				// });
 				// console.log('term on focus');
+				if (!vscode.postMessage) console.log('postMessage error 2');
 				vscode.postMessage({
 					command: 'cli-focus'
 				});
@@ -461,12 +468,13 @@ window.addEventListener('message', (event) => {
 				// console.log(`xterm title: ${title}`);
 			});
 
-			if (!term)
+			if (!term) {
+			     if (!vscode.postMessage) console.log('postMessage error 3');
 				vscode.postMessage({
 					command: 'quit',
 					data: "Term objekat error?!"
 				});
-			else
+			} else
 				term.focus();
 			break;
 
