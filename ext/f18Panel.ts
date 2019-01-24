@@ -89,6 +89,7 @@ export class F18Panel {
 
     public readonly panelCaption: string;
     private webPanel: vscode.WebviewPanel;
+    private webPanelIsLive: boolean;
     private readonly extensionPath: string;
     // private disposables: vscode.Disposable[] = [];
 
@@ -116,6 +117,7 @@ export class F18Panel {
         this.fontSize = 16;
         this.terminalDisposed = false;
         this.webPanelDisposed = false;
+        this.webPanelIsLive = false;
 
         const tmpFS = vscode.workspace.getConfiguration('f18').get('fontSize');
         if (tmpFS !== undefined) {
@@ -168,6 +170,7 @@ export class F18Panel {
             };
 
             const createTerminalInstance = () => {
+
                 this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
                 this.terminalInstance.processId.then(
                     (processId: number) => {
@@ -182,10 +185,34 @@ export class F18Panel {
                             letterSpacing: LETTER_SPACING,
                             lineHeight: LINE_HEIGHT
                         };
+
                         this.webPanel.webview.postMessage({
-                            command: 'term-get-dimensions',
-                            data: JSON.stringify(configMerged)
+                            command: 'ping'
                         });
+
+                        const postDimMsg = () => {
+                            if (!this.webPanelIsLive) {
+                                vscode.window.showErrorMessage('web panel nije inicijaliziran?!');
+                                this.webPanel.dispose();
+                                return;
+                            }
+                            this.webPanel.webview.postMessage({
+                                command: 'term-get-dimensions',
+                                data: JSON.stringify(configMerged)
+                            });
+                        };
+
+                        setTimeout(() => {
+                            if (this.webPanelIsLive)
+                                postDimMsg();
+                            else {
+                                // webview se jos nije inicijalizovao, ponovi ping
+                                this.webPanel.webview.postMessage({
+                                    command: 'ping'
+                                });
+                                setTimeout(postDimMsg, 500);
+                            }
+                        }, 200);
                     },
                     () => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
                 );
@@ -230,8 +257,16 @@ export class F18Panel {
         // Handle messages from the webview
         this.webPanel.webview.onDidReceiveMessage((message: any) => {
             switch (message.command) {
+                case 'pong':
+                    this.webPanelIsLive = true;
+
                 case 'alert':
                     vscode.window.showErrorMessage(message.data);
+                    break;
+
+                case 'quit':
+                    vscode.window.showErrorMessage(message.data);
+                    this.webPanel.dispose();
                     break;
 
                 case 'cli-dimensions':
@@ -292,7 +327,7 @@ export class F18Panel {
         // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
 
         const f18HomePath = path.join(Global.folderPath, '..', 'data');
-        Helper.mkdirp(f18HomePath, () => {});
+        Helper.mkdirp(f18HomePath, () => { });
 
         let sendInitCmds: string[] = [];
 

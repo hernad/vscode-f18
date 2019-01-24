@@ -228,7 +228,8 @@ import * as winptyCompat from 'vscode-xterm/lib/addons/winptyCompat/winptyCompat
 // import * as search from 'vscode-xterm/lib/addons/search/search';
 // import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
 
-import { Query } from 'react-apollo';
+// import { Query } from 'react-apollo';
+// import { notDeepEqual } from 'assert';
 // import gql from "graphql-tag";
 
 /* hernad: apollo graphql out"
@@ -324,7 +325,13 @@ window.addEventListener('pageshow', (event) => {
 window.addEventListener('message', (event) => {
 	const message = (event as any).data; // The JSON data our extension sent
 
+	//if (!vscode.postMessage)
+
 	switch (message.command) {
+		case 'ping':
+		    vscode.postMessage({
+			   command: 'pong'
+		    });
 		case 'term-get-dimensions':
 			config = JSON.parse(message.data);
 			const html = document.body.parentElement;
@@ -358,7 +365,6 @@ window.addEventListener('message', (event) => {
 			*/
 
 			headerWithWrapper.innerHTML = '<div id="terminal" class="terminal-wrapper"></div>';
-
 
 			//const xtermElement = document.createElement('div');
 			const container = document.getElementById('root');
@@ -441,7 +447,13 @@ window.addEventListener('message', (event) => {
 				// console.log(`xterm title: ${title}`);
 			});
 
-			term.focus();
+			if (!term)
+				vscode.postMessage({
+					command: 'quit',
+					data: "Term objekat error?!"
+				});
+			else
+				term.focus();
 			break;
 
 		case 'term-write':
@@ -617,7 +629,7 @@ class FontMeasurer {
 		return this._lastFontMeasurement;
 	}
 
-	public evaluateColsAndRows(width: number, height: number): { rows: number, cols: number} {
+	public evaluateColsAndRows(width: number, height: number): { rows: number, cols: number } {
 		// Ignore if dimensions are undefined or 0
 		if (!width || !height) {
 			return null;
