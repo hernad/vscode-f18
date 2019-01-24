@@ -329,11 +329,12 @@ window.addEventListener('message', (event) => {
 
 	switch (message.command) {
 		case 'ping':
+		    console.log('dosao ping :)');
 		    vscode.postMessage({
 			   command: 'pong'
 			});
 			break;
-			
+
 		case 'term-get-dimensions':
 		    try {
 			   config = JSON.parse(message.data);

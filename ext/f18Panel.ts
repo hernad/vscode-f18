@@ -21,6 +21,9 @@ const DEFAULT_LINUX_FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'D
 
 // EDITOR_FONT_DEFAULTS.fontFamily
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 export class F18Panel {
 
     public static F18: F18Panel | undefined;
@@ -106,6 +109,7 @@ export class F18Panel {
     private terminalDisposed: boolean;
     private webPanelDisposed: boolean;
 
+
     private constructor(cModul: string, extensionPath: string, column: vscode.ViewColumn) {
         this.extensionPath = extensionPath;
 
@@ -190,7 +194,7 @@ export class F18Panel {
                             command: 'ping'
                         });
 
-                       
+                        /*
                         const postDimMsg = () => {
                             if (!this.webPanelIsLive) {
                                 vscode.window.showErrorMessage('web panel nije inicijaliziran?!');
@@ -203,27 +207,46 @@ export class F18Panel {
                             });
                         };
 
-                        setTimeout(() => {
-                            if (this.webPanelIsLive)
-                                postDimMsg();
-                            else {
+
+                        const sendDimensionsWhile = async () => {
+
+                            // console.log('Taking a break...');
+                            // await sleep(200);
+                            // console.log('Two seconds later');
+
+                            while (!this.webPanelIsLive) {
                                 // webview se jos nije inicijalizovao, ponovi ping
+                                console.log('ping...')
                                 this.webPanel.webview.postMessage({
                                     command: 'ping'
                                 });
-                                setTimeout(postDimMsg, 500);
+                                await (200);
                             }
-                        }, 200);
-                    
-                        /* dummy varijanta
-                        setTimeout(() => {
-                            console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
-                            this.webPanel.webview.postMessage({
-                                command: 'term-get-dimensions',
-                                data: JSON.stringify(configMerged)
-                            })
-                        }, 200);
+                            postDimMsg();
+                        }
+                        
+
+                        sendDimensionsWhile();
                         */
+
+                        // dummy varijanta
+                        const dimOrPing = () => setTimeout(() => {
+                            console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
+                            if (this.webPanelIsLive) {
+                                this.webPanel.webview.postMessage({
+                                    command: 'term-get-dimensions',
+                                    data: JSON.stringify(configMerged)
+                                })
+                            } else {
+                                this.webPanel.webview.postMessage({
+                                    command: 'ping'
+                                })
+                                dimOrPing();
+                            }
+                        }, 50);
+
+                        dimOrPing();
+                        
 
                     },
                     () => vscode.window.showErrorMessage('terminal se ne može kreirati?!')
