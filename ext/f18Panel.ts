@@ -30,7 +30,7 @@ process.on('uncaughtException', function (error: Error) {
 });
 
 
-function modulOk(modul: string) {
+function modulExists(modul: string) {
 
     return ['fin', 'kalk', 'fakt', 'os', 'ld', 'pos', 'epdv', 'cmd'].
         findIndex((el) => el === modul) > 0
@@ -49,11 +49,11 @@ process.on('unhandledRejection', function (reason: Error, p) {
             const regex = /F18 (\w+) - \d+/;
             const caption = reason.message;
             const modul = caption.replace(regex, "$1")
-            if (modulOk(modul))
+            if (modulExists(modul)) {
+                console.log(`unhandledRejection novi pokusaj kreiranja: ${modul}`);
                 F18Panel.create(modul);
-            console.log();
-
-
+            } 
+            else console.log(`unhandledRejection - ne znam sta uraditi sa: ${caption}`);
 
         }
     });
@@ -270,7 +270,7 @@ export class F18Panel {
                     createTerminalInstance();
                 }
             } catch (e) {
-                vscode.window.showErrorMessage(`imamo proooblem ${e}`);
+                throw new Error(this.panelCaption);
             }
 
         });
