@@ -38,7 +38,7 @@ function modulExists(modul: string) {
 }
 
 process.on('unhandledRejection', function (reason: Error, p) {
-    
+
     // vscode.window.showErrorMessage(`promise unhandled rejection ${reason}`);
 
     F18Panel.instances.forEach((f18Panel: F18Panel) => {
@@ -52,7 +52,7 @@ process.on('unhandledRejection', function (reason: Error, p) {
             if (modulExists(modul)) {
                 console.log(`unhandledRejection novi pokusaj kreiranja: ${modul}`);
                 F18Panel.create(modul);
-            } 
+            }
             else console.log(`unhandledRejection - ne znam sta uraditi sa: ${caption}`);
 
         }
@@ -146,8 +146,6 @@ export class F18Panel {
     private terminalDisposed: boolean;
     private webPanelDisposed: boolean;
 
-
-
     private constructor(cModul: string, column: vscode.ViewColumn) {
 
         this.extensionPath = Global.context.extensionPath;
@@ -240,7 +238,7 @@ export class F18Panel {
                                 } else {
                                     count++;
                                     if (count > 3)
-                                       throw new Error(this.panelCaption)
+                                        throw new Error(this.panelCaption)
                                     else
                                         dim();
                                 }
@@ -276,13 +274,15 @@ export class F18Panel {
         });
 
         const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
-        if (!F18Panel.isDownloadedBinary && runSelect)
-            vscode.commands.executeCommand('f18.selectDatabase')
-                .then(() => setTimeout(getConnectionThenRun, 770)); // timeout potreban da se propagira promjena konfiguracije
-        else
-            getConnectionThenRun();
-
-
+        try {
+            if (!F18Panel.isDownloadedBinary && runSelect)
+                vscode.commands.executeCommand('f18.selectDatabase')
+                    .then(() => setTimeout(getConnectionThenRun, 770)); // timeout potreban da se propagira promjena konfiguracije
+            else
+                getConnectionThenRun();
+        } catch {
+            throw (this.panelCaption);
+        }
     }
 
 
