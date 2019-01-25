@@ -280,7 +280,7 @@ const vscode = acquireVsCodeApi();
 // https://xtermjs.org/docs/api/addons/fullscreen/
 // Terminal.applyAddon(fullscreen);
 // Terminal.applyAddon(search);
-Terminal.applyAddon(webLinks);
+// Terminal.applyAddon(webLinks);
 Terminal.applyAddon(winptyCompat);
 
 let term: any;
