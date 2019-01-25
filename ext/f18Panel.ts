@@ -399,7 +399,7 @@ export class F18Panel {
 
         let adminParams = '';
         if (this.adminConnection !== undefined) {
-            adminParams = `-ua ${this.adminConnection.user} -up ${this.adminConnection.password}`;
+            adminParams = `-ua ${this.adminConnection.user} -pa ${this.adminConnection.password}`;
         }
         let runExe: string;
         if (this.modul !== 'cmd')
