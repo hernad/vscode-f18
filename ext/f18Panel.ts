@@ -75,9 +75,9 @@ export class F18Panel {
 
     public static create(modulF18: string) {
         // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
-        const column = undefined;
+        // const column = undefined;
 
-        F18Panel.F18 = new F18Panel(modulF18, column || vscode.ViewColumn.One);
+        F18Panel.F18 = new F18Panel(modulF18, vscode.ViewColumn.One);
 
         vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
             // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
@@ -140,6 +140,7 @@ export class F18Panel {
     private terminalInstance?: vscode.Terminal;
     private readonly modul: string;
     private connection: IConnection;
+    private adminConnection: IConnection;
     private readonly panelNum: number;
     private cols: number;
     private rows: number;
@@ -181,103 +182,16 @@ export class F18Panel {
 
         const getConnectionThenRun = () => PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
             this.connection = connection;
+            PostgresConnection.getDefaultConnection('admin').then( (adminConnection: IConnection) => {
 
-            this.webPanel = vscode.window.createWebviewPanel(
-                F18Panel.viewType,
-                this.panelCaption,
-                { viewColumn: column, preserveFocus: false },
-                {
-                    enableScripts: true, // Enable javascript in the webview
-                    retainContextWhenHidden: true,
-
-                    // And restric the webview to only loading content from our extension's `media` directory.
-                    localResourceRoots: [
-                        vscode.Uri.file(path.join(this.extensionPath, 'cli')),
-                        vscode.Uri.file(path.join(this.extensionPath, 'build'))
-                    ]
-                }
-            );
-            this.webPanelDisposed = false;
-            this.configurePanel();
-
-            F18Panel.instances.push(this);
-
-            this.webPanel.webview.html = this._getHtmlForWebview();
-
-            const fetchOptions = {
-                host: 'https://dl.bintray.com/bringout',
-                packageName: 'F18',
-                // platform: 'windows-x64'
-                revision,
-                cleanup: true,
-                execPath: (Helper.is_windows() ? 'F18.exe' : 'F18'),
-                execHash: execHashList[Helper.os_platform()]
-            };
-
-
-            const createTerminalInstance = () => {
-
-                this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
-                this.terminalInstance.processId
-                    .then(
-                        (processId: number) => {
-                            console.log(`kreiran terminal ${processId}`);
-                            this.terminalDisposed = false;
-                            const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
-                            const configMerged = {
-                                ...config,
-                                rendererType: RENDERER_TYPE,
-                                fontFamily: this.fontFamily,
-                                letterSpacing: LETTER_SPACING,
-                                lineHeight: LINE_HEIGHT
-                            };
-
-                            let count = 0;
-                            const dim = () => setTimeout(() => {
-                                console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
-                                if (this.webPanelIsLive) {
-                                    this.webPanel.webview.postMessage({
-                                        command: 'term-get-dimensions',
-                                        data: JSON.stringify(configMerged)
-                                    })
-                                } else {
-                                    count++;
-                                    if (count > 3)
-                                        throw new Error(this.panelCaption)
-                                    else
-                                        dim();
-                                }
-                            }, 300);
-
-                            dim();
-
-                            // test handliranja greske
-                            // if (this.panelCaption.includes('2'))
-                            //    throw new Error(this.panelCaption);
-
-                        },
-                        () => {
-                            console.log(`terminal ${this.panelCaption} se ne može kreirati?!`);
-                            throw new Error(this.panelCaption);
-                        }
-                    );
-            }
-            
-
-            try {
-                if (!F18Panel.isDownloadedBinary) {
-                    vscodeFetchUnzip(fetchOptions).then(() => {
-                        F18Panel.isDownloadedBinary = true;
-                        createTerminalInstance();
-                    });
-                } else {
-                    createTerminalInstance();
-                }
-            } catch (e) {
-                throw new Error(this.panelCaption);
-            }
-
-        });
+                this.adminConnection = adminConnection;
+                this.afterConnect();
+            }).catch(() => {
+                this.adminConnection = undefined;
+                this.afterConnect();
+            });
+        })
+        
 
         const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
         try {
@@ -291,6 +205,105 @@ export class F18Panel {
         }
     }
 
+
+    private afterConnect() {
+
+        this.webPanel = vscode.window.createWebviewPanel(
+            F18Panel.viewType,
+            this.panelCaption,
+            { viewColumn: undefined, preserveFocus: false },
+            {
+                enableScripts: true, // Enable javascript in the webview
+                retainContextWhenHidden: true,
+
+                // And restric the webview to only loading content from our extension's `media` directory.
+                localResourceRoots: [
+                    vscode.Uri.file(path.join(this.extensionPath, 'cli')),
+                    vscode.Uri.file(path.join(this.extensionPath, 'build'))
+                ]
+            }
+        );
+        this.webPanelDisposed = false;
+        this.configurePanel();
+
+        F18Panel.instances.push(this);
+
+        this.webPanel.webview.html = this._getHtmlForWebview();
+
+        const fetchOptions = {
+            host: 'https://dl.bintray.com/bringout',
+            packageName: 'F18',
+            // platform: 'windows-x64'
+            revision,
+            cleanup: true,
+            execPath: (Helper.is_windows() ? 'F18.exe' : 'F18'),
+            execHash: execHashList[Helper.os_platform()]
+        };
+
+        const createTerminalInstance = () => {
+
+            this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
+            this.terminalInstance.processId
+                .then(
+                    (processId: number) => {
+                        console.log(`kreiran terminal ${processId}`);
+                        this.terminalDisposed = false;
+                        const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
+                        const configMerged = {
+                            ...config,
+                            rendererType: RENDERER_TYPE,
+                            fontFamily: this.fontFamily,
+                            letterSpacing: LETTER_SPACING,
+                            lineHeight: LINE_HEIGHT
+                        };
+
+                        let count = 0;
+                        const dim = () => setTimeout(() => {
+                            console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
+                            if (this.webPanelIsLive) {
+                                this.webPanel.webview.postMessage({
+                                    command: 'term-get-dimensions',
+                                    data: JSON.stringify(configMerged)
+                                })
+                            } else {
+                                count++;
+                                if (count > 3)
+                                    throw new Error(this.panelCaption)
+                                else
+                                    dim();
+                            }
+                        }, 300);
+
+                        dim();
+
+                        // test handliranja greske
+                        // if (this.panelCaption.includes('2'))
+                        //    throw new Error(this.panelCaption);
+
+                    },
+                    () => {
+                        console.log(`terminal ${this.panelCaption} se ne može kreirati?!`);
+                        throw new Error(this.panelCaption);
+                    }
+                );
+        }
+        
+
+        try {
+            if (!F18Panel.isDownloadedBinary) {
+                vscodeFetchUnzip(fetchOptions).then(() => {
+                    F18Panel.isDownloadedBinary = true;
+                    createTerminalInstance();
+                });
+            } else {
+                createTerminalInstance();
+            }
+        } catch (e) {
+            throw new Error(this.panelCaption);
+        }
+
+
+    }
 
     public configurePanel() {
 
@@ -384,9 +397,13 @@ export class F18Panel {
         // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3  
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so ]]; then ln -sf /lib64/libpcre.so ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
 
+        let adminParams = '';
+        if (this.adminConnection !== undefined) {
+            adminParams = `-ua ${this.adminConnection.user} -up ${this.adminConnection.password}`;
+        }
         let runExe: string;
         if (this.modul !== 'cmd')
-            runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul}${cmdSeparator} exit`;
+            runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul}${cmdSeparator} exit`;
         // console.log(runExe);
         // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
 

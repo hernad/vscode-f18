@@ -9,11 +9,13 @@ import { Database } from './database';
 
 export class PostgresConnection {
 
-  public static async getDefaultConnection(): Promise<IConnection> {
-
+  public static async getDefaultConnection(sufix?: string): Promise<IConnection> {
 
     let defaultConnection = Global.PostgresConfiguration.get<string>("defaultConnection");
     if (!defaultConnection) return null;
+
+    if (sufix)
+      defaultConnection += '_' + sufix;
 
     let connections = Global.contextPostgres.globalState.get<{ [key: string]: IConnection }>(Constants.PostgresGlobalStateKey);
     if (!connections) connections = {};
@@ -38,7 +40,7 @@ export class PostgresConnection {
     }
 
     let defaultDatabase = Global.PostgresConfiguration.get<string>("defaultDatabase");
-  
+
     if (defaultDatabase) {
       const conn = await Database.createConnection(connection, 'postgres');
 

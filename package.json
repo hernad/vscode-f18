@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "1.1.6",
+	"version": "1.2.1",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -21,7 +21,7 @@
 		"commands": [
 			{
 				"command": "f18.selectDatabase",
-				"title": "Odaberi bazu",
+				"title": "Odaberi F18 bazu",
 				"category": "F18"
 			},
 			{
@@ -87,7 +87,7 @@
 					"f18.fullScreen": {
 						"description": "Koristiti čitav ekran",
 						"type": "boolean",
-						"default": true
+						"default": false
 					},
 					"f18.selectDatabaseOnStart": {
 						"description": "Upit za odabir baze pri prvom pokretanju",
@@ -97,7 +97,7 @@
 					"f18.fontSize": {
 						"description": "F18 font veličina",
 						"type": "number",
-						"default": 16
+						"default": 18
 					}
 				}
 			}
