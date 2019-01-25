@@ -216,7 +216,7 @@ import { Terminal } from 'vscode-xterm/lib/public/Terminal';
 // import * as fit from 'xterm/lib/addons/fit/fit';
 // import * as fullscreen from 'xterm/lib/addons/fullscreen/fullscreen';
 // import * as search from 'xterm/lib/addons/search/search';
-import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
+// import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
 import * as winptyCompat from 'vscode-xterm/lib/addons/winptyCompat/winptyCompat';
 // import { ISearchOptions } from 'xterm/lib/addons/search/Interfaces';
 // import { Terminal as TerminalType } from 'vscode-xterm';
@@ -440,9 +440,8 @@ window.addEventListener('message', (event) => {
 
 			term.open(terminalElement);
 			term.winptyCompatInit();
-			term.webLinksInit();
-			// term.fit();
-			// term.toggleFullScreen(true);
+			// term.webLinksInit();
+
 			term.on('focus', () => {
 				// console.log( `xterm  ${term.getOption('termName')} ima focus rows: ${term.cols} cols: ${term.rows}`);
 				// console.log( `xterm ${term.getOption('termName')}: ${headerWithWrapper.clientWidth} ${headerWithWrapper.clientHeight}`);

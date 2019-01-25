@@ -214,6 +214,7 @@ export class F18Panel {
                 execHash: execHashList[Helper.os_platform()]
             };
 
+
             const createTerminalInstance = () => {
 
                 this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
@@ -261,6 +262,7 @@ export class F18Panel {
                         }
                     );
             }
+            
 
             try {
                 if (!F18Panel.isDownloadedBinary) {
@@ -394,10 +396,7 @@ export class F18Panel {
         let sendInitCmds: string[] = [];
 
         sendInitCmds.push("");
-        sendInitCmds.push("");
-        sendInitCmds.push("");
-
-        
+    
         if (Helper.is_windows()) {
             sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
             sendInitCmds.push('cls');
@@ -427,7 +426,6 @@ export class F18Panel {
         }
 
     
-       
         if (this.modul !== 'cmd')
             sendInitCmds.push(runExe);
 
@@ -546,6 +544,7 @@ export class F18Panel {
 			</body>
             </html>`;
 
+ 
         /*
             hernad: react-out
             <script nonce="${nonce}" src="${scriptReact1Uri}"></script>
