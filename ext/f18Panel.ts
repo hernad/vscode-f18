@@ -358,6 +358,7 @@ export class F18Panel {
                     break;
 
                 case 'cli-input':
+                    // input konzole
                     if (this.terminalInstance) {
                         // https://www.vt100.net/docs/vt510-rm/chapter4.html#T4-5
 
@@ -386,6 +387,10 @@ export class F18Panel {
     }
 
     public createTerminal() {
+
+        // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
+        const regexVsCodePdf = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
+
         // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
         this.terminalInstance!.show(true);
         // @ts-ignore
@@ -467,8 +472,18 @@ export class F18Panel {
         });
 
         (this.terminalInstance as any).onDidWriteData((data: string) => {
+            // ovdje se hvata output konzole
             // console.log('onDidWriteData: ' + data);
-            this.webPanel.webview.postMessage({ command: 'term-write', data });
+            
+        if (regexVsCodePdf.test(data)) {
+                const match = data.match(regexVsCodePdf);
+                const sendOut = data.replace(match[0], '');
+                // vscode.window.showInformationMessage(`${match[1]} ${match[2]}`);
+                vscode.commands.executeCommand(match[1],match[2]);
+                this.webPanel.webview.postMessage({ command: 'term-write', data:  sendOut});
+            } else {
+                this.webPanel.webview.postMessage({ command: 'term-write', data });
+            }
         });
     }
 

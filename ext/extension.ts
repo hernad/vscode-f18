@@ -82,7 +82,7 @@ export function activate(context: vscode.ExtensionContext) {
 	setTimeout(() => {
 		const onStart: string = vscode.workspace.getConfiguration('f18').get('onStart');
 		if (onStart.trim() !== '')
-		    vscode.commands.executeCommand(`f18.start.${onStart}`);
+			vscode.commands.executeCommand(`f18.start.${onStart}`);
 	}, 1000);
 }
 
