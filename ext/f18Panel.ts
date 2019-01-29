@@ -488,8 +488,12 @@ export class F18Panel {
                 // vscode.window.showInformationMessage(`${match[1]} ${match[2]}`);
 
                 const fileUri: vscode.Uri = vscode.Uri.file(match[2]);
-                vscode.commands.executeCommand(match[1], fileUri.with({ scheme: 'vscode-resource' }).toString());
-                this.webPanel.webview.postMessage({ command: 'term-write', data: sendOut });
+                // mora se malo sacekati da terminal osvjezi F18 screen
+                setTimeout(
+                    () => vscode.commands.executeCommand(match[1], fileUri.with({ scheme: 'vscode-resource' }).toString()),
+                    300
+                );
+                this.webPanel.webview.postMessage({ command: 'term-write', data });
             } else {
                 this.webPanel.webview.postMessage({ command: 'term-write', data });
             }
