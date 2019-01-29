@@ -182,7 +182,7 @@ export class F18Panel {
 
         const getConnectionThenRun = () => PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
             this.connection = connection;
-            PostgresConnection.getDefaultConnection('admin').then( (adminConnection: IConnection) => {
+            PostgresConnection.getDefaultConnection('admin').then((adminConnection: IConnection) => {
 
                 this.adminConnection = adminConnection;
                 this.afterConnect();
@@ -191,7 +191,7 @@ export class F18Panel {
                 this.afterConnect();
             });
         })
-        
+
 
         const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
         try {
@@ -287,7 +287,7 @@ export class F18Panel {
                     }
                 );
         }
-        
+
 
         try {
             if (!F18Panel.isDownloadedBinary) {
@@ -389,6 +389,8 @@ export class F18Panel {
     public createTerminal() {
 
         // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
+        const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
+
         const regexVsCodePdf = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
         // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
@@ -418,7 +420,7 @@ export class F18Panel {
         let sendInitCmds: string[] = [];
 
         sendInitCmds.push("");
-    
+
         if (Helper.is_windows()) {
             sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
             sendInitCmds.push('cls');
@@ -443,13 +445,13 @@ export class F18Panel {
                 F18Panel.firstTerminal = false;
             }
             sendInitCmds.push(`export LD_LIBRARY_PATH=${Global.folderPath}`);
-            sendInitCmds.push('export F18_ESHELL=1'); 
+            sendInitCmds.push('export F18_ESHELL=1');
             sendInitCmds.push(`export F18_HOME=${f18HomePath}`);
             sendInitCmds.push(`cd $F18_HOME`);
             (this.modul !== 'cmd') ? sendInitCmds.push('clear') : sendInitCmds.push('pwd');
         }
 
-    
+
         if (this.modul !== 'cmd')
             sendInitCmds.push(runExe);
 
@@ -476,13 +478,18 @@ export class F18Panel {
         (this.terminalInstance as any).onDidWriteData((data: string) => {
             // ovdje se hvata output konzole
             // console.log('onDidWriteData: ' + data);
-            
-        if (regexVsCodePdf.test(data)) {
-                const match = data.match(regexVsCodePdf);
-                const sendOut = data.replace(match[0], '');
+
+            // ocistiti data od Cursor position komandi
+            const cleanData = data.replace(regexCursorPosition, '');
+
+            if (regexVsCodePdf.test(cleanData)) {
+                const match = cleanData.match(regexVsCodePdf);
+                const sendOut = cleanData.replace(match[0], '');
                 // vscode.window.showInformationMessage(`${match[1]} ${match[2]}`);
-                vscode.commands.executeCommand(match[1],match[2]);
-                this.webPanel.webview.postMessage({ command: 'term-write', data:  sendOut});
+
+                const fileUri: vscode.Uri = vscode.Uri.file(match[2]);
+                vscode.commands.executeCommand(match[1], fileUri.with({ scheme: 'vscode-resource' }).toString());
+                this.webPanel.webview.postMessage({ command: 'term-write', data: sendOut });
             } else {
                 this.webPanel.webview.postMessage({ command: 'term-write', data });
             }
@@ -578,7 +585,7 @@ export class F18Panel {
 			</body>
             </html>`;
 
- 
+
         /*
             hernad: react-out
             <script nonce="${nonce}" src="${scriptReact1Uri}"></script>
