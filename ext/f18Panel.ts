@@ -430,6 +430,7 @@ export class F18Panel {
             sendInitCmds.push(`cd ${Global.folderPath}`);
             sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
             sendInitCmds.push(`set F18_HOME=${f18HomePath}`);
+            sendInitCmds.push('set F18_ESHELL=1');
             sendInitCmds.push(`cd %F18_HOME%`);
             (this.modul !== 'cmd') ? sendInitCmds.push('cls') : sendInitCmds.push('echo %CD%');
 
@@ -442,6 +443,7 @@ export class F18Panel {
                 F18Panel.firstTerminal = false;
             }
             sendInitCmds.push(`export LD_LIBRARY_PATH=${Global.folderPath}`);
+            sendInitCmds.push('export F18_ESHELL=1'); 
             sendInitCmds.push(`export F18_HOME=${f18HomePath}`);
             sendInitCmds.push(`cd $F18_HOME`);
             (this.modul !== 'cmd') ? sendInitCmds.push('clear') : sendInitCmds.push('pwd');
