@@ -391,7 +391,7 @@ export class F18Panel {
         // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
         const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
         const regexClearLineCurRight = new RegExp("\\x1b\\[0K", "g"); // windows terminal
-
+  
         const regexVsCodePdf = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
         // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
@@ -483,6 +483,9 @@ export class F18Panel {
             // ocistiti data od Cursor position komandi
             let cleanData = data.replace(regexCursorPosition, '');
             cleanData = data.replace(regexClearLineCurRight, '');
+            // https://stackoverflow.com/questions/20856197/remove-non-ascii-character-in-string
+            cleanData = cleanData.replace(/[^\x00-\x7F]/g, "");
+
             console.log(`clean data: ${cleanData}`);
 
             if (regexVsCodePdf.test(cleanData)) {
