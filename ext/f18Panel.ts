@@ -390,6 +390,7 @@ export class F18Panel {
 
         // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
         const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
+        const regexClearLineCurRight = new RegExp("\\x1b\\[0K", "g"); // windows terminal
 
         const regexVsCodePdf = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
@@ -480,10 +481,13 @@ export class F18Panel {
             // console.log('onDidWriteData: ' + data);
 
             // ocistiti data od Cursor position komandi
-            const cleanData = data.replace(regexCursorPosition, '');
+            let cleanData = data.replace(regexCursorPosition, '');
+            cleanData = data.replace(regexClearLineCurRight, '');
+            console.log(`clean data: ${cleanData}`);
 
             if (regexVsCodePdf.test(cleanData)) {
                 const match = cleanData.match(regexVsCodePdf);
+                
                 const sendOut = cleanData.replace(match[0], '');
                 // vscode.window.showInformationMessage(`${match[1]} ${match[2]}`);
 
