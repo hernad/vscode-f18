@@ -485,9 +485,9 @@ export class F18Panel {
             cleanData = data.replace(regexClearLineCurRight, '');
             // https://stackoverflow.com/questions/20856197/remove-non-ascii-character-in-string
             //cleanData = cleanData.replace(/[^\x00-\x7F]/g, "");
-            cleanData.replace(new RegExp('\r?\n','g'), '');
+            cleanData = cleanData.replace(new RegExp('\r?\n','g'), '');
 
-            console.log(`clean data: ${encodeURIComponent(cleanData)}`);
+            //console.log(`clean data: ${encodeURIComponent(cleanData)}`);
 
             if (regexVsCodePdf.test(cleanData)) {
                 const match = cleanData.match(regexVsCodePdf);
