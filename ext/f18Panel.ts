@@ -183,7 +183,6 @@ export class F18Panel {
         const getConnectionThenRun = () => PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
             this.connection = connection;
             PostgresConnection.getDefaultConnection('admin').then((adminConnection: IConnection) => {
-
                 this.adminConnection = adminConnection;
                 this.afterConnect();
             }).catch(() => {
@@ -191,7 +190,6 @@ export class F18Panel {
                 this.afterConnect();
             });
         })
-
 
         const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
         try {
@@ -225,7 +223,6 @@ export class F18Panel {
         );
         this.webPanelDisposed = false;
         this.configurePanel();
-
         F18Panel.instances.push(this);
 
         this.webPanel.webview.html = this._getHtmlForWebview();
