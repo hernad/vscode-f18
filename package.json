@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "1.6.2",
+	"version": "1.6.3",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -14,7 +14,7 @@
 		"*"
 	],
 	"extensionDependencies": [
-		"bout.postgres"
+		"bring-out.postgres"
 	],
 	"main": "./build/ext/extension.js",
 	"contributes": {
