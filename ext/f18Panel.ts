@@ -491,7 +491,7 @@ export class F18Panel {
                 
                 const sendOut = cleanData.replace(match[0], '');
                 const fileName = match[2].replace(regexCursorPosition, '');
-                vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
+                //vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
                 
                 const fileUri: vscode.Uri = vscode.Uri.file(fileName);
                 console.log(`match ${fileName} fileUri: ${fileUri}`);
