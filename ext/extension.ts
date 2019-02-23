@@ -21,7 +21,12 @@ export function activate(context: vscode.ExtensionContext) {
 		})
 	)
 
-	const postgresExtension = vscode.extensions.getExtension('bout.postgres');
+	const postgresExtension = vscode.extensions.getExtension('bringout.postgres');
+	if (postgresExtension == undefined) { 
+		vscode.window.showErrorMessage('Instalirati bringout.postgres !');
+		return;
+    };
+
 	postgresExtension.activate().then(() => {
 		const postgresApi = postgresExtension.exports;
 		// console.log( `postgresql API: ${importedApi.sum(1, 1)} ${importedApi.context()}`);

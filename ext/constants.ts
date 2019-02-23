@@ -14,9 +14,3 @@ export const execHashList: any = {
   'windows-x86': '63ea6c48262b05acd5f6ad7ce7f43547'
 };
 
-
-
-// F18-linux-x64_20190221.1.zip
-// 33ab03ee8343b3957a9ac8be64ec523b  tmp/F18
-// F18-linux-x86_20190221.1.zip
-// 37bfccc32a2d12abfcef1b35e6be4fc4  tmp/F18

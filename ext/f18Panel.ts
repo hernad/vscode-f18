@@ -490,9 +490,10 @@ export class F18Panel {
                 const match = cleanData.match(regexVsCodePdf);
                 
                 const sendOut = cleanData.replace(match[0], '');
-                // vscode.window.showInformationMessage(`${match[1]} ${match[2]}`);
-
-                const fileUri: vscode.Uri = vscode.Uri.file(match[2]);
+                const fileName = match[2].replace(regexCursorPosition, '');
+                vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
+                
+                const fileUri: vscode.Uri = vscode.Uri.file(fileName);
                 console.log(`match ${match[2]} fileUri: ${fileUri}`);
                 // mora se malo sacekati da terminal osvjezi F18 screen
                 setTimeout(

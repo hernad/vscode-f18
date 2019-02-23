@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "1.6.3",
+	"version": "1.6.6",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -9,12 +9,9 @@
 		"F18",
 		"eShell"
 	],
-	"publisher": "bring-out",
+	"publisher": "bringout",
 	"activationEvents": [
 		"*"
-	],
-	"extensionDependencies": [
-		"bring-out.postgres"
 	],
 	"main": "./build/ext/extension.js",
 	"contributes": {
