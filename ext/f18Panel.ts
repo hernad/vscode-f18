@@ -479,7 +479,7 @@ export class F18Panel {
 
             // ocistiti data od Cursor position komandi
             let cleanData = data.replace(regexCursorPosition, '');
-            cleanData = data.replace(regexClearLineCurRight, '');
+            cleanData = cleanData.replace(regexClearLineCurRight, '');
             // https://stackoverflow.com/questions/20856197/remove-non-ascii-character-in-string
             //cleanData = cleanData.replace(/[^\x00-\x7F]/g, "");
             cleanData = cleanData.replace(new RegExp('\r?\n','g'), '');
@@ -494,7 +494,7 @@ export class F18Panel {
                 vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
                 
                 const fileUri: vscode.Uri = vscode.Uri.file(fileName);
-                console.log(`match ${match[2]} fileUri: ${fileUri}`);
+                console.log(`match ${fileName} fileUri: ${fileUri}`);
                 // mora se malo sacekati da terminal osvjezi F18 screen
                 setTimeout(
                     () => {
