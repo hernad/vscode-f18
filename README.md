@@ -2,7 +2,7 @@
 
 F18 eShell klijent (FIN, KALK, FAKT, OS, LD, ePDV, POS)
 
-F18: `20190226.3`
+F18: `20190306.1`
 
 
 ## Developemnt
