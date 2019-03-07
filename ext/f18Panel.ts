@@ -150,6 +150,7 @@ export class F18Panel {
     private fontSize: number;
     private terminalDisposed: boolean;
     private webPanelDisposed: boolean;
+    private switchPosPM: string;
 
     private constructor(cModul: string, column: vscode.ViewColumn) {
 
@@ -169,6 +170,11 @@ export class F18Panel {
             this.fontSize = tmpFS as number;
             // vscode.window.showErrorMessage(`fontsize: ${this.fontSize}`);
         }
+
+        if (cModul === "pos") {
+            this.switchPosPM = "--pos-pm " + vscode.workspace.getConfiguration('f18').get('posPM');
+        } else
+            this.switchPosPM = "";
 
         this.fontFamily = Helper.is_windows() ? DEFAULT_WINDOWS_FONT_FAMILY : DEFAULT_LINUX_FONT_FAMILY;
         const tmpFF = vscode.workspace.getConfiguration('editor', null).get('fontFamily');
@@ -388,7 +394,7 @@ export class F18Panel {
         // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
         const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
         const regexClearLineCurRight = new RegExp("\\x1b\\[0K", "g"); // windows terminal
-  
+
         const regexVsCodePdf = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
         // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
@@ -408,8 +414,9 @@ export class F18Panel {
         }
         let runExe: string;
         if (this.modul !== 'cmd')
-            runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul}${cmdSeparator} exit`;
-        // console.log(runExe);
+            runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
+        
+        //console.log(runExe);
         // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
 
         const f18HomePath = path.join(Global.folderPath, '..', 'data');
@@ -482,17 +489,17 @@ export class F18Panel {
             cleanData = cleanData.replace(regexClearLineCurRight, '');
             // https://stackoverflow.com/questions/20856197/remove-non-ascii-character-in-string
             //cleanData = cleanData.replace(/[^\x00-\x7F]/g, "");
-            cleanData = cleanData.replace(new RegExp('\r?\n','g'), '');
+            cleanData = cleanData.replace(new RegExp('\r?\n', 'g'), '');
 
             //console.log(`clean data: ${encodeURIComponent(cleanData)}`);
 
             if (regexVsCodePdf.test(cleanData)) {
                 const match = cleanData.match(regexVsCodePdf);
-                
+
                 const sendOut = cleanData.replace(match[0], '');
                 const fileName = match[2].replace(regexCursorPosition, '');
                 //vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
-                
+
                 const fileUri: vscode.Uri = vscode.Uri.file(fileName);
                 console.log(`match ${fileName} fileUri: ${fileUri}`);
                 // mora se malo sacekati da terminal osvjezi F18 screen

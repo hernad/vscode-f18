@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent",
-	"version": "1.7.3",
+	"version": "1.7.5",
 	"description": "F18 klijent",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -81,6 +81,12 @@
 							"ld"
 						]
 					},
+					"f18.posPM": {
+						"description": "F18 POS prodajno mjesto",
+						"type": "string",
+						"default": "1 ",
+						"maxLength": 2
+					},
 					"f18.fullScreen": {
 						"description": "Koristiti čitav ekran",
 						"type": "boolean",
@@ -95,6 +101,16 @@
 						"description": "F18 font veličina",
 						"type": "number",
 						"default": 18
+					},
+					"f18.verChannel": {
+						"description": "F18 verzija (S-standard, E-edge, X-test)",
+						"type": "string",
+						"default": "S",
+						"enum": [
+							"S",
+							"E",
+							"X"
+						]
 					}
 				}
 			}
