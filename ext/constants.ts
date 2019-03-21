@@ -6,13 +6,15 @@ export class Constants {
 }
 
 
-const revisionS = '20190321.1';
+const revisionS = '20190321.2';
 const execHashListS: any = {
-  'linux-x64': 'fb3344193d5c870e90354d877f4a142c',
-  'linux-x86': 'd16c718512f84cec4b01f093e8798420',
-  'windows-x64': 'd39200212d7db157c3c1169c8b8e0e23',
-  'windows-x86': '99fbbb9c196ac6b57dce6c0bdf19e85e'
+  'linux-x64': '3c42dce5246e64d4bd0399e9c87746e4',
+  'linux-x86': '77a39200eb0bf030e820d9807c480cc9',
+  'windows-x64': 'bf7eadf92a8f6c876a067060625ee984',
+  'windows-x86': '158546a4b0c40b7dce16e2978d326dac'
 };
+
+
 
 
 const revisionX = '20190320.6';
