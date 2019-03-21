@@ -6,22 +6,23 @@ export class Constants {
 }
 
 
-const revisionS = '20190320.6';
+const revisionS = '20190321.1';
 const execHashListS: any = {
+  'linux-x64': 'fb3344193d5c870e90354d877f4a142c',
+  'linux-x86': 'd16c718512f84cec4b01f093e8798420',
+  'windows-x64': 'd39200212d7db157c3c1169c8b8e0e23',
+  'windows-x86': '99fbbb9c196ac6b57dce6c0bdf19e85e'
+};
+
+
+const revisionX = '20190320.6';
+const execHashListX: any = {
   'linux-x64': '61e360c1ea91cef98ace5587c9b0892e',
   'linux-x86': 'f287a3df59a68456ca2ce030bc3195c2',
   'windows-x64': '6d688469e1a18298ade6fd0ee9ab5331',
   'windows-x86': 'b57ee647810d83ae901c0739edabbe20'
 };
 
-
-const revisionX = '20190320.5';
-const execHashListX: any = {
-  'linux-x64': 'ac6819fb1ee814fb5e7e4de56052c85d',
-  'linux-x86': '71639f2774d92d76e0464cd1fa786d6b',
-  'windows-x64': '7324273572ed9fb4c55afad0db5505c0',
-  'windows-x86': '7072da58ee941674ad2fee75f7e7f2e7'
-};
 
 const revisionE = revisionX;
 const execHashListE = execHashListX;
