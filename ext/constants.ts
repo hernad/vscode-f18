@@ -6,25 +6,22 @@ export class Constants {
 }
 
 
-const revisionS = '20190329.5';
+const revisionS = '20190405.1';
 const execHashListS: any = {
-  'linux-x64': 'af826ce68734d1373f5d6a40abc67342',
-  'linux-x86': '6daef05b5d756eabfdf77cf02c9dccf1',
-  'windows-x64': 'f552b78df4cf5ef23e454371c8fb1806',
-  'windows-x86': '706b36b3a98cf3a10eff1367d3657036'
+  'linux-x64': 'd93d77824ba56f3d031cd6b1c162e75f',
+  'linux-x86': '9bc35a0fce46e04f6f6d12644dc6a222',
+  'windows-x64': 'a9358bb91c145c0accfc8303121c8a55',
+  'windows-x86': '3d82d603d656dd03ce73b25e3a324936'
 };
 
 
-
-const revisionX = '20190328.3';
+const revisionX = '20190402.1';
 const execHashListX: any = {
-  'linux-x64': '505772cb2dfb973ce1cb69f0dbd50c29',
-  'linux-x86': 'ffed34c59d7c84180abd973c78a5c8a6',
-  'windows-x64': 'd4d3045586c503afaacb02f9f8134341',
-  'windows-x86': '556cec004fce79bf7a12a463ca2ccf41'
+  'linux-x64': '60b94d8032af4ba861261d2c9152c072',
+  'linux-x86': '5a2f761b0cb8af48198ebc10e7305f4f',
+  'windows-x64': '94b754829467b9bf9bf2e2ce95e46184',
+  'windows-x86': '8a57e7396ff450ec0238a01d8415415d'
 };
-
-
 
 
 const revisionE = revisionX;
