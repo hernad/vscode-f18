@@ -35,3 +35,9 @@ function getCoreNodeModule(moduleName: string) {
 
   return null;
 }
+
+export function vscode_version_match(major: number, minor: number) {
+
+  return vscode.version.match(new RegExp(`${major}\.${minor}\.*`, ''));
+
+}

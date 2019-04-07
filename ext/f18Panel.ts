@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { vscodeFetchUnzip } from './fetchUnzip';
 import { Helper } from './helper';
-import { Global } from './global';
+import { Global, vscode_version_match } from './global';
 import { execHashList, revision } from './constants';
 import { IConnection } from './IConnection';
 import { PostgresConnection } from './postgresConnection';
@@ -93,10 +93,11 @@ export class F18Panel {
                 return f18Panel.panelCaption !== terminal.name;
             });
 
+            // izbaciti iz liste instanci ovu koju gasimo
             F18Panel.instances = filtered;
 
-            if (F18Panel.instances.length == 0)
-                F18Panel.currentPanelNum = 1;
+            //if (F18Panel.instances.length == 0)
+            //    F18Panel.currentPanelNum = 1;
 
         });
     }
@@ -130,7 +131,7 @@ export class F18Panel {
     */
 
     private static readonly viewType = 'F18';
-    private static currentPanelNum = 1;
+    //private static currentPanelNum = 1;
 
     public readonly panelCaption: string;
     private webPanelIsLive: boolean;
@@ -182,9 +183,20 @@ export class F18Panel {
             ? (this.fontFamily = tmpFF as string)
             : vscode.window.showErrorMessage('config editor.fontFamily?!');
 
-        this.panelNum = F18Panel.currentPanelNum;
+
+        // instances = [ 'fin 1', 'kalk 1', 'fin 2', 'fakt 1', 'fin 3' ] => next kalk = 2
+        let nLast = 0;
+        F18Panel.instances.forEach(f18Panel => {
+            const regexp = new RegExp(`F18 ${this.modul} - (\\d+)`);
+            if (regexp.test(f18Panel.panelCaption)) {
+                const match = f18Panel.panelCaption.match(regexp);
+                const nNum = parseInt(match[1]);
+                if (nNum > nLast) nLast = nNum;
+
+            }
+        });
+        this.panelNum = nLast + 1;
         this.panelCaption = `F18 ${this.modul} - ${this.panelNum}`;
-        F18Panel.currentPanelNum++;
 
         const getConnectionThenRun = () => PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
             this.connection = connection;
@@ -262,7 +274,7 @@ export class F18Panel {
 
                         let count = 0;
                         const dim = () => setTimeout(() => {
-                            console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
+                            // console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
                             if (this.webPanelIsLive) {
                                 this.webPanel.webview.postMessage({
                                     command: 'term-get-dimensions',
@@ -356,8 +368,10 @@ export class F18Panel {
 
                 case 'cli-focus':
                     // @ts-ignore
-                    if (this.terminalInstance!.resize) this.terminalInstance!.resize(this.cols, this.rows);
-                    // vscode.window.showInformationMessage(`cli-focus: resize ${this.cols} x ${this.rows}`);
+                    if (this.terminalInstance!.resize) {
+                        // @ts-ignore
+                        this.terminalInstance!.resize(this.cols, this.rows);
+                    };
                     break;
 
                 case 'cli-input':
@@ -385,7 +399,7 @@ export class F18Panel {
         this.height = dims.height;
 
         this.rows = dims.rows;
-        this.cols = dims.cols;
+        this.cols = dims.cols - 1;
         // vscode.window.showInformationMessage(`rows: ${this.rows}, cols: ${this.cols}`);
     }
 
@@ -397,15 +411,18 @@ export class F18Panel {
 
         const regexVsCodePdf = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
-        // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
-        this.terminalInstance!.show(true);
+        if (vscode_version_match(1, 31)) {
+            // ver 1.31.403 
+            // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
+            this.terminalInstance!.show(true);
+        }
         // @ts-ignore
         if (this.terminalInstance!.resize) this.terminalInstance!.resize(this.cols, this.rows);
-        this.terminalInstance!.hide();
+        if (vscode_version_match(1, 31)) this.terminalInstance!.hide();
 
         const cmdSeparator = Helper.is_windows() ? '&' : ';';
 
-        // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3  
+        // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so.1 ]]; then ln -sf /lib64/libpcre.so.1 ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
 
         let adminParams = '';
@@ -415,7 +432,7 @@ export class F18Panel {
         let runExe: string;
         if (this.modul !== 'cmd')
             runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
-        
+
         //console.log(runExe);
         // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
 
@@ -558,7 +575,7 @@ export class F18Panel {
         /*
         const reactScript1 = `node_modules/react/umd/react.${mode}.js`;
         const reactScript2 = `node_modules/react-dom/umd/react-dom.${mode}.js`;
-    
+
         //<script src="./node_modules/react/umd/react.development.js"></script>
         //<script src="./node_modules/react-dom/umd/react-dom.development.js"></script>
         */
