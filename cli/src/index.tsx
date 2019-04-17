@@ -1,222 +1,13 @@
-/*
-hernad: react-out
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-
-import { Hello } from './components/Hello';
-import MyButton from './components/MyButton';
-import MySection from './components/MySection';
-
-class MyCompoment extends React.Component {
-	public render() {
-		return (
-			<section>
-				<h1>my component</h1>
-				<p>content in my comp</p>
-				<footer>
-					<small>&copy; hernad 2018</small>
-				</footer>
-				<button>BTN</button>
-			</section>
-		);
-	}
-}
-*/
-
-/*
-const numbers = [1, 2, 3];
-for (const num of numbers) {
-    console.log(num);
-}
-*/
-
-/*
-const propDugmeNaslov = 'P2 Dugme from Var';
-const myThirdElement = <MySection.Third ptext={propDugmeNaslov} />;
-
-interface IMyContainerState {
-	items: string[];
-}
-type TResoveFn = (items: IMyContainerState) => void;
-
-const resolveFn = (resolve: TResoveFn) => {
-	setTimeout(() => {
-		const posaljiItems: IMyContainerState = { items: [ 'First', 'Second', 'Third', 'pet' ] };
-		resolve(posaljiItems);
-	}, 2000);
-};
-
-function fetchData() {
-	return new Promise(resolveFn);
-}
-
-import reverse from './reverse';
-
-class MyContainer extends React.Component<{}, IMyContainerState> {
-	public state: IMyContainerState = {
-		items: [ 'nula' ]
-	};
-
-	public onClick = reverse.bind(this);
-
-	// After the component has been rendered, make the
-	// call to fetch the component data, and change the
-	// state when the data arrives.
-	public componentDidMount() {
-		fetchData().then((value) => {
-			const fetchedItems = value.items;
-			this.setState({ items: [ ...this.state.items, ...fetchedItems ] } as IMyContainerState);
-		});
-	}
-
-	public render() {
-		return (
-			<React.Fragment>
-				<MySection.MyList {...this.state} />
-				<button onClick={this.onClick}>REVERSE</button>
-			</React.Fragment>
-		);
-	}
-}
-*/
-
-
-/*
-import { PermissionProvider } from './components/PermissionContext';
-
-const myCompInstance = ReactDOM.render(
-	<div>
-		<PermissionProvider>
-			<MyContainer />
-			<MySection.MyList items={[ 'AAA', 'BBB' ]} />
-			<MySection>
-				<button>btn 1</button>
-				<p />
-				<button>btn 2</button>
-			</MySection>
-			<MyButton>
-				<label>vako nako</label>
-				<p />
-				<label>novi label</label>
-				<ul>
-					<li>item 1</li>
-					<li>item 2</li>
-				</ul>
-			</MyButton>
-		</PermissionProvider>
-	</div>,
-	document.getElementById('example')
-);
-*/
-
-/*
-import MyFeature from './components/MyFeature';
-ReactDOM.render(<MyFeature />, document.getElementById('example'));
-*/
-
-/*
-import InheritedComponent from './components/InheritedComponent';
-ReactDOM.render(<InheritedComponent />, document.getElementById('example'));
-*/
-
-// import App from './components/BootApp';
-// import 'bootstrap/dist/css/bootstrap.css';
-// import './components/BootApp.css';
-
-/*
-hernad: apollo-out
-import ApolloClient from 'apollo-boost';
-
-import Forms from './components/BootForms';
-import Lists from './components/BootLists';
-
-const client = new ApolloClient({
-	// uri: 'http://localhost:5000/graphql'
-	uri: 'https://w5xlvm3vzz.lp.gql.zone/graphql'
-});
-
-import gql from 'graphql-tag';
-*/
-
-/*
-ReactDOM.render(
-	<ul>
-	   <li>loading....</li>
-	</ul>, document.getElementById('example'));
-*/
-
-/*
-client.query({
-	query: gql`
-	{
-      allKontos{
-        nodes {
-          id
-          naz
-        }
-      }
-	  allRobas{
-        nodes {
-          id
-          naz
-        }
-      }
-	}
-    `
-  })
-  .then(result => {
-	const nodesK = (result as any).data.allKontos.nodes;
-	const nodesR = (result as any).data.allRobas.nodes;
-	console.log(nodesK);
-	const kontaElement = Object.keys(nodesK).map(key =>
-	    <li key={key}>id={nodesK[key].id} naz={nodesK[key].naz}
-	     <p/>
-		 <input value={nodesK[key].naz} size={100} />
-		</li>);
-	const robaElement = Object.keys(nodesR).map(key => <li key={key}>id={nodesR[key].id} naz={nodesR[key].naz}</li>);
-	ReactDOM.render(
-		<ul>
-		   {kontaElement}
-		   <button>======================================================================</button>
-		   {robaElement}
-		</ul>, document.getElementById('example'));
-
-   });
-//  .then(result => console.log((result as any).data.allKontos.nodes));
-*/
-
-/*
-hernad: react-bootstrap out
-import { Navbar, Nav, NavItem, MenuItem, Grid, Row, Col } from 'react-bootstrap';
-*/
-
-/*
-ReactDOM.render(
-  <Navbar className="navbar-top" fluid={true}>
-     <Forms/>,
-	 <Lists/>,
-	 <ul>
-        {Object.keys(konta).map(key => <li key={key}>key={key} val={(konta as any)[key]}</li>)}
-     </ul>
-  </Navbar>, document.getElementById('example'));
-*/
-
-// const domInstance = ReactDOM.findDOMNode(myCompInstance);
-
-/* 
-hernad: react-out
-import { ApolloProvider } from 'react-apollo';
-*/
 
 
 /// <reference path="../node_modules/vscode-xterm/typings/xterm.d.ts"/>
 
 import { Terminal } from 'vscode-xterm/lib/public/Terminal';
-// import * as attach from 'xterm/lib/addons/attach/attach';
+//import * as attach from 'xterm/lib/addons/attach/attach';
 // import * as fit from 'xterm/lib/addons/fit/fit';
 // import * as fullscreen from 'xterm/lib/addons/fullscreen/fullscreen';
 // import * as search from 'xterm/lib/addons/search/search';
-// import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
+//import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
 import * as winptyCompat from 'vscode-xterm/lib/addons/winptyCompat/winptyCompat';
 // import { ISearchOptions } from 'xterm/lib/addons/search/Interfaces';
 // import { Terminal as TerminalType } from 'vscode-xterm';
@@ -228,48 +19,6 @@ import * as winptyCompat from 'vscode-xterm/lib/addons/winptyCompat/winptyCompat
 // import * as search from 'vscode-xterm/lib/addons/search/search';
 // import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
 
-// import { Query } from 'react-apollo';
-// import { notDeepEqual } from 'assert';
-// import gql from "graphql-tag";
-
-/* hernad: apollo graphql out"
-const ExchangeRates = () => (
-	<Query
-		query={gql`
-			{
-				rates(currency: "EUR") {
-					currency
-					rate
-				}
-			}
-		`}
-	>
-		{({ loading, error, data }) => {
-			if (loading) {
-				return <p>Učitavam...</p>;
-			}
-			if (error) {
-				return <p>Greška</p>;
-			}
-
-			return data.rates.map(({ currency, rate }) => (
-				<div key={currency}>
-					<p>{`${currency}: ${rate}`}</p>
-				</div>
-			));
-		}}
-	</Query>
-);
-
-const App = () => (
-	<ApolloProvider client={client}>
-		<div>
-			<h2>First Apollo app 🚀</h2>
-			<ExchangeRates />
-		</div>
-	</ApolloProvider>
-);
-*/
 
 // @ts-ignore
 const vscode = acquireVsCodeApi();
@@ -280,51 +29,155 @@ const vscode = acquireVsCodeApi();
 // https://xtermjs.org/docs/api/addons/fullscreen/
 // Terminal.applyAddon(fullscreen);
 // Terminal.applyAddon(search);
-// Terminal.applyAddon(webLinks);
+//Terminal.applyAddon(webLinks);
 Terminal.applyAddon(winptyCompat);
+//Terminal.applyAddon(attach);
 
 let term: any;
+let termOptions: any;
 let config: any;
 
 if (document.addEventListener) {
 	document.addEventListener('DOMContentLoaded', (event) => {
 		if (!vscode.postMessage) console.log('postMessage error 0');
 		vscode.postMessage({
-				command: 'ready'
+			command: 'ready'
 		});
 		console.log('document loaded - post msg ready');
 	});
 }
 
-window.addEventListener('focus', (event) => {
-	// console.log(`window focus ${window.screen.width} ${window.screen.height} ${document.body.children.length} ${document.body.children[0].className} ${document.body.children[1]} ${document.body.children[2]} ${document.body.children[3]}}}`);
-	// const xterm = document.getElementsByClassName("xterm-screen").item(0) as HTMLDivElement
-	// term ? term.focus() : console.log('term element nije definisan?!');
-	// vscode.postMessage({
-	//	command: 'cli-set-focus'
-	// });
-	// const mainContainer = document.getElementById('workbench.main.container');
-	// console.log(`maincontainer ${mainContainer}`);
-	// mainContainer.style.visibility = "hidden";
-	// canvas
-	// const xtermTextLayer = document.getElementsByClassName("xterm-helper-textarea").item(0) as HTMLDivElement; //.style.display = 'none';
-	// if (xtermTextLayer) xtermTextLayer.focus();
-	// dom
-	// const xtermScreen = document.getElementsByClassName("xterm-screen").item(0) as HTMLDivElement; //.style.display = 'none';
-	// xtermScreen ? xtermScreen.focus() : console.log('xterm-screen nema !?');
-	// #terminal > div > div.xterm-screen > div > textarea
-	// <textarea class="xterm-helper-textarea" aria-label="Terminal input" aria-multiline="false" autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0"></textarea>
-	// term ? term.viewport.viewportElement.click() : console.log('no term element');
-	//if (term) {
-	// term.focus();
-	// const btn =	document.getElementById('btn_k_ins')
-	// if (btn) btn.click();
-	//}
-});
+if (document.addEventListener) {
+	document.addEventListener('DOMContentLoaded', (event) => {
+		if (!vscode.postMessage) console.log('postMessage error 0');
+		vscode.postMessage({
+			command: 'ready'
+		});
+		console.log('document loaded - post msg ready');
+	});
+}
 
-window.addEventListener('pageshow', (event) => {
+/*
+var simulateClick = function (elem) {
+	// Create our event (with options)
+	var evt = new MouseEvent('click', {
+		bubbles: true,
+		cancelable: true,
+		view: window,
+		clientX: 10,
+        clientY: 10
+	});
+	// If cancelled, don't dispatch our event
+	//var canceled = !elem.dispatchEvent(evt);
+	elem.dispatchEvent(evt);
+	
+
+};
+*/
+
+/*
+function simulateKey (keyCode, type, modifiers) {
+	var evtName = (typeof(type) === "string") ? "key" + type : "keydown";	
+	var modifier = (typeof(modifiers) === "object") ? modifier : {};
+
+	var event = document.createEvent("HTMLEvents");
+	event.initEvent(evtName, true, false);
+	// @ts-ignore
+	event.keyCode = keyCode;
+	
+	for (var i in modifiers) {
+		event[i] = modifiers[i];
+	}
+
+	document.dispatchEvent(event);
+}
+*/
+
+function handleVisibilityChange() {
+  if (document["hidden"]) {
+	    //console.log('bluram');
+  } else {
+        //console.log('focusam');
+	    
+		/*
+		//var someLink = document.getElementById('terminal');
+		simulateClick(document.getElementById('google'));
+
+        document.getElementById("google").addEventListener("click", () => {
+		    term.textarea.focus();
+		});
+
+		document.getElementById("google").addEventListener("keydown", () => {
+			term.textarea.focus();
+		});
+
+		document.getElementById("input1").addEventListener("keydown", () => {
+			term.textarea.focus();
+		});
+		*/
+
+		//term.textarea.dispatchEvent(new KeyboardEvent('keypress',{'key':'1'}));
+
+		//document.getElementById('terminal').focus();
+	
+		//term.textarea.focus();
+		//vscode.postMessage({
+		//	command: "cli-focus"
+		//});
+		//const terminalElement = document.getElementById('terminal');
+		//terminalElement.style.display = 'block';
+
+		//const headerWithWrapper = document.createElement('div');
+	    //headerWithWrapper.innerHTML = '<input type="text" id="input1" minlength="4" maxlength="8" size="10">';
+	
+		//const container = document.getElementById('root');
+		//document.getElementById('terminal').remove();
+		//container.appendChild(headerWithWrapper);
+
+		//document.getElementById('input1').focus();
+		
+
+		//term.focus();
+
+		//const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+		//xtermScreen.style.width = '50%';
+		//xtermScreen.style.height = '50%';
+		
+		/*
+		let el;
+		for (let i = 0; i < 20; i++) {
+			simulateKey(9, "press", undefined);
+			el = document.activeElement;
+			console.log(`${i} ${el.className}`);
+	        if (el.className === 'xterm-helper-textarea') {
+				i=20;
+			} else {
+				//if (el.nextElementSibling) {
+				//	el = el.nextElementSibling;
+				//	// @ts-ignore
+				//	el.focus();
+				//	console.log('focus');
+				//} else {
+				//	console.log('no sibling?');
+				//}
+			}
+		}
+		*/
+
+		
+		//const xtermTextArea = document.getElementsByClassName("xterm-helper-textarea").item(0) as HTMLElement;
+		//xtermTextArea.focus();
+			
+
+  }
+}
+
+document.addEventListener("visibilitychange", handleVisibilityChange, false);
+
+
+//window.addEventListener('pageshow', (event) => {
 	// console.log('window pageshow');
-});
+//});
 
 window.addEventListener('message', (event) => {
 	const message = (event as any).data; // The JSON data our extension sent
@@ -332,7 +185,7 @@ window.addEventListener('message', (event) => {
 	//if (!vscode.postMessage)
 
 	switch (message.command) {
-	
+
 		case 'ping':
 			console.log('dosao ping :)');
 			if (!vscode.postMessage) console.log('postMessage error 5');
@@ -371,38 +224,24 @@ window.addEventListener('message', (event) => {
 				command: 'cli-dimensions',
 				data
 			});
-			
+
 			break;
 
 		case 'term-create':
 			// console.log('message: term-create');
 			const headerWithWrapper = document.createElement('div');
-			// headerWithWrapper.classList.add('terminal-wrapper');
-			/*
-			headerWithWrapper.innerHTML =
-				'Komande: <button id="btn_k_f5">F5</button>  <button id="btn_k_f8">F8</button>  <button id="btn_k_ins">INS/OVER</button> <div id="terminal" class="terminal-wrapper"></div>';
-			*/
+	
 
+			//headerWithWrapper.innerHTML = '<div id="terminal" class="terminal-wrapper"></div><a id="google" href="#input1">termin</a><input type="text" id="input1" minlength="4" maxlength="8" size="10">';
 			headerWithWrapper.innerHTML = '<div id="terminal" class="terminal-wrapper"></div>';
-
-			//const xtermElement = document.createElement('div');
+			
 			const container = document.getElementById('root');
-			//.appendChild(xtermElement);
 			container.appendChild(headerWithWrapper);
 			const terminalElement = document.getElementById('terminal');
 
-			const termOptions = JSON.parse(message.data);
+			termOptions = JSON.parse(message.data);
 			term = new Terminal(termOptions);
 			term.winptyCompatInit();
-
-			/*
-			term.on('key', (key: any, ev: any) => {
-				vscode.postMessage({
-					command: 'cli-input',
-					data: key
-				});
-			});
-			*/
 
 			// hvata sve evente - i keystrokes i mouse evente
 			term.on('data', (data: any) => {
@@ -413,6 +252,10 @@ window.addEventListener('message', (event) => {
 					data
 				});
 			});
+
+			//term._core.register(term.addDisposableListener('paste', (data, ev) => {
+			//	term.write(data);
+			//}));
 
 			/*
 			document.getElementById('btn_k_f5').onclick = (event: any) => {
@@ -442,6 +285,7 @@ window.addEventListener('message', (event) => {
 			term.winptyCompatInit();
 			// term.webLinksInit();
 
+
 			term.on('focus', () => {
 				// console.log( `xterm  ${term.getOption('termName')} ima focus rows: ${term.cols} cols: ${term.rows}`);
 				// console.log( `xterm ${term.getOption('termName')}: ${headerWithWrapper.clientWidth} ${headerWithWrapper.clientHeight}`);
@@ -451,12 +295,12 @@ window.addEventListener('message', (event) => {
 				// const height = parseInt(computedStyle.getPropertyValue('height').replace('px', ''), 10);
 
 				// term.element.click();
-				// vscode.postMessage({
+				//vscode.postMessage({
 				// 	command: 'cli-input',
-				// 	// data: '\x1b[11~'  // K_F1
 				// 	data: '\x1b[24~' // K_F12
-				// });
+				//});
 				// console.log('term on focus');
+
 				if (!vscode.postMessage) console.log('postMessage error 2');
 				vscode.postMessage({
 					command: 'cli-focus'
@@ -467,23 +311,59 @@ window.addEventListener('message', (event) => {
 				// console.log(`xterm title: ${title}`);
 			});
 
+
 			if (!term) {
-			     if (!vscode.postMessage) console.log('postMessage error 3');
+				if (!vscode.postMessage) console.log('postMessage error 3');
 				vscode.postMessage({
 					command: 'quit',
 					data: "Term objekat error?!"
 				});
-			} else
+			} else {
 				term.focus();
+				/*
+				let el = document.activeElement;
+		        let clses = '';
+		        el.classList.forEach( (cls) => {
+			        clses += ";" + cls;
+		        });
+				console.log(`${el.id} ${el.className} - ${clses}`);
+				*/
+				// xterm-helper-textarea
+			}
 			break;
 
 		case 'term-write':
 			if (term) term.write(message.data);
 			break;
 
-		// case 'term-focus':
-		//	term ? term.focus() : vscode.postMessage({ command: 'alert', data: "term-focus ne radi?!" });
-		//	break;
+
+    case 'term-hide': 
+				//const teEl = document.getElementById('terminal');
+				//getElementsByClassName("example").
+				const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+				xtermScreen.style.width = '1%';
+				xtermScreen.style.height = '1%';
+				//teEl.style.display = 'none';
+				//teEl.style.width = '10%';
+				//teEl.style.height = '10%';
+				
+
+				
+				//const iframe = document.getElementById('active-frame');
+				// @ts-ignore
+				//iframe.width = '10%'; iframe.height = '10%';
+			
+				break;
+
+		case 'term-show':
+
+				const xtermScreen2 = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+				xtermScreen2.style.width = '100%';
+				xtermScreen2.style.height = '100%';
+
+				if (term) term.focus();
+				break;
+
 	}
 });
 

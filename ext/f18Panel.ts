@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { vscodeFetchUnzip } from './fetchUnzip';
@@ -68,6 +69,7 @@ function globalHandler(error: Error) {
 export class F18Panel {
 
     public static F18: F18Panel | undefined;
+    public static downloadNew: boolean;
     public static isDownloadedBinary: boolean = false;
     public static firstTerminal: boolean = true;
     public static instances: F18Panel[] = [];
@@ -78,6 +80,13 @@ export class F18Panel {
         // const column = undefined;
 
         F18Panel.F18 = new F18Panel(modulF18, vscode.ViewColumn.One);
+        F18Panel.downloadNew = vscode.workspace.getConfiguration('f18').get('download');
+        //F18Panel.downloadNew = true;
+
+        // ako se ne zeli download, stavi marker da je download izvrsen
+        //if (!downloadBinary)
+         //  F18Panel.isDownloadedBinary = true;
+
 
         vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
             // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
@@ -227,11 +236,12 @@ export class F18Panel {
         this.webPanel = vscode.window.createWebviewPanel(
             F18Panel.viewType,
             this.panelCaption,
-            { viewColumn: undefined, preserveFocus: false },
+            { viewColumn: vscode.ViewColumn.Active, preserveFocus: false },
             {
-                enableScripts: true, // Enable javascript in the webview
+                enableScripts: true,
                 retainContextWhenHidden: true,
-
+                enableFindWidget: false,
+                
                 // And restric the webview to only loading content from our extension's `media` directory.
                 localResourceRoots: [
                     vscode.Uri.file(path.join(this.extensionPath, 'cli')),
@@ -261,7 +271,7 @@ export class F18Panel {
             this.terminalInstance.processId
                 .then(
                     (processId: number) => {
-                        console.log(`kreiran terminal ${processId}`);
+                        // console.log(`kreiran terminal ${processId}`);
                         this.terminalDisposed = false;
                         const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
                         const configMerged = {
@@ -291,10 +301,6 @@ export class F18Panel {
 
                         dim();
 
-                        // test handliranja greske
-                        // if (this.panelCaption.includes('2'))
-                        //    throw new Error(this.panelCaption);
-
                     },
                     () => {
                         console.log(`terminal ${this.panelCaption} se ne može kreirati?!`);
@@ -305,11 +311,18 @@ export class F18Panel {
 
 
         try {
-            if (!F18Panel.isDownloadedBinary) {
-                vscodeFetchUnzip(fetchOptions).then(() => {
-                    F18Panel.isDownloadedBinary = true;
-                    createTerminalInstance();
-                });
+            if (!F18Panel.isDownloadedBinary && F18Panel.downloadNew) {
+                vscodeFetchUnzip(fetchOptions).
+                   then(
+                       () => {
+                          F18Panel.isDownloadedBinary = true;
+                          createTerminalInstance();
+                       },
+                       () => {
+                          vscode.window.showErrorMessage('catch fetch');
+                          createTerminalInstance();  
+                       }
+                    );
             } else {
                 createTerminalInstance();
             }
@@ -332,6 +345,14 @@ export class F18Panel {
                 this.terminalDisposed = true;
             }
             this.webPanelDisposed = true;
+        });
+
+        this.webPanel.onDidChangeViewState((e) => {
+
+            if (e.webviewPanel.active) {
+                //vscode.window.showInformationMessage(`on change view state active ${e.webviewPanel.title}`);
+            }
+
         });
 
         // Handle messages from the webview
@@ -367,14 +388,19 @@ export class F18Panel {
                     break;
 
                 case 'cli-focus':
+
+                    //this.terminalInstance.sendText('\x1b[I');
+                    //vscode.window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
                     // @ts-ignore
                     if (this.terminalInstance!.resize) {
                         // @ts-ignore
                         this.terminalInstance!.resize(this.cols, this.rows);
                     };
+
                     break;
 
                 case 'cli-input':
+
                     // input konzole
                     if (this.terminalInstance) {
                         // https://www.vt100.net/docs/vt510-rm/chapter4.html#T4-5
@@ -392,6 +418,7 @@ export class F18Panel {
             }
         });
     }
+
 
     public computeDimensions(msg_data: string) {
         const dims = JSON.parse(msg_data);
@@ -412,7 +439,7 @@ export class F18Panel {
         const regexVsCodePdf = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
         if (vscode_version_match(1, 31)) {
-            // ver 1.31.403 
+            // ver 1.31.403
             // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
             this.terminalInstance!.show(true);
         }
@@ -421,6 +448,14 @@ export class F18Panel {
         if (vscode_version_match(1, 31)) this.terminalInstance!.hide();
 
         const cmdSeparator = Helper.is_windows() ? '&' : ';';
+
+        if (!Global.folderPath) {
+           Global.folderPath = path.join(Global.context.extensionPath, '..', 'F18', 'F18_0');
+           Global.execPath = path.join(Global.folderPath, (Helper.is_windows() ? 'F18.exe' : 'F18'));
+           if (!fs.existsSync(Global.execPath))
+              vscode.window.showErrorMessage(`F18_0 exec ne postoji: ${Global.execPath}`);
+
+        }
 
         // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3
         const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so.1 ]]; then ln -sf /lib64/libpcre.so.1 ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
@@ -492,11 +527,17 @@ export class F18Panel {
             termName: this.panelCaption
         };
         this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
+        this.webPanel.webview.postMessage( { command: 'term-hide' });
 
         sendInitCmds.forEach((element) => {
             this.terminalInstance!.sendText(element);
         });
-
+        setTimeout(
+            () => {
+                this.webPanel.webview.postMessage( { command: 'term-show' });        
+            },
+            500
+        );
         (this.terminalInstance as any).onDidWriteData((data: string) => {
             // ovdje se hvata output konzole
             // console.log('onDidWriteData: ' + data);

@@ -7,6 +7,7 @@ import { Helper } from './helper';
 import { Fetcher } from './fetcher';
 import { unzip } from './unzip';
 import * as md5File from 'md5-file/promise';
+import { F18Panel } from './f18Panel';
 
 /*
  
@@ -121,8 +122,12 @@ export async function download(options: any = {}, progress: vscode.Progress<{}>,
                     // console.error(error);
                     process.exit(1);
                 });
-        } else
+        } else {
             vscode.window.showErrorMessage(`cannot download revision ${options.revision} ?!`);
+            Global.folderPath = undefined;
+            vscode.window.showInformationMessage('running F18_0 ...');
+            resolve({ message: 'no download', revisionInfo });
+        }
     });
 
     md5File(revisionInfo.execPath)
