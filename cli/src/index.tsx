@@ -94,11 +94,11 @@ function simulateKey (keyCode, type, modifiers) {
 */
 
 function handleVisibilityChange() {
-  if (document["hidden"]) {
-	    //console.log('bluram');
-  } else {
-        //console.log('focusam');
-	    
+	if (document["hidden"]) {
+		//console.log('bluram');
+	} else {
+		//console.log('focusam');
+
 		/*
 		//var someLink = document.getElementById('terminal');
 		simulateClick(document.getElementById('google'));
@@ -119,7 +119,7 @@ function handleVisibilityChange() {
 		//term.textarea.dispatchEvent(new KeyboardEvent('keypress',{'key':'1'}));
 
 		//document.getElementById('terminal').focus();
-	
+
 		//term.textarea.focus();
 		//vscode.postMessage({
 		//	command: "cli-focus"
@@ -128,21 +128,21 @@ function handleVisibilityChange() {
 		//terminalElement.style.display = 'block';
 
 		//const headerWithWrapper = document.createElement('div');
-	    //headerWithWrapper.innerHTML = '<input type="text" id="input1" minlength="4" maxlength="8" size="10">';
-	
+		//headerWithWrapper.innerHTML = '<input type="text" id="input1" minlength="4" maxlength="8" size="10">';
+
 		//const container = document.getElementById('root');
 		//document.getElementById('terminal').remove();
 		//container.appendChild(headerWithWrapper);
 
 		//document.getElementById('input1').focus();
-		
+
 
 		//term.focus();
 
 		//const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
 		//xtermScreen.style.width = '50%';
 		//xtermScreen.style.height = '50%';
-		
+
 		/*
 		let el;
 		for (let i = 0; i < 20; i++) {
@@ -164,19 +164,19 @@ function handleVisibilityChange() {
 		}
 		*/
 
-		
+
 		//const xtermTextArea = document.getElementsByClassName("xterm-helper-textarea").item(0) as HTMLElement;
 		//xtermTextArea.focus();
-			
 
-  }
+
+	}
 }
 
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 
 
 //window.addEventListener('pageshow', (event) => {
-	// console.log('window pageshow');
+// console.log('window pageshow');
 //});
 
 window.addEventListener('message', (event) => {
@@ -230,11 +230,11 @@ window.addEventListener('message', (event) => {
 		case 'term-create':
 			// console.log('message: term-create');
 			const headerWithWrapper = document.createElement('div');
-	
+
 
 			//headerWithWrapper.innerHTML = '<div id="terminal" class="terminal-wrapper"></div><a id="google" href="#input1">termin</a><input type="text" id="input1" minlength="4" maxlength="8" size="10">';
 			headerWithWrapper.innerHTML = '<div id="terminal" class="terminal-wrapper"></div>';
-			
+
 			const container = document.getElementById('root');
 			container.appendChild(headerWithWrapper);
 			const terminalElement = document.getElementById('terminal');
@@ -295,10 +295,6 @@ window.addEventListener('message', (event) => {
 				// const height = parseInt(computedStyle.getPropertyValue('height').replace('px', ''), 10);
 
 				// term.element.click();
-				//vscode.postMessage({
-				// 	command: 'cli-input',
-				// 	data: '\x1b[24~' // K_F12
-				//});
 				// console.log('term on focus');
 
 				if (!vscode.postMessage) console.log('postMessage error 2');
@@ -337,32 +333,37 @@ window.addEventListener('message', (event) => {
 			break;
 
 
-    case 'term-hide': 
-				//const teEl = document.getElementById('terminal');
-				//getElementsByClassName("example").
-				const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-				xtermScreen.style.width = '1%';
-				xtermScreen.style.height = '1%';
-				//teEl.style.display = 'none';
-				//teEl.style.width = '10%';
-				//teEl.style.height = '10%';
-				
+		case 'term-hide':
+			//const teEl = document.getElementById('terminal');
+			//getElementsByClassName("example").
+			const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+			xtermScreen.style.width = '1%';
+			xtermScreen.style.height = '1%';
+			//teEl.style.display = 'none';
+			//teEl.style.width = '10%';
+			//teEl.style.height = '10%';
 
-				
-				//const iframe = document.getElementById('active-frame');
-				// @ts-ignore
-				//iframe.width = '10%'; iframe.height = '10%';
-			
-				break;
+
+
+			//const iframe = document.getElementById('active-frame');
+			// @ts-ignore
+			//iframe.width = '10%'; iframe.height = '10%';
+
+			break;
 
 		case 'term-show':
+		case 'focus-back':
 
-				const xtermScreen2 = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-				xtermScreen2.style.width = '100%';
-				xtermScreen2.style.height = '100%';
+			const xtermScreen2 = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+			xtermScreen2.style.width = '100%';
+			xtermScreen2.style.height = '100%';
+			vscode.postMessage({
+				command: 'cli-input',
+				data: '\x1b[24~' // K_F12
+		    });
 
-				if (term) term.focus();
-				break;
+			if (term) term.focus();
+			break;
 
 	}
 });

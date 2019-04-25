@@ -74,6 +74,7 @@ export class F18Panel {
     public static firstTerminal: boolean = true;
     public static instances: F18Panel[] = [];
     public webPanel: vscode.WebviewPanel;
+    public lostFocus: boolean = false;
 
     public static create(modulF18: string) {
         // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
@@ -85,7 +86,7 @@ export class F18Panel {
 
         // ako se ne zeli download, stavi marker da je download izvrsen
         //if (!downloadBinary)
-         //  F18Panel.isDownloadedBinary = true;
+        //  F18Panel.isDownloadedBinary = true;
 
 
         vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
@@ -241,7 +242,7 @@ export class F18Panel {
                 enableScripts: true,
                 retainContextWhenHidden: true,
                 enableFindWidget: false,
-                
+
                 // And restric the webview to only loading content from our extension's `media` directory.
                 localResourceRoots: [
                     vscode.Uri.file(path.join(this.extensionPath, 'cli')),
@@ -313,15 +314,15 @@ export class F18Panel {
         try {
             if (!F18Panel.isDownloadedBinary && F18Panel.downloadNew) {
                 vscodeFetchUnzip(fetchOptions).
-                   then(
-                       () => {
-                          F18Panel.isDownloadedBinary = true;
-                          createTerminalInstance();
-                       },
-                       () => {
-                          vscode.window.showErrorMessage('catch fetch');
-                          createTerminalInstance();  
-                       }
+                    then(
+                        () => {
+                            F18Panel.isDownloadedBinary = true;
+                            createTerminalInstance();
+                        },
+                        () => {
+                            vscode.window.showErrorMessage('catch fetch');
+                            createTerminalInstance();
+                        }
                     );
             } else {
                 createTerminalInstance();
@@ -436,7 +437,7 @@ export class F18Panel {
         const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
         const regexClearLineCurRight = new RegExp("\\x1b\\[0K", "g"); // windows terminal
 
-        const regexVsCodePdf = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
+        const regexVsCodeCmd = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
         if (vscode_version_match(1, 31)) {
             // ver 1.31.403
@@ -450,10 +451,10 @@ export class F18Panel {
         const cmdSeparator = Helper.is_windows() ? '&' : ';';
 
         if (!Global.folderPath) {
-           Global.folderPath = path.join(Global.context.extensionPath, '..', 'F18', 'F18_0');
-           Global.execPath = path.join(Global.folderPath, (Helper.is_windows() ? 'F18.exe' : 'F18'));
-           if (!fs.existsSync(Global.execPath))
-              vscode.window.showErrorMessage(`F18_0 exec ne postoji: ${Global.execPath}`);
+            Global.folderPath = path.join(Global.context.extensionPath, '..', 'F18', 'F18_0');
+            Global.execPath = path.join(Global.folderPath, (Helper.is_windows() ? 'F18.exe' : 'F18'));
+            if (!fs.existsSync(Global.execPath))
+                vscode.window.showErrorMessage(`F18_0 exec ne postoji: ${Global.execPath}`);
 
         }
 
@@ -527,17 +528,17 @@ export class F18Panel {
             termName: this.panelCaption
         };
         this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
-        this.webPanel.webview.postMessage( { command: 'term-hide' });
+        this.webPanel.webview.postMessage({ command: 'term-hide' });
 
         sendInitCmds.forEach((element) => {
             this.terminalInstance!.sendText(element);
         });
-        setTimeout(
-            () => {
-                this.webPanel.webview.postMessage( { command: 'term-show' });        
-            },
-            500
-        );
+        //setTimeout(
+        //    () => {
+        //        this.webPanel.webview.postMessage( { command: 'term-show' });        
+        //    },
+        //    500
+        //);
         (this.terminalInstance as any).onDidWriteData((data: string) => {
             // ovdje se hvata output konzole
             // console.log('onDidWriteData: ' + data);
@@ -551,26 +552,40 @@ export class F18Panel {
 
             //console.log(`clean data: ${encodeURIComponent(cleanData)}`);
 
-            if (regexVsCodePdf.test(cleanData)) {
-                const match = cleanData.match(regexVsCodePdf);
+            if (regexVsCodeCmd.test(cleanData)) {
+                const match = cleanData.match(regexVsCodeCmd);
 
-                const sendOut = cleanData.replace(match[0], '');
-                const fileName = match[2].replace(regexCursorPosition, '');
-                //vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
+                if (match[1] == 'f18.klijent' && match[2] == 'start') {
+                    // F18 klijent: f18.klijent - start
+                    this.webPanel.webview.postMessage({ command: 'term-show' });
+                } else {
+                    // F18 klijent: pdf print
 
-                const fileUri: vscode.Uri = vscode.Uri.file(fileName);
-                console.log(`match ${fileName} fileUri: ${fileUri}`);
-                // mora se malo sacekati da terminal osvjezi F18 screen
-                setTimeout(
-                    () => {
-                        console.log(`vscode-resource: ${fileUri.with({ scheme: 'vscode-resource' }).toString()}`);
-                        vscode.commands.executeCommand(match[1], fileUri.with({ scheme: 'vscode-resource' }).toString());
-                    },
-                    300
-                );
-                this.webPanel.webview.postMessage({ command: 'term-write', data });
+                    // match[1] - pdf.view, match[2] - cFile
+                    const fileName = match[2].replace(regexCursorPosition, '');
+                    //vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
+
+                    const fileUri: vscode.Uri = vscode.Uri.file(fileName);
+                    console.log(`match ${fileName} fileUri: ${fileUri}`);
+                    // mora se malo sacekati da terminal osvjezi F18 screen
+                    setTimeout(
+                        () => {
+                            console.log(`vscode-resource: ${fileUri.with({ scheme: 'vscode-resource' }).toString()}`);
+                            vscode.commands.executeCommand(match[1], fileUri.with({ scheme: 'vscode-resource' }).toString());
+                        },
+                        300
+                    );
+                    this.webPanel.webview.postMessage({ command: 'term-write', data });
+                }
             } else {
-                this.webPanel.webview.postMessage({ command: 'term-write', data });
+                if (this.webPanel.active) {
+                    if (this.lostFocus) {
+                        this.webPanel.webview.postMessage({ command: 'focus-back' });
+                        this.lostFocus = false;
+                    }
+                    this.webPanel.webview.postMessage({ command: 'term-write', data });
+                } else
+                    this.lostFocus = true;
             }
         });
     }
