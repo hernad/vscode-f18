@@ -334,20 +334,10 @@ window.addEventListener('message', (event) => {
 
 
 		case 'term-hide':
-			//const teEl = document.getElementById('terminal');
-			//getElementsByClassName("example").
+
 			const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
 			xtermScreen.style.width = '1%';
 			xtermScreen.style.height = '1%';
-			//teEl.style.display = 'none';
-			//teEl.style.width = '10%';
-			//teEl.style.height = '10%';
-
-
-
-			//const iframe = document.getElementById('active-frame');
-			// @ts-ignore
-			//iframe.width = '10%'; iframe.height = '10%';
 
 			break;
 
