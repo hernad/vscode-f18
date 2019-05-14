@@ -528,7 +528,8 @@ export class F18Panel {
             termName: this.panelCaption
         };
         this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
-        this.webPanel.webview.postMessage({ command: 'term-hide' });
+        if ( this.modul !== 'cmd' )
+            this.webPanel.webview.postMessage({ command: 'term-hide' });
 
         sendInitCmds.forEach((element) => {
             this.terminalInstance!.sendText(element);
