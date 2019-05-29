@@ -7,6 +7,7 @@ import { Global, vscode_version_match } from './global';
 import { execHashList, revision } from './constants';
 import { IConnection } from './IConnection';
 import { PostgresConnection } from './postgresConnection';
+import { string } from 'prop-types';
 
 // import { isContext } from 'vm';
 
@@ -162,6 +163,7 @@ export class F18Panel {
     private terminalDisposed: boolean;
     private webPanelDisposed: boolean;
     private switchPosPM: string;
+    private termBuffer: string[] = [];
 
     private constructor(cModul: string, column: vscode.ViewColumn) {
 
@@ -351,7 +353,8 @@ export class F18Panel {
         this.webPanel.onDidChangeViewState((e) => {
 
             if (e.webviewPanel.active) {
-                //vscode.window.showInformationMessage(`on change view state active ${e.webviewPanel.title}`);
+                //vscode.window.showInformationMessage(`on change view: state active ${e.webviewPanel.title}`);
+                //vscode.commands.executeCommand("default:type", { "text": '\t\t\t\t' } );
             }
 
         });
@@ -466,8 +469,9 @@ export class F18Panel {
             adminParams = `-ua ${this.adminConnection.user} -pa ${this.adminConnection.password}`;
         }
         let runExe: string;
-        if (this.modul !== 'cmd')
+        if (this.modul !== 'cmd') {
             runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
+        };
 
         //console.log(runExe);
         // const runExe = `echo ${Global.execPath} 2 VECE ${this.modul}_${this.panelNum}.log -h 192.168.124.1 -y 5432 -u hernad -p hernad -d ${this.f18Organizacija} --${this.modul}`;
@@ -576,21 +580,37 @@ export class F18Panel {
                         },
                         300
                     );
-                    this.webPanel.webview.postMessage({ command: 'term-write', data });
+                    this.termWrite( data );
+                    
                 }
             } else {
-                if (this.webPanel.active) {
-                    if (this.lostFocus) {
-                        this.webPanel.webview.postMessage({ command: 'focus-back' });
-                        this.lostFocus = false;
-                    }
-                    this.webPanel.webview.postMessage({ command: 'term-write', data });
-                } else
-                    this.lostFocus = true;
+                this.termWrite( data );
             }
         });
     }
 
+    private termWrite( data: string ) {
+        if (this.webPanel.active) {
+            if (this.lostFocus) {
+                this.webPanel.webview.postMessage({ command: 'focus-back' });
+                this.lostFocus = false;
+            }
+            this.emptyTermBuffer();
+            this.webPanel.webview.postMessage({ command: 'term-write', data });
+        } else {
+            this.lostFocus = true;
+            vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
+            this.termBuffer.unshift( data );
+        }
+    }
+
+    private emptyTermBuffer() {
+
+         while (this.termBuffer.length > 0) {
+            let data = this.termBuffer.pop();
+            this.webPanel.webview.postMessage({ command: 'term-write', data });
+        }
+    }
     /*
     public dispose() {
 

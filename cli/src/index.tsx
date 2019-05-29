@@ -93,11 +93,74 @@ function simulateKey (keyCode, type, modifiers) {
 }
 */
 
+// https://gist.github.com/ejoubaud/7d7c57cda1c10a4fae8c
+// https://stackoverflow.com/questions/10455626/keydown-simulation-in-chrome-fires-normally-but-not-the-correct-key/10520017#10520017
+
+
+function keyGen(k) {
+    var oEvent = document.createEvent('KeyboardEvent');
+
+    // Chromium Hack
+    Object.defineProperty(oEvent, 'keyCode', {
+                get : function() {
+                    return this.keyCodeVal;
+                }
+    });     
+    Object.defineProperty(oEvent, 'which', {
+                get : function() {
+                    return this.keyCodeVal;
+                }
+    });     
+
+    //if (oEvent.initKeyboardEvent) {
+        oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, k, k, "", false, "");
+    //} else {
+     //   oEvent.initKeyEvent("keydown", true, true, document.defaultView, false, false, false, false, k, 0);
+    //}
+
+	// @ts-ignore
+    oEvent.keyCodeVal = k;
+
+    if (oEvent.keyCode !== k) {
+        alert("keyCode mismatch " + oEvent.keyCode + "(" + oEvent.which + ")");
+    }
+
+	//document.body.dispatchEvent(oEvent);
+	document.activeElement.dispatchEvent(oEvent);
+}
+
 function handleVisibilityChange() {
 	if (document["hidden"]) {
-		//console.log('bluram');
+		console.log('bluram');
 	} else {
-		//console.log('focusam');
+		console.log('focusam');
+		vscode.postMessage({
+			command: 'cli-focus'
+		});
+
+		/*
+        keyGen(9);
+		keyGen(9);
+		keyGen(9);
+		keyGen(9);
+		keyGen(9);
+		keyGen(9);
+		*/
+
+		//const keyEvent = new KeyboardEvent("keydown", {keyCode : String.fromCharCode(9) });
+    
+	    //document.dispatchEvent(keyEvent);
+	
+		/*
+		const evt = new MouseEvent("click", {
+			view: window,
+			bubbles: true,
+			cancelable: true,
+			clientX: 20,
+		}),
+		ele = document.getElementById('terminal');
+		ele.dispatchEvent(evt);
+		*/
 
 		/*
 		//var someLink = document.getElementById('terminal');
@@ -347,12 +410,13 @@ window.addEventListener('message', (event) => {
 			const xtermScreen2 = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
 			xtermScreen2.style.width = '100%';
 			xtermScreen2.style.height = '100%';
-			vscode.postMessage({
-				command: 'cli-input',
-				data: '\x1b[24~' // K_F12
-		    });
+			//vscode.postMessage({
+			//	command: 'cli-input',
+			//	data: '\x1b[24~' // K_F12
+			//});
+			
 
-			if (term) term.focus();
+			//if (term) term.focus();
 			break;
 
 	}
