@@ -599,7 +599,7 @@ export class F18Panel {
             this.webPanel.webview.postMessage({ command: 'term-write', data });
         } else {
             this.lostFocus = true;
-            vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
+            //vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
             this.termBuffer.unshift( data );
         }
     }
