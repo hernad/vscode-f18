@@ -70,21 +70,21 @@ var simulateClick = function (elem) {
 	// If cancelled, don't dispatch our event
 	//var canceled = !elem.dispatchEvent(evt);
 	elem.dispatchEvent(evt);
-	
+
 
 };
 */
 
 /*
 function simulateKey (keyCode, type, modifiers) {
-	var evtName = (typeof(type) === "string") ? "key" + type : "keydown";	
+	var evtName = (typeof(type) === "string") ? "key" + type : "keydown";
 	var modifier = (typeof(modifiers) === "object") ? modifier : {};
 
 	var event = document.createEvent("HTMLEvents");
 	event.initEvent(evtName, true, false);
 	// @ts-ignore
 	event.keyCode = keyCode;
-	
+
 	for (var i in modifiers) {
 		event[i] = modifiers[i];
 	}
@@ -105,12 +105,12 @@ function keyGen(k) {
                 get : function() {
                     return this.keyCodeVal;
                 }
-    });     
+    });
     Object.defineProperty(oEvent, 'which', {
                 get : function() {
                     return this.keyCodeVal;
                 }
-    });     
+    });
 
     //if (oEvent.initKeyboardEvent) {
         oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, k, k, "", false, "");
@@ -138,6 +138,14 @@ function handleVisibilityChange() {
 			command: 'cli-focus'
 		});
 
+		//term.textarea.style.opacity='0.2';
+		const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+		xtermScreen.style.opacity = '0.5';
+		//alert('update-cli');
+		setTimeout( () => {
+			xtermScreen.style.opacity = '1.0'; 
+		}, 500);
+	
 		/*
         keyGen(9);
 		keyGen(9);
@@ -148,9 +156,9 @@ function handleVisibilityChange() {
 		*/
 
 		//const keyEvent = new KeyboardEvent("keydown", {keyCode : String.fromCharCode(9) });
-    
+
 	    //document.dispatchEvent(keyEvent);
-	
+
 		/*
 		const evt = new MouseEvent("click", {
 			view: window,
@@ -206,6 +214,10 @@ function handleVisibilityChange() {
 		//xtermScreen.style.width = '50%';
 		//xtermScreen.style.height = '50%';
 
+
+		//term.showCursor();
+		//term.emit('resize', { cols: 30, rows: 15 });
+
 		/*
 		let el;
 		for (let i = 0; i < 20; i++) {
@@ -235,6 +247,7 @@ function handleVisibilityChange() {
 	}
 }
 
+ 
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 
 
@@ -414,7 +427,7 @@ window.addEventListener('message', (event) => {
 			//	command: 'cli-input',
 			//	data: '\x1b[24~' // K_F12
 			//});
-			
+
 
 			//if (term) term.focus();
 			break;
