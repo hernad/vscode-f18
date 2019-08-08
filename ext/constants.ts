@@ -5,31 +5,31 @@ export class Constants {
   public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
-const revisionS = '20190703.4';
+const revisionS = '20190808.1';
 const execHashListS: any = {
-  'linux-x64': 'db022db1346a68b630831fe461e8d274',
-  'linux-x86': 'be9879b9498c535f9197ee6e335b5c52',
-  'windows-x64': '2ec3684c4087354d158eaff299e06424',
-  'windows-x86': 'e023569b58d13009474d35a2616b3f96'
+  'linux-x64': '079c78e56d6fb02eda2474df53b2c997',
+  'linux-x86': '2fdd5b6c199b323f3600dd33e7d4fe00',
+  'windows-x64': '2680f5d80b4d4083fe74a9b141f299ff',
+  'windows-x86': '537d636d3388a2bcdafcefa9a738cc84'
 };
 
-
-const revisionE = '20190626.3';
+const revisionE = '20190716.2';
 const execHashListE: any = {
-  'linux-x64': '9e209453ff2cdb931efa5d58dbcfc318',
-  'linux-x86': '02d5a825a87188c8074f4953886d25bd',
-  'windows-x64': '5d6bf786178847929bc8a54551711e84',
-  'windows-x86': '0fb949b1c88c3f0a7a3525560660d8cc'
+  'linux-x64': 'b688bae1426a63443dd855b640f6046e',
+  'linux-x86': '358bc6c051029bea97303a586404d78c',
+  'windows-x64': '5a66007d223ba472f8cfc85f6c00eb58',
+  'windows-x86': '2aba042fa604c24230647d8df221d776'
 };
 
-
-const revisionX = '20190612.1';
+const revisionX = '20190705.3';
 const execHashListX: any = {
-  'linux-x64': '62c2c85b152709713ac8fc3a1ae2248c',
-  'linux-x86': 'b7dc2243fde043d64a6756f4ecec56cd',
-  'windows-x64': 'ed49d493fcefd392aa0dffbb043aeeeb',
-  'windows-x86': '4836c5c6d8373b6788594704b0aed330'
+  'linux-x64': '927683d68d3b691e0503d3d1c2cd6da4',
+  'linux-x86': '1dad6287e672e424618dbab60998da7b',
+  'windows-x64': 'e41f6e6825a357c370238f5c580d3aa7',
+  'windows-x86': '3478d238cc5eca003fc6ee1343027ec2'
 };
+
+
 
 
 const execHashListAll: any = {
