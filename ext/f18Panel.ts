@@ -350,14 +350,16 @@ export class F18Panel {
             this.webPanelDisposed = true;
         });
 
+        /*
         this.webPanel.onDidChangeViewState((e) => {
 
             if (e.webviewPanel.active) {
-                //vscode.window.showInformationMessage(`on change view: state active ${e.webviewPanel.title}`);
-                //vscode.commands.executeCommand("default:type", { "text": '\t\t\t\t' } );
+                // vscode.window.showInformationMessage(`on change view: state active ${e.webviewPanel.title}`);
+                // vscode.commands.executeCommand("default:type", { "text": '\t\t\t\t' } );
             }
 
         });
+        */
 
         // Handle messages from the webview
         this.webPanel.webview.onDidReceiveMessage((message: any) => {
@@ -555,9 +557,12 @@ export class F18Panel {
             //cleanData = cleanData.replace(/[^\x00-\x7F]/g, "");
             cleanData = cleanData.replace(new RegExp('\r?\n', 'g'), '');
 
+    
+
             //console.log(`clean data: ${encodeURIComponent(cleanData)}`);
 
             if (regexVsCodeCmd.test(cleanData)) {
+                // console.log(`A:${data}`);
                 const match = cleanData.match(regexVsCodeCmd);
 
                 if (match[1] == 'f18.klijent' && match[2] == 'start') {
@@ -584,6 +589,7 @@ export class F18Panel {
                     
                 }
             } else {
+                // console.log(`B:${data}`);
                 this.termWrite( data );
             }
         });
