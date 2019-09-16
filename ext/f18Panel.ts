@@ -422,15 +422,22 @@ export class F18Panel {
                         }
                     }
                     break;
-                
+
                 case 'term-show':
 
+                    // @ts-ignore
+                    if (this.terminalInstance!.resize) {
+                        // @ts-ignore
+                        this.terminalInstance!.resize(this.cols, this.rows);
+                    };
                     this.webPanel.webview.postMessage({ command: 'term-show' });
                     break;
 
                 case 'pdf-view':
 
-                
+                    const fileUri: vscode.Uri = vscode.Uri.file(message.data);
+                    //console.log(`vscode-resource: ${fileUri.with({ scheme: 'vscode-resource' }).toString()}`);
+                    vscode.commands.executeCommand("pdf.view", fileUri.with({ scheme: 'vscode-resource' }).toString());
                     break;
             }
         });
@@ -450,15 +457,14 @@ export class F18Panel {
     public createTerminal() {
 
         // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
-        const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
-        const regexClearLineCurRight = new RegExp("\\x1b\\[0K", "g"); // windows terminal
-
-        const regexVsCodeCmd = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
+        //const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
+        //const regexClearLineCurRight = new RegExp("\\x1b\\[0K", "g"); // windows terminal
+        //const regexVsCodeCmd = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
         //if (vscode_version_match(1, 31)) {
-            // ver 1.31.403
-            // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
-            this.terminalInstance!.show(true);
+        // ver 1.31.403
+        // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
+        this.terminalInstance!.show(true);
         //}
         // @ts-ignore
         if (this.terminalInstance!.resize) this.terminalInstance!.resize(this.cols, this.rows);
@@ -546,71 +552,20 @@ export class F18Panel {
             termName: this.panelCaption
         };
         this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
-        if ( this.modul !== 'cmd' )
+        if (this.modul !== 'cmd')
             this.webPanel.webview.postMessage({ command: 'term-hide' });
 
         sendInitCmds.forEach((element) => {
             this.terminalInstance!.sendText(element);
         });
-        //setTimeout(
-        //    () => {
-        //        this.webPanel.webview.postMessage( { command: 'term-show' });        
-        //    },
-        //    500
-        //);
+
         (this.terminalInstance as any).onDidWriteData((data: string) => {
-           this.termWrite( data );
+            this.termWrite(data);
         });
 
-        
-            // ovdje se hvata output konzole
-            // console.log('onDidWriteData: ' + data);
-
-            /*
-            // ocistiti data od Cursor position komandi
-            let cleanData = data.replace(regexCursorPosition, '');
-            cleanData = cleanData.replace(regexClearLineCurRight, '');
-            // https://stackoverflow.com/questions/20856197/remove-non-ascii-character-in-string
-            //cleanData = cleanData.replace(/[^\x00-\x7F]/g, "");
-            cleanData = cleanData.replace(new RegExp('\r?\n', 'g'), '');
-
-    
-
-            //console.log(`clean data: ${encodeURIComponent(cleanData)}`);
-
-            if (regexVsCodeCmd.test(cleanData)) {
-                // console.log(`A:${data}`);
-                const match = cleanData.match(regexVsCodeCmd);
-
-                if (match[1] == 'f18.klijent' && match[2] == 'start') {
-                    // F18 klijent: f18.klijent - start
-                    this.webPanel.webview.postMessage({ command: 'term-show' });
-                } else {
-                    // F18 klijent: pdf print
-
-                    // match[1] - pdf.view, match[2] - cFile
-                    const fileName = match[2].replace(regexCursorPosition, '');
-                    //vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
-
-                    const fileUri: vscode.Uri = vscode.Uri.file(fileName);
-                    console.log(`match ${fileName} fileUri: ${fileUri}`);
-                    // mora se malo sacekati da terminal osvjezi F18 screen
-                    setTimeout(
-                        () => {
-                            console.log(`vscode-resource: ${fileUri.with({ scheme: 'vscode-resource' }).toString()}`);
-                            vscode.commands.executeCommand(match[1], fileUri.with({ scheme: 'vscode-resource' }).toString());
-                        },
-                        300
-                    );
-                    this.termWrite( data );
-                    
-                }
-
-                */
-     
     }
 
-    private termWrite( data: string ) {
+    private termWrite(data: string) {
         if (this.webPanel.active) {
             if (this.lostFocus) {
                 this.webPanel.webview.postMessage({ command: 'focus-back' });
@@ -621,13 +576,13 @@ export class F18Panel {
         } else {
             this.lostFocus = true;
             //vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
-            this.termBuffer.unshift( data );
+            this.termBuffer.unshift(data);
         }
     }
 
     private emptyTermBuffer() {
 
-         while (this.termBuffer.length > 0) {
+        while (this.termBuffer.length > 0) {
             let data = this.termBuffer.pop();
             this.webPanel.webview.postMessage({ command: 'term-write', data });
         }

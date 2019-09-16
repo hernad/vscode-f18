@@ -4,7 +4,7 @@
 
 //import { Terminal } from 'vscode-xterm/lib/public/Terminal';
 import { Terminal } from 'xterm';
-import { MyWebLinksAddon } from './MyWebLinksAddon'; 
+import { MyWebLinksAddon } from './MyWebLinksAddon';
 
 // import * as attach from 'xterm/lib/addons/attach/attach';
 // import * as fit from 'xterm/lib/addons/fit/fit';
@@ -115,32 +115,32 @@ function simulateKey (keyCode, type, modifiers) {
 
 
 function keyGen(k) {
-    var oEvent = document.createEvent('KeyboardEvent');
+	var oEvent = document.createEvent('KeyboardEvent');
 
-    // Chromium Hack
-    Object.defineProperty(oEvent, 'keyCode', {
-                get : function() {
-                    return this.keyCodeVal;
-                }
-    });
-    Object.defineProperty(oEvent, 'which', {
-                get : function() {
-                    return this.keyCodeVal;
-                }
-    });
+	// Chromium Hack
+	Object.defineProperty(oEvent, 'keyCode', {
+		get: function () {
+			return this.keyCodeVal;
+		}
+	});
+	Object.defineProperty(oEvent, 'which', {
+		get: function () {
+			return this.keyCodeVal;
+		}
+	});
 
-    //if (oEvent.initKeyboardEvent) {
-        oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, k, k, "", false, "");
-    //} else {
-     //   oEvent.initKeyEvent("keydown", true, true, document.defaultView, false, false, false, false, k, 0);
-    //}
+	//if (oEvent.initKeyboardEvent) {
+	oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, k, k, "", false, "");
+	//} else {
+	//   oEvent.initKeyEvent("keydown", true, true, document.defaultView, false, false, false, false, k, 0);
+	//}
 
 	// @ts-ignore
-    oEvent.keyCodeVal = k;
+	oEvent.keyCodeVal = k;
 
-    if (oEvent.keyCode !== k) {
-        alert("keyCode mismatch " + oEvent.keyCode + "(" + oEvent.which + ")");
-    }
+	if (oEvent.keyCode !== k) {
+		alert("keyCode mismatch " + oEvent.keyCode + "(" + oEvent.which + ")");
+	}
 
 	//document.body.dispatchEvent(oEvent);
 	document.activeElement.dispatchEvent(oEvent);
@@ -159,10 +159,10 @@ function handleVisibilityChange() {
 		const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
 		xtermScreen.style.opacity = '0.5';
 		//alert('update-cli');
-		setTimeout( () => {
-			xtermScreen.style.opacity = '1.0'; 
+		setTimeout(() => {
+			xtermScreen.style.opacity = '1.0';
 		}, 500);
-	
+
 		/*
         keyGen(9);
 		keyGen(9);
@@ -174,7 +174,7 @@ function handleVisibilityChange() {
 
 		//const keyEvent = new KeyboardEvent("keydown", {keyCode : String.fromCharCode(9) });
 
-	    //document.dispatchEvent(keyEvent);
+		//document.dispatchEvent(keyEvent);
 
 		/*
 		const evt = new MouseEvent("click", {
@@ -264,7 +264,7 @@ function handleVisibilityChange() {
 	}
 }
 
- 
+
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 
 
@@ -333,12 +333,14 @@ window.addEventListener('message', (event) => {
 			const terminalElement = document.getElementById('terminal');
 
 			termOptions = JSON.parse(message.data);
-			term = new Terminal(termOptions);
-			term.loadAddon(new MyWebLinksAddon());
+
+			const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
+			term = new Terminal({ ...termOptions, windowsMode: isWindows });
+			//term.loadAddon(new MyWebLinksAddon());
 			//term.winptyCompatInit();
 
 			// hvata sve evente - i keystrokes i mouse evente
-			term.onData( (data: string) => {
+			term.onData((data: string) => {
 				// console.log(`cli-input: ${data}`);
 				if (!vscode.postMessage) console.log('postMessage error 1');
 				vscode.postMessage({
@@ -347,42 +349,31 @@ window.addEventListener('message', (event) => {
 				});
 			});
 
-			term.onTitleChange( (data: string) => {
+			term.onTitleChange((data: string) => {
 
-			
 				const regexVsCodeCmd = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
-
 				const match = data.match(regexVsCodeCmd);
 
 				if (!match) {
-				   return;
+					return;
 				}
 
-                if (match[1] == 'f18.klijent' && match[2] == 'start') {
-                    // F18 klijent: f18.klijent - start
-					
+				if (match[1] == 'f18.klijent' && match[2] == 'start') {
+					// F18 klijent: f18.klijent - start
 					vscode.postMessage({
 						command: 'term-show'
 					});
 
-                } else if (match[1] == 'pdf.view') {
-                   
-                    // match[1] - pdf.view, match[2] - cFile
-                    const fileName = match[2];
-                    //vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
+				} else if (match[1] == 'pdf.view') {
 
-                    //const fileUri: vscode.Uri = vscode.Uri.file(fileName);
-					//alert(`match ${fileName}`);
-					vscode.post({
+					// match[1] - pdf.view, match[2] - cFile
+					const fileName = match[2];
+					vscode.postMessage({
 						command: 'pdf-view',
 						data: fileName
 					})
-					
-                    
-                    
-                    
 				}
-				
+
 			});
 
 			//term._core.register(term.addDisposableListener('paste', (data, ev) => {
@@ -421,21 +412,21 @@ window.addEventListener('message', (event) => {
 			//term.on('focus', () => {
 			//	// console.log( `xterm  ${term.getOption('termName')} ima focus rows: ${term.cols} cols: ${term.rows}`);
 			//	// console.log( `xterm ${term.getOption('termName')}: ${headerWithWrapper.clientWidth} ${headerWithWrapper.clientHeight}`);
-//
+			//
 			//	//const computedStyle = window.getComputedStyle( iframe.width);
 			//	// const width = parseInt(computedStyle.getPropertyValue('width').replace('px', ''), 10);
 			//	// const height = parseInt(computedStyle.getPropertyValue('height').replace('px', ''), 10);
-//
+			//
 			//	// term.element.click();
 			//	// console.log('term on focus');
-//
+			//
 			//	if (!vscode.postMessage) console.log('postMessage error 2');
 			//	vscode.postMessage({
 			//		command: 'cli-focus'
 			//	});
 			//});
 
-			term.onTitleChange( (title: string) => {
+			term.onTitleChange((title: string) => {
 				// console.log(`xterm title: ${title}`);
 			});
 
