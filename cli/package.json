@@ -5,11 +5,6 @@
   "license": "MIT",
   "devDependencies": {
     "@types/bootstrap": "^4.1.2",
-    "@types/react-bootstrap": "^0.32.15",
-    "@types/react-router-bootstrap": "^0.24.5",
-    "@types/react-router-dom": "^4.3.1",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
     "typings-for-css-modules-loader": "^1.7.0",
     "webpack": "^4.28.3",
     "webpack-cli": "^3.2.0"
@@ -27,6 +22,7 @@
     "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.3.1",
     "vscode-xterm": "^3.9.0-beta1",
-    "xterm": "^3.9.1"
+    "xterm": "^4.0.1",
+    "xterm-addon-web-links": "^0.2.0"
   }
 }

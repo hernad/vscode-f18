@@ -421,6 +421,17 @@ export class F18Panel {
                             this.terminalInstance.sendText(message.data, false);
                         }
                     }
+                    break;
+                
+                case 'term-show':
+
+                    this.webPanel.webview.postMessage({ command: 'term-show' });
+                    break;
+
+                case 'pdf-view':
+
+                
+                    break;
             }
         });
     }
@@ -444,14 +455,15 @@ export class F18Panel {
 
         const regexVsCodeCmd = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 
-        if (vscode_version_match(1, 31)) {
+        //if (vscode_version_match(1, 31)) {
             // ver 1.31.403
             // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
             this.terminalInstance!.show(true);
-        }
+        //}
         // @ts-ignore
         if (this.terminalInstance!.resize) this.terminalInstance!.resize(this.cols, this.rows);
-        if (vscode_version_match(1, 31)) this.terminalInstance!.hide();
+        //if (vscode_version_match(1, 31)) 
+        this.terminalInstance!.hide();
 
         const cmdSeparator = Helper.is_windows() ? '&' : ';';
 
@@ -547,9 +559,14 @@ export class F18Panel {
         //    500
         //);
         (this.terminalInstance as any).onDidWriteData((data: string) => {
+           this.termWrite( data );
+        });
+
+        
             // ovdje se hvata output konzole
             // console.log('onDidWriteData: ' + data);
 
+            /*
             // ocistiti data od Cursor position komandi
             let cleanData = data.replace(regexCursorPosition, '');
             cleanData = cleanData.replace(regexClearLineCurRight, '');
@@ -588,11 +605,9 @@ export class F18Panel {
                     this.termWrite( data );
                     
                 }
-            } else {
-                // console.log(`B:${data}`);
-                this.termWrite( data );
-            }
-        });
+
+                */
+     
     }
 
     private termWrite( data: string ) {

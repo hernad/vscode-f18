@@ -1,14 +1,22 @@
 
 
-/// <reference path="../node_modules/vscode-xterm/typings/xterm.d.ts"/>
+/// <reference path="../node_modules/xterm/typings/xterm.d.ts"/>
 
-import { Terminal } from 'vscode-xterm/lib/public/Terminal';
-//import * as attach from 'xterm/lib/addons/attach/attach';
+//import { Terminal } from 'vscode-xterm/lib/public/Terminal';
+import { Terminal } from 'xterm';
+import { MyWebLinksAddon } from './MyWebLinksAddon'; 
+
+// import * as attach from 'xterm/lib/addons/attach/attach';
 // import * as fit from 'xterm/lib/addons/fit/fit';
 // import * as fullscreen from 'xterm/lib/addons/fullscreen/fullscreen';
 // import * as search from 'xterm/lib/addons/search/search';
 //import * as webLinks from 'vscode-xterm/lib/addons/webLinks/webLinks';
-import * as winptyCompat from 'vscode-xterm/lib/addons/winptyCompat/winptyCompat';
+//import * as winptyCompat from 'vscode-xterm/lib/addons/winptyCompat/winptyCompat';
+
+// import { WebLinksAddon } from 'xterm-addon-web-links';
+//import { WinptyCompat } from 'xterm/lib/addons/winptyCompat/winptyCompat';
+
+
 // import { ISearchOptions } from 'xterm/lib/addons/search/Interfaces';
 // import { Terminal as TerminalType } from 'vscode-xterm';
 
@@ -29,13 +37,22 @@ const vscode = acquireVsCodeApi();
 // https://xtermjs.org/docs/api/addons/fullscreen/
 // Terminal.applyAddon(fullscreen);
 // Terminal.applyAddon(search);
+
+// const terminal = new Terminal();
+// Load WebLinksAddon on terminal, this is all that's needed to get web links
+// working in the terminal.
+//terminal.loadAddon(new WinptyCompat());
+
+
 //Terminal.applyAddon(webLinks);
-Terminal.applyAddon(winptyCompat);
+//Terminal.applyAddon(winptyCompat);
 //Terminal.applyAddon(attach);
 
 let term: any;
 let termOptions: any;
 let config: any;
+
+
 
 if (document.addEventListener) {
 	document.addEventListener('DOMContentLoaded', (event) => {
@@ -317,16 +334,55 @@ window.addEventListener('message', (event) => {
 
 			termOptions = JSON.parse(message.data);
 			term = new Terminal(termOptions);
-			term.winptyCompatInit();
+			term.loadAddon(new MyWebLinksAddon());
+			//term.winptyCompatInit();
 
 			// hvata sve evente - i keystrokes i mouse evente
-			term.on('data', (data: any) => {
+			term.onData( (data: string) => {
 				// console.log(`cli-input: ${data}`);
 				if (!vscode.postMessage) console.log('postMessage error 1');
 				vscode.postMessage({
 					command: 'cli-input',
 					data
 				});
+			});
+
+			term.onTitleChange( (data: string) => {
+
+			
+				const regexVsCodeCmd = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
+
+				const match = data.match(regexVsCodeCmd);
+
+				if (!match) {
+				   return;
+				}
+
+                if (match[1] == 'f18.klijent' && match[2] == 'start') {
+                    // F18 klijent: f18.klijent - start
+					
+					vscode.postMessage({
+						command: 'term-show'
+					});
+
+                } else if (match[1] == 'pdf.view') {
+                   
+                    // match[1] - pdf.view, match[2] - cFile
+                    const fileName = match[2];
+                    //vscode.window.showInformationMessage(`${match[1]} ${fileName}`);
+
+                    //const fileUri: vscode.Uri = vscode.Uri.file(fileName);
+					//alert(`match ${fileName}`);
+					vscode.post({
+						command: 'pdf-view',
+						data: fileName
+					})
+					
+                    
+                    
+                    
+				}
+				
 			});
 
 			//term._core.register(term.addDisposableListener('paste', (data, ev) => {
@@ -358,28 +414,28 @@ window.addEventListener('message', (event) => {
 			*/
 
 			term.open(terminalElement);
-			term.winptyCompatInit();
+			//term.winptyCompatInit();
 			// term.webLinksInit();
 
 
-			term.on('focus', () => {
-				// console.log( `xterm  ${term.getOption('termName')} ima focus rows: ${term.cols} cols: ${term.rows}`);
-				// console.log( `xterm ${term.getOption('termName')}: ${headerWithWrapper.clientWidth} ${headerWithWrapper.clientHeight}`);
+			//term.on('focus', () => {
+			//	// console.log( `xterm  ${term.getOption('termName')} ima focus rows: ${term.cols} cols: ${term.rows}`);
+			//	// console.log( `xterm ${term.getOption('termName')}: ${headerWithWrapper.clientWidth} ${headerWithWrapper.clientHeight}`);
+//
+			//	//const computedStyle = window.getComputedStyle( iframe.width);
+			//	// const width = parseInt(computedStyle.getPropertyValue('width').replace('px', ''), 10);
+			//	// const height = parseInt(computedStyle.getPropertyValue('height').replace('px', ''), 10);
+//
+			//	// term.element.click();
+			//	// console.log('term on focus');
+//
+			//	if (!vscode.postMessage) console.log('postMessage error 2');
+			//	vscode.postMessage({
+			//		command: 'cli-focus'
+			//	});
+			//});
 
-				//const computedStyle = window.getComputedStyle( iframe.width);
-				// const width = parseInt(computedStyle.getPropertyValue('width').replace('px', ''), 10);
-				// const height = parseInt(computedStyle.getPropertyValue('height').replace('px', ''), 10);
-
-				// term.element.click();
-				// console.log('term on focus');
-
-				if (!vscode.postMessage) console.log('postMessage error 2');
-				vscode.postMessage({
-					command: 'cli-focus'
-				});
-			});
-
-			term.on('title', (title: string) => {
+			term.onTitleChange( (title: string) => {
 				// console.log(`xterm title: ${title}`);
 			});
 
