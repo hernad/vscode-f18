@@ -423,15 +423,10 @@ export class F18Panel {
                     }
                     break;
 
-                case 'term-show':
-
-                    // @ts-ignore
-                    if (this.terminalInstance!.resize) {
-                        // @ts-ignore
-                        this.terminalInstance!.resize(this.cols, this.rows);
-                    };
-                    this.webPanel.webview.postMessage({ command: 'term-show' });
-                    break;
+                //case 'term-show':
+//
+                //    this.webPanel.webview.postMessage({ command: 'term-show' });
+                //    break;
 
                 case 'pdf-view':
 

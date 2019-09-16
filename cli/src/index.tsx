@@ -265,6 +265,17 @@ function handleVisibilityChange() {
 }
 
 
+function termShow() {
+	const xtermScreen2 = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+	xtermScreen2.style.width = '100%';
+	xtermScreen2.style.height = '100%';
+	//vscode.postMessage({
+	//	command: 'cli-input',
+	//	data: '\x1b[24~' // K_F12
+	//});
+
+	//if (term) term.focus();
+}
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 
 
@@ -360,9 +371,7 @@ window.addEventListener('message', (event) => {
 
 				if (match[1] == 'f18.klijent' && match[2] == 'start') {
 					// F18 klijent: f18.klijent - start
-					vscode.postMessage({
-						command: 'term-show'
-					});
+					termShow();
 
 				} else if (match[1] == 'pdf.view') {
 
@@ -426,11 +435,6 @@ window.addEventListener('message', (event) => {
 			//	});
 			//});
 
-			term.onTitleChange((title: string) => {
-				// console.log(`xterm title: ${title}`);
-			});
-
-
 			if (!term) {
 				if (!vscode.postMessage) console.log('postMessage error 3');
 				vscode.postMessage({
@@ -467,16 +471,7 @@ window.addEventListener('message', (event) => {
 		case 'term-show':
 		case 'focus-back':
 
-			const xtermScreen2 = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-			xtermScreen2.style.width = '100%';
-			xtermScreen2.style.height = '100%';
-			//vscode.postMessage({
-			//	command: 'cli-input',
-			//	data: '\x1b[24~' // K_F12
-			//});
-
-
-			//if (term) term.focus();
+		    termShow();
 			break;
 
 	}
