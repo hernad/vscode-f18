@@ -149,7 +149,7 @@ export class F18Panel {
     private readonly extensionPath: string;
     // private disposables: vscode.Disposable[] = [];
 
-    private terminalInstance?: vscode.Terminal;
+    private terminalInstance: vscode.Terminal;
     private readonly modul: string;
     private connection: IConnection;
     private adminConnection: IConnection;
@@ -236,6 +236,7 @@ export class F18Panel {
 
     private afterConnect() {
 
+        console.log(`afterConnect`);
         this.webPanel = vscode.window.createWebviewPanel(
             F18Panel.viewType,
             this.panelCaption,
@@ -270,6 +271,7 @@ export class F18Panel {
 
         const createTerminalInstance = () => {
 
+            console.log('createTerminalInstance');
             this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
             this.terminalInstance.processId
                 .then(
@@ -390,7 +392,7 @@ export class F18Panel {
 
                 case 'cli-dimensions':
                     this.computeDimensions(message.data);
-                    this.createTerminal();
+                    this.createClientTerminal();
                     break;
 
                 case 'cli-focus':
@@ -424,7 +426,7 @@ export class F18Panel {
                     break;
 
                 //case 'term-show':
-//
+                //
                 //    this.webPanel.webview.postMessage({ command: 'term-show' });
                 //    break;
 
@@ -449,8 +451,10 @@ export class F18Panel {
         // vscode.window.showInformationMessage(`rows: ${this.rows}, cols: ${this.cols}`);
     }
 
-    public createTerminal() {
+    public createClientTerminal() {
 
+
+        console.log(`createClientTerminal`);
         // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
         //const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
         //const regexClearLineCurRight = new RegExp("\\x1b\\[0K", "g"); // windows terminal
@@ -459,12 +463,14 @@ export class F18Panel {
         //if (vscode_version_match(1, 31)) {
         // ver 1.31.403
         // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
-        this.terminalInstance!.show(true);
-        //}
+
+        // console.log( `createClientTerminal ${this.rows} / ${this.cols}` );
+        this.terminalInstance.hide();
         // @ts-ignore
-        if (this.terminalInstance!.resize) this.terminalInstance!.resize(this.cols, this.rows);
+        this.terminalInstance.resize(this.cols, this.rows);
         //if (vscode_version_match(1, 31)) 
-        this.terminalInstance!.hide();
+        //this.terminalInstance.hide();
+
 
         const cmdSeparator = Helper.is_windows() ? '&' : ';';
 
@@ -554,9 +560,23 @@ export class F18Panel {
             this.terminalInstance!.sendText(element);
         });
 
-        (this.terminalInstance as any).onDidWriteData((data: string) => {
-            this.termWrite(data);
-        });
+        console.log(`terminalInstance: ${JSON.stringify(this.terminalInstance)}`);
+
+        if ((this.terminalInstance as any).onDidWriteData) {
+
+            (this.terminalInstance as any).onDidWriteData((data: string) => {
+                this.termWrite(data);
+            });
+
+        } else {
+
+            (<any>vscode.window).onDidWriteTerminalData((e: any) => {
+                //console.log(`onDidWriteData ${JSON.stringify(e)}`);
+                if (this.terminalInstance.name == e.terminal.name)
+                    this.termWrite(e.data);
+            });
+        };
+
 
     }
 
