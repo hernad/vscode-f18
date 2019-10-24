@@ -111,6 +111,7 @@ export class F18Panel {
             //    F18Panel.currentPanelNum = 1;
 
         });
+
     }
 
     /*
@@ -222,6 +223,13 @@ export class F18Panel {
         })
 
         const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
+
+        (<any>vscode).window.onDidWriteTerminalData((e: any) => {
+            //console.log(`onDidWriteData ${JSON.stringify(e)}`);
+            if (!this.webPanelDisposed && e && e.terminal && this.terminalInstance && (this.terminalInstance.name == e.terminal.name))
+                this.termWrite(e.data);
+        });
+
         try {
             if (!F18Panel.isDownloadedBinary && runSelect)
                 vscode.commands.executeCommand('f18.selectDatabase')
@@ -344,12 +352,13 @@ export class F18Panel {
 
             if (this.webPanelDisposed) return;
 
+            this.webPanelDisposed = true;
             // ovo se desi kada nasilno ugasimo tab (kada ne izadjemo iz F18 regularno)
             if (!this.terminalDisposed && this.terminalInstance) {
                 this.terminalInstance.dispose();
                 this.terminalDisposed = true;
             }
-            this.webPanelDisposed = true;
+
         });
 
         /*
@@ -399,10 +408,11 @@ export class F18Panel {
 
                     //this.terminalInstance.sendText('\x1b[I');
                     //vscode.window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
+
                     // @ts-ignore
-                    if (this.terminalInstance!.resize) {
+                    if (this.terminalInstance && this.terminalInstance.resize) {
                         // @ts-ignore
-                        this.terminalInstance!.resize(this.cols, this.rows);
+                        this.terminalInstance.resize(this.cols, this.rows);
                     };
 
                     break;
@@ -465,9 +475,11 @@ export class F18Panel {
         // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
 
         // console.log( `createClientTerminal ${this.rows} / ${this.cols}` );
-        this.terminalInstance.hide();
+
+        //this.terminalInstance.hide();
         // @ts-ignore
-        this.terminalInstance.resize(this.cols, this.rows);
+        //this.terminalInstance.resize(this.cols, this.rows);
+
         //if (vscode_version_match(1, 31)) 
         //this.terminalInstance.hide();
 
@@ -560,28 +572,14 @@ export class F18Panel {
             this.terminalInstance!.sendText(element);
         });
 
-        console.log(`terminalInstance: ${JSON.stringify(this.terminalInstance)}`);
+        // console.log(`terminalInstance: ${JSON.stringify(this.terminalInstance)}`);
 
-        if ((this.terminalInstance as any).onDidWriteData) {
-
-            (this.terminalInstance as any).onDidWriteData((data: string) => {
-                this.termWrite(data);
-            });
-
-        } else {
-
-            (<any>vscode.window).onDidWriteTerminalData((e: any) => {
-                //console.log(`onDidWriteData ${JSON.stringify(e)}`);
-                if (this.terminalInstance.name == e.terminal.name)
-                    this.termWrite(e.data);
-            });
-        };
 
 
     }
 
     private termWrite(data: string) {
-        if (this.webPanel.active) {
+        if (this.webPanel && this.webPanel.active) {
             if (this.lostFocus) {
                 this.webPanel.webview.postMessage({ command: 'focus-back' });
                 this.lostFocus = false;
@@ -602,7 +600,8 @@ export class F18Panel {
             this.webPanel.webview.postMessage({ command: 'term-write', data });
         }
     }
-    /*
+
+
     public dispose() {
 
         if (!this.terminalDisposed && this.terminalInstance) {
@@ -623,7 +622,7 @@ export class F18Panel {
         // }
         F18Panel.F18 = undefined;
     }
-    */
+
 
 
     private _getHtmlForWebview() {

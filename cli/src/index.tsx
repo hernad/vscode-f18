@@ -130,7 +130,7 @@ function keyGen(k) {
 	});
 
 	//if (oEvent.initKeyboardEvent) {
-	oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, k, k, "", false, "");
+	// oEvent.initKeyboardEvent("keydown", true, true, document.defaultView, k, k, "", false, "");
 	//} else {
 	//   oEvent.initKeyEvent("keydown", true, true, document.defaultView, false, false, false, false, k, 0);
 	//}
@@ -157,10 +157,12 @@ function handleVisibilityChange() {
 
 		//term.textarea.style.opacity='0.2';
 		const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-		xtermScreen.style.opacity = '0.5';
+		if (xtermScreen)
+			xtermScreen.style.opacity = '0.5';
 		//alert('update-cli');
 		setTimeout(() => {
-			xtermScreen.style.opacity = '1.0';
+			if (xtermScreen)
+				xtermScreen.style.opacity = '1.0';
 		}, 500);
 
 		/*
@@ -463,15 +465,17 @@ window.addEventListener('message', (event) => {
 		case 'term-hide':
 
 			const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-			xtermScreen.style.width = '1%';
-			xtermScreen.style.height = '1%';
+			if (xtermScreen) {
+				xtermScreen.style.width = '1%';
+				xtermScreen.style.height = '1%';
+			}
 
 			break;
 
 		case 'term-show':
 		case 'focus-back':
 
-		    termShow();
+			termShow();
 			break;
 
 	}

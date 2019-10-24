@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent-dev",
-	"version": "3.0.3",
+	"version": "3.0.17",
 	"description": "F18 klijent DEV",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -147,8 +147,8 @@
 		"@types/yauzl": "^2.9.1",
 		"awesome-typescript-loader": "^5.2.1",
 		"source-map-loader": "^0.2.4",
-		"typescript": "^3.2.1",
-		"vscode": "^1.1.28"
+		"typescript": "^3.6.4",
+		"vscode": "^1.1.30"
 	},
 	"repository": {
 		"type": "git",
