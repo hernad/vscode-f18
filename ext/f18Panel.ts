@@ -632,7 +632,9 @@ export class F18Panel {
 
         const mainScript = 'dist/bundle.js';
 
+        // stilovi vscode-xterm trebaju
         const xtermStyle = 'node_modules/vscode-xterm/lib/xterm.css';
+
         // const xtermFullScreenStyle = 'node_modules/xterm/dist/addons/fullscreen/fullscreen.css';
         const mainStyle = 'index.css';
 

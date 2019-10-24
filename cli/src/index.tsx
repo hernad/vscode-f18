@@ -53,14 +53,13 @@ let termOptions: any;
 let config: any;
 
 
-
 if (document.addEventListener) {
 	document.addEventListener('DOMContentLoaded', (event) => {
 		if (!vscode.postMessage) console.log('postMessage error 0');
 		vscode.postMessage({
 			command: 'ready'
 		});
-		console.log('document loaded - post msg ready');
+		// console.log('document loaded - post msg ready');
 	});
 }
 
@@ -70,7 +69,7 @@ if (document.addEventListener) {
 		vscode.postMessage({
 			command: 'ready'
 		});
-		console.log('document loaded - post msg ready');
+		// console.log('document loaded - post msg ready');
 	});
 }
 
