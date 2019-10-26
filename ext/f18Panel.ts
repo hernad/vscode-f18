@@ -517,19 +517,35 @@ export class F18Panel {
         sendInitCmds.push("");
 
         if (Helper.is_windows()) {
-            sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
-            sendInitCmds.push('cls');
-            // ako mode con: => ... Lines: 3000 => exit
-            sendInitCmds.push(
-                'powershell "$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }"'
-            );
-            sendInitCmds.push('if %errorlevel% neq 0 exit');
-            sendInitCmds.push(`cd ${Global.folderPath}`);
-            sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
-            sendInitCmds.push(`set F18_HOME=${f18HomePath}`);
-            sendInitCmds.push('set F18_ESHELL=1');
-            sendInitCmds.push(`cd %F18_HOME%`);
-            (this.modul !== 'cmd') ? sendInitCmds.push('cls') : sendInitCmds.push('echo %CD%');
+            if (true) {
+                sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
+                sendInitCmds.push('cls');
+                // ako mode con: => ... Lines: 3000 => exit
+                sendInitCmds.push(
+                    '$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }'
+                );
+                sendInitCmds.push(`cd ${Global.folderPath}`);
+                sendInitCmds.push(`$env:PATH='${Global.folderPath}\\bin;${Global.folderPath};' + $env:PATH`);
+                sendInitCmds.push(`$env:F18_HOME='${f18HomePath}'`);
+                sendInitCmds.push(`$env:F18_ESHELL='1'`);
+                sendInitCmds.push(`cd $env:F18_HOME`);
+                (this.modul !== 'cmd') ? sendInitCmds.push('cls') : sendInitCmds.push('(Resolve-Path .\).Path');
+
+            } else {
+                sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
+                sendInitCmds.push('cls');
+                // ako mode con: => ... Lines: 3000 => exit
+                sendInitCmds.push(
+                    'powershell "$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }"'
+                );
+                sendInitCmds.push('if %errorlevel% neq 0 exit');
+                sendInitCmds.push(`cd ${Global.folderPath}`);
+                sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
+                sendInitCmds.push(`set F18_HOME=${f18HomePath}`);
+                sendInitCmds.push('set F18_ESHELL=1');
+                sendInitCmds.push(`cd %F18_HOME%`);
+                (this.modul !== 'cmd') ? sendInitCmds.push('cls') : sendInitCmds.push('echo %CD%');
+            }
 
         } else {
             sendInitCmds.push(`stty cols ${this.cols} rows ${this.rows}`);
@@ -714,7 +730,7 @@ function getNonce() {
 
 function shell() {
     if (Helper.is_windows()) {
-        return 'cmd.exe';
+        return 'pwsh.exe';
     } else {
         return '/bin/bash';
     }

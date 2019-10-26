@@ -348,6 +348,7 @@ window.addEventListener('message', (event) => {
 
 			const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
 			term = new Terminal({ ...termOptions, windowsMode: isWindows });
+			console.log(`isWindows: ${isWindows}`);
 			//term.loadAddon(new MyWebLinksAddon());
 			//term.winptyCompatInit();
 
