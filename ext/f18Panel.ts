@@ -483,8 +483,8 @@ export class F18Panel {
         //if (vscode_version_match(1, 31)) 
         //this.terminalInstance.hide();
 
-
-        const cmdSeparator = Helper.is_windows() ? '&' : ';';
+        const cmdSeparator = (shell() == 'cmd.exe') ? '&' : ';';
+      
 
         if (!Global.folderPath) {
             Global.folderPath = path.join(Global.context.extensionPath, '..', 'F18', 'F18_0');
@@ -517,7 +517,7 @@ export class F18Panel {
         sendInitCmds.push("");
 
         if (Helper.is_windows()) {
-            if (true) {
+            if (shell() != 'cmd.exe') {
                 sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
                 sendInitCmds.push('cls');
                 // ako mode con: => ... Lines: 3000 => exit
@@ -563,8 +563,10 @@ export class F18Panel {
         }
 
 
-        if (this.modul !== 'cmd')
+        if (this.modul !== 'cmd') {
+            console.log(`runExe: ${runExe}`);
             sendInitCmds.push(runExe);
+        }
 
         const termOptions = {
             cols: this.cols,
@@ -728,9 +730,9 @@ function getNonce() {
     return text;
 }
 
-function shell() {
+function shell() : string {
     if (Helper.is_windows()) {
-        return 'pwsh.exe';
+        return vscode.workspace.getConfiguration('f18').get('winShell');
     } else {
         return '/bin/bash';
     }
