@@ -4,7 +4,7 @@
 
 //import { Terminal } from 'vscode-xterm/lib/public/Terminal';
 import { Terminal } from 'xterm';
-import { MyWebLinksAddon } from './MyWebLinksAddon';
+//import { MyWebLinksAddon } from './MyWebLinksAddon';
 
 // import * as attach from 'xterm/lib/addons/attach/attach';
 // import * as fit from 'xterm/lib/addons/fit/fit';
@@ -112,7 +112,7 @@ function simulateKey (keyCode, type, modifiers) {
 // https://gist.github.com/ejoubaud/7d7c57cda1c10a4fae8c
 // https://stackoverflow.com/questions/10455626/keydown-simulation-in-chrome-fires-normally-but-not-the-correct-key/10520017#10520017
 
-
+/*
 function keyGen(k) {
 	var oEvent = document.createEvent('KeyboardEvent');
 
@@ -144,6 +144,7 @@ function keyGen(k) {
 	//document.body.dispatchEvent(oEvent);
 	document.activeElement.dispatchEvent(oEvent);
 }
+*/
 
 function handleVisibilityChange() {
 	if (document["hidden"]) {
@@ -267,9 +268,11 @@ function handleVisibilityChange() {
 
 
 function termShow() {
-	const xtermScreen2 = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-	xtermScreen2.style.width = '100%';
-	xtermScreen2.style.height = '100%';
+	const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+	if (xtermScreen) {
+	  xtermScreen.style.width = '100%';
+	  xtermScreen.style.height = '100%';
+	}
 	//vscode.postMessage({
 	//	command: 'cli-input',
 	//	data: '\x1b[24~' // K_F12
@@ -346,9 +349,11 @@ window.addEventListener('message', (event) => {
 
 			termOptions = JSON.parse(message.data);
 
-			const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
-			term = new Terminal({ ...termOptions, windowsMode: isWindows });
-			console.log(`isWindows: ${isWindows}`);
+			// const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
+			//term = new Terminal({ ...termOptions, "windowsMode": isWindows });
+			term = new Terminal({ ...termOptions });
+			
+			//console.log(`isWindows: ${isWindows}`);
 			//term.loadAddon(new MyWebLinksAddon());
 			//term.winptyCompatInit();
 

@@ -228,6 +228,7 @@ export class F18Panel {
             //console.log(`onDidWriteData ${JSON.stringify(e)}`);
             if (!this.webPanelDisposed && e && e.terminal && this.terminalInstance && (this.terminalInstance.name == e.terminal.name))
                 this.termWrite(e.data);
+                console.log(`term: ${e.data}`);
         });
 
         try {
@@ -573,7 +574,7 @@ export class F18Panel {
             rows: this.rows,
             cursorBlink: true,
             bellStyle: 'sound',
-            cursorStyle: 'block', // cursorStyle: 'underline','bar',
+            cursorStyle: 'underline', // cursorStyle: 'block', 'underline','bar',
             rendererType: RENDERER_TYPE,
             experimentalCharAtlas: 'dynamic',
             fontFamily: this.fontFamily,
