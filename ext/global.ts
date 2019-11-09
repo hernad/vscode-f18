@@ -1,6 +1,7 @@
 'use strict';
 import * as keytarType from 'keytar';
 import * as yauzlType from 'yauzl';
+import * as ptyType from 'node-pty';
 // import * as httpType from 'http-proxy-agent';
 // @ts-ignore
 import * as httpsType from 'https-proxy-agent';
@@ -13,7 +14,7 @@ export class Global {
   public static yauzl: typeof yauzlType = getCoreNodeModule('yauzl');
   //public static httpProxyAgent: typeof httpType = getCoreNodeModule('http-proxy-agent');
   public static httpsProxyAgent: typeof httpsType = getCoreNodeModule('https-proxy-agent');
-  
+  public static pty: typeof ptyType = getCoreNodeModule('node-pty');
   public static context: vscode.ExtensionContext;
   public static contextPostgres: vscode.ExtensionContext; 
   public static execPath: string;

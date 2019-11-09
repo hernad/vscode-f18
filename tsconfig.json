@@ -13,7 +13,8 @@
         "strict": false
 	},
 	"include": [
-		"ext"
+        "ext",
+        "typings"
 	],
     "exclude": [
         "node_modules",

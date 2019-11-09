@@ -8,6 +8,8 @@ import { execHashList, revision } from './constants';
 import { IConnection } from './IConnection';
 import { PostgresConnection } from './postgresConnection';
 import { string } from 'prop-types';
+import { IPtyForkOptions, IPty } from 'node-pty';
+import { isUndefined } from 'lodash';
 
 // import { isContext } from 'vm';
 
@@ -150,7 +152,7 @@ export class F18Panel {
     private readonly extensionPath: string;
     // private disposables: vscode.Disposable[] = [];
 
-    private terminalInstance: vscode.Terminal;
+    // private terminalInstance: vscode.Terminal;
     private readonly modul: string;
     private connection: IConnection;
     private adminConnection: IConnection;
@@ -165,6 +167,7 @@ export class F18Panel {
     private webPanelDisposed: boolean;
     private switchPosPM: string;
     private termBuffer: string[] = [];
+    private _ptyProcess: IPty;
 
     private constructor(cModul: string, column: vscode.ViewColumn) {
 
@@ -224,12 +227,15 @@ export class F18Panel {
 
         const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
 
+        /*
         (<any>vscode).window.onDidWriteTerminalData((e: any) => {
             //console.log(`onDidWriteData ${JSON.stringify(e)}`);
             if (!this.webPanelDisposed && e && e.terminal && this.terminalInstance && (this.terminalInstance.name == e.terminal.name))
                 this.termWrite(e.data);
                 console.log(`term: ${e.data}`);
         });
+        */
+
 
         try {
             if (!F18Panel.isDownloadedBinary && runSelect)
@@ -278,49 +284,75 @@ export class F18Panel {
             execHash: execHashList[Helper.os_platform()]
         };
 
-        const createTerminalInstance = () => {
+        const createPty = () => {
 
-            console.log('createTerminalInstance');
-            this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
-            this.terminalInstance.processId
-                .then(
-                    (processId: number) => {
-                        // console.log(`kreiran terminal ${processId}`);
-                        this.terminalDisposed = false;
-                        const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
-                        const configMerged = {
-                            ...config,
-                            rendererType: RENDERER_TYPE,
-                            fontFamily: this.fontFamily,
-                            letterSpacing: LETTER_SPACING,
-                            lineHeight: LINE_HEIGHT
-                        };
+            console.log('createPty');
 
-                        let count = 0;
-                        const dim = () => setTimeout(() => {
-                            // console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
-                            if (this.webPanelIsLive) {
-                                this.webPanel.webview.postMessage({
-                                    command: 'term-get-dimensions',
-                                    data: JSON.stringify(configMerged)
-                                })
-                            } else {
-                                count++;
-                                if (count > 3)
-                                    throw new Error(this.panelCaption)
-                                else
-                                    dim();
-                            }
-                        }, 300);
+            //this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
+            //this.terminalInstance.processId
+            //    .then(
+            //        (processId: number) => {
+            // console.log(`kreiran terminal ${processId}`);
+            this.terminalDisposed = false;
+            const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
+            const configMerged = {
+                ...config,
+                rendererType: RENDERER_TYPE,
+                fontFamily: this.fontFamily,
+                letterSpacing: LETTER_SPACING,
+                lineHeight: LINE_HEIGHT
+            };
 
+            let count = 0;
+            const dim = () => setTimeout(() => {
+                // console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
+                if (this.webPanelIsLive) {
+                    this.webPanel.webview.postMessage({
+                        command: 'term-get-dimensions',
+                        data: JSON.stringify(configMerged)
+                    })
+                } else {
+                    count++;
+                    if (count > 3)
+                        throw new Error(this.panelCaption)
+                    else
                         dim();
+                }
+            }, 300);
 
-                    },
-                    () => {
-                        console.log(`terminal ${this.panelCaption} se ne može kreirati?!`);
-                        throw new Error(this.panelCaption);
-                    }
-                );
+            dim();
+
+            const ptyForkOptions: IPtyForkOptions = {
+                name: 'cmd.exe',
+                cols: this.cols,
+                rows: this.rows,
+                cwd: process.cwd()
+                /*
+                env: Object.assign(
+                    {},
+                    ...Object.keys(process.env)
+                        .filter((key: string) => !isUndefined(process.env[key]))
+                        .map((key: string) => ({ [key]: process.env[key] }))
+                ),
+                */
+            };
+
+            const pty = Global.pty.spawn('cmd.exe', '', ptyForkOptions);
+            this._ptyProcess = pty;
+            this._ptyProcess.write('echo Hello World\r' );
+            
+            this._ptyProcess.on('data', (e: string) => {
+                //console.log(`pty.onData: ${e}`);
+                if (!this.webPanelDisposed)
+                    this.xtermWrite(e);
+            });
+
+            //    },
+            //    () => {
+            //        console.log(`terminal ${this.panelCaption} se ne može kreirati?!`);
+            //        throw new Error(this.panelCaption);
+            //    }
+            //);
         }
 
 
@@ -330,15 +362,15 @@ export class F18Panel {
                     then(
                         () => {
                             F18Panel.isDownloadedBinary = true;
-                            createTerminalInstance();
+                            createPty();
                         },
                         () => {
                             vscode.window.showErrorMessage('catch fetch');
-                            createTerminalInstance();
+                            createPty();
                         }
                     );
             } else {
-                createTerminalInstance();
+                createPty();
             }
         } catch (e) {
             throw new Error(this.panelCaption);
@@ -355,8 +387,8 @@ export class F18Panel {
 
             this.webPanelDisposed = true;
             // ovo se desi kada nasilno ugasimo tab (kada ne izadjemo iz F18 regularno)
-            if (!this.terminalDisposed && this.terminalInstance) {
-                this.terminalInstance.dispose();
+            if (!this.terminalDisposed) {
+                //this.terminalInstance.dispose();
                 this.terminalDisposed = true;
             }
 
@@ -408,32 +440,35 @@ export class F18Panel {
                 case 'cli-focus':
 
                     //this.terminalInstance.sendText('\x1b[I');
-                    //vscode.window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
+                    vscode.window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
+                    this._ptyProcess.resize(this.cols, this.rows);
 
                     // @ts-ignore
-                    if (this.terminalInstance && this.terminalInstance.resize) {
-                        // @ts-ignore
-                        this.terminalInstance.resize(this.cols, this.rows);
-                    };
+                    //if (this.terminalInstance && this.terminalInstance.resize) {
+                    // @ts-ignore
+                    //this.terminalInstance.resize(this.cols, this.rows);
+                    //};
 
                     break;
 
                 case 'cli-input':
 
                     // input konzole
-                    if (this.terminalInstance) {
-                        // https://www.vt100.net/docs/vt510-rm/chapter4.html#T4-5
+                    //if (this.terminalInstance) {
+                    // https://www.vt100.net/docs/vt510-rm/chapter4.html#T4-5
 
-                        // Cursor Position Report	CSI 6 n	same	same	CPR
-                        // Response:	CSI Pl; Pc R
-                        // Pl	No. of lines
-                        // Pc	No. of columns
-                        if ((new RegExp("\\x1b\\[\\d+;\\d+R")).test(message.data)) {
-                            //vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
-                        } else {
-                            this.terminalInstance.sendText(message.data, false);
-                        }
-                    }
+                    // Cursor Position Report	CSI 6 n	same	same	CPR
+                    // Response:	CSI Pl; Pc R
+                    // Pl	No. of lines
+                    // Pc	No. of columns
+                    //if ((new RegExp("\\x1b\\[\\d+;\\d+R")).test(message.data)) {
+                    //    //vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
+                    //} else {
+                    //this.terminalInstance.sendText(message.data, false);
+                    this._ptyProcess.write(message.data);
+                    // console.log(`cli-input: ${message.data} -> pty`);
+                    //}
+                    //}
                     break;
 
                 //case 'term-show':
@@ -485,7 +520,6 @@ export class F18Panel {
         //this.terminalInstance.hide();
 
         const cmdSeparator = (shell() == 'cmd.exe') ? '&' : ';';
-      
 
         if (!Global.folderPath) {
             Global.folderPath = path.join(Global.context.extensionPath, '..', 'F18', 'F18_0');
@@ -587,8 +621,10 @@ export class F18Panel {
         if (this.modul !== 'cmd')
             this.webPanel.webview.postMessage({ command: 'term-hide' });
 
-        sendInitCmds.forEach((element) => {
-            this.terminalInstance!.sendText(element);
+        sendInitCmds.forEach((data: string) => {
+            //this.terminalInstance!.sendText(element);
+            console.log(`sendInitCmds: ${data}`);
+            this._ptyProcess.write(data + '\r' );
         });
 
         // console.log(`terminalInstance: ${JSON.stringify(this.terminalInstance)}`);
@@ -597,7 +633,7 @@ export class F18Panel {
 
     }
 
-    private termWrite(data: string) {
+    private xtermWrite(data: string) {
         if (this.webPanel && this.webPanel.active) {
             if (this.lostFocus) {
                 this.webPanel.webview.postMessage({ command: 'focus-back' });
@@ -607,7 +643,7 @@ export class F18Panel {
             this.webPanel.webview.postMessage({ command: 'term-write', data });
         } else {
             this.lostFocus = true;
-            //vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
+            vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
             this.termBuffer.unshift(data);
         }
     }
@@ -623,9 +659,10 @@ export class F18Panel {
 
     public dispose() {
 
-        if (!this.terminalDisposed && this.terminalInstance) {
+        if (!this.terminalDisposed) {
             this.terminalDisposed = true;
-            this.terminalInstance.dispose();
+            //this.terminalInstance.dispose();
+            this._ptyProcess.kill();
         }
 
         if (!this.webPanelDisposed && this.webPanel) {
@@ -731,7 +768,7 @@ function getNonce() {
     return text;
 }
 
-function shell() : string {
+function shell(): string {
     if (Helper.is_windows()) {
         return vscode.workspace.getConfiguration('f18').get('winShell');
     } else {
