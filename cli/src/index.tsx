@@ -4,6 +4,8 @@
 //import { Terminal } from 'vscode-xterm/lib/public/Terminal';
 import { Terminal } from 'xterm';
 //import { MyWebLinksAddon } from './MyWebLinksAddon';
+import { WebglAddon } from 'xterm-addon-webgl';
+
 
 
 // @ts-ignore
@@ -146,7 +148,8 @@ window.addEventListener('message', (event) => {
 
 			const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
 			term = new Terminal({ ...termOptions, "windowsMode": isWindows });
-
+			
+			
 			// hvata sve evente - i keystrokes i mouse evente
 			term.onData((data: string) => {
 				// console.log(`cli-input: ${data}`);
@@ -211,6 +214,8 @@ window.addEventListener('message', (event) => {
 			*/
 
 			term.open(terminalElement);
+			term.loadAddon(new WebglAddon());
+
 			//term.winptyCompatInit();
 			// term.webLinksInit();
 

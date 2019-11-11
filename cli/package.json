@@ -9,8 +9,9 @@
   },
   "dependencies": {
     "cuid": "^2.1.4",
-    "xterm": "^4.2.0",
     "vscode-xterm": "^3.9.0-beta1",
-    "xterm-addon-web-links": "^0.3.0-beta5"
+    "xterm": "^4.3.0-beta18",
+    "xterm-addon-web-links": "^0.3.0-beta5",
+    "xterm-addon-webgl": "^0.3.0"
   }
 }
