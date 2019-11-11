@@ -337,9 +337,16 @@ export class F18Panel {
                 */
             };
 
-            const pty = Global.pty.spawn('cmd.exe', '', ptyForkOptions);
+            let pty;
+            if (Helper.is_windows())  {
+                pty = Global.pty.spawn('cmd.exe', '', ptyForkOptions);
+            } else {
+                pty = Global.pty.spawn('/bin/bash', undefined, ptyForkOptions);
+            }
+
+            
             this._ptyProcess = pty;
-            this._ptyProcess.write('echo Hello World\r' );
+            //this._ptyProcess.write('echo Hello World\r' );
             
             this._ptyProcess.on('data', (e: string) => {
                 //console.log(`pty.onData: ${e}`);
