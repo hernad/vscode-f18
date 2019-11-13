@@ -13,13 +13,18 @@ import { isUndefined } from 'lodash';
 
 // import { isContext } from 'vm';
 
+/* canvas-nowebgl
 const LINE_HEIGHT = 0.915;
 const LETTER_SPACING = 0;
+*/
+const LINE_HEIGHT = 0.920;
+const LETTER_SPACING = 1;
+
 const RENDERER_TYPE = 'canvas'; // 'dom' | 'canvas'
 
 const DEFAULT_WINDOWS_FONT_FAMILY = "Consolas, 'Courier New', monospace";
 // const DEFAULT_MAC_FONT_FAMILY = 'Menlo, Monaco, \'Courier New\', monospace';
-const DEFAULT_LINUX_FONT_FAMILY = "'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'";
+const DEFAULT_LINUX_FONT_FAMILY = "'Source Code Pro', Hack, 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'";
 
 // /home/hernad/vscode/src/vs/editor/common/config/commonEditorConfig.ts
 
@@ -199,6 +204,7 @@ export class F18Panel {
             ? (this.fontFamily = tmpFF as string)
             : vscode.window.showErrorMessage('config editor.fontFamily?!');
 
+        console.log(`fontFamily: ${this.fontFamily}`);
 
         // instances = [ 'fin 1', 'kalk 1', 'fin 2', 'fakt 1', 'fin 3' ] => next kalk = 2
         let nLast = 0;
@@ -440,14 +446,14 @@ export class F18Panel {
                     break;
 
                 case 'cli-dimensions':
-                    this.computeDimensions(message.data);
+                    this.setRowsCols(message.data);
                     this.createClientTerminal();
                     break;
 
                 case 'cli-focus':
 
                     //this.terminalInstance.sendText('\x1b[I');
-                    vscode.window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
+                    // vscode.window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
                     this._ptyProcess.resize(this.cols, this.rows);
 
                     // @ts-ignore
@@ -494,7 +500,7 @@ export class F18Panel {
     }
 
 
-    public computeDimensions(msg_data: string) {
+    public setRowsCols(msg_data: string) {
         const dims = JSON.parse(msg_data);
         this.width = dims.width;
         this.height = dims.height;
@@ -615,7 +621,7 @@ export class F18Panel {
             rows: this.rows,
             cursorBlink: true,
             bellStyle: 'sound',
-            cursorStyle: 'underline', // cursorStyle: 'block', 'underline','bar',
+            cursorStyle: 'block', // cursorStyle: 'block', 'underline','bar',
             rendererType: RENDERER_TYPE,
             experimentalCharAtlas: 'dynamic',
             fontFamily: this.fontFamily,
@@ -650,7 +656,7 @@ export class F18Panel {
             this.webPanel.webview.postMessage({ command: 'term-write', data });
         } else {
             this.lostFocus = true;
-            vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
+            // vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
             this.termBuffer.unshift(data);
         }
     }
@@ -696,7 +702,7 @@ export class F18Panel {
         const mainScript = 'dist/bundle.js';
 
         // stilovi vscode-xterm trebaju
-        const xtermStyle = 'node_modules/vscode-xterm/lib/xterm.css';
+        const xtermStyle = 'node_modules/xterm/css/xterm.css';
 
         // const xtermFullScreenStyle = 'node_modules/xterm/dist/addons/fullscreen/fullscreen.css';
         const mainStyle = 'index.css';

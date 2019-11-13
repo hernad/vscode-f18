@@ -1,26 +1,14 @@
 
 /// <reference path="../node_modules/xterm/typings/xterm.d.ts"/>
 
-//import { Terminal } from 'vscode-xterm/lib/public/Terminal';
+
 import { Terminal } from 'xterm';
 //import { MyWebLinksAddon } from './MyWebLinksAddon';
 import { WebglAddon } from 'xterm-addon-webgl';
 
 
-
 // @ts-ignore
 const vscode = acquireVsCodeApi();
-
-// https://xtermjs.org/docs/api/addons/attach/
-// Terminal.applyAddon(attach);
-// Terminal.applyAddon(fit);
-// https://xtermjs.org/docs/api/addons/fullscreen/
-// Terminal.applyAddon(fullscreen);
-// Terminal.applyAddon(search);
-
-// const terminal = new Terminal();
-// Load WebLinksAddon on terminal, this is all that's needed to get web links
-// working in the terminal.
 
 
 let term: any;
@@ -47,20 +35,19 @@ function handleVisibilityChange() {
 			command: 'cli-focus'
 		});
 
-		/*
+
 		const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-		
-		
+
 		if (xtermScreen)
 			xtermScreen.style.opacity = '0.5';
-		//alert('update-cli');
+
 		setTimeout(() => {
 			if (xtermScreen)
 				xtermScreen.style.opacity = '1.0';
 		}, 500);
-		*/
 
-		
+
+
 	}
 }
 
@@ -68,8 +55,8 @@ function handleVisibilityChange() {
 function termShow() {
 	const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
 	if (xtermScreen) {
-	  xtermScreen.style.width = '100%';
-	  xtermScreen.style.height = '100%';
+		xtermScreen.style.width = '100%';
+		xtermScreen.style.height = '100%';
 	}
 	//vscode.postMessage({
 	//	command: 'cli-input',
@@ -148,8 +135,8 @@ window.addEventListener('message', (event) => {
 
 			const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
 			term = new Terminal({ ...termOptions, "windowsMode": isWindows });
-			
-			
+
+
 			// hvata sve evente - i keystrokes i mouse evente
 			term.onData((data: string) => {
 				// console.log(`cli-input: ${data}`);
@@ -216,26 +203,7 @@ window.addEventListener('message', (event) => {
 			term.open(terminalElement);
 			term.loadAddon(new WebglAddon());
 
-			//term.winptyCompatInit();
-			// term.webLinksInit();
 
-
-			//term.on('focus', () => {
-			//	// console.log( `xterm  ${term.getOption('termName')} ima focus rows: ${term.cols} cols: ${term.rows}`);
-			//	// console.log( `xterm ${term.getOption('termName')}: ${headerWithWrapper.clientWidth} ${headerWithWrapper.clientHeight}`);
-			//
-			//	//const computedStyle = window.getComputedStyle( iframe.width);
-			//	// const width = parseInt(computedStyle.getPropertyValue('width').replace('px', ''), 10);
-			//	// const height = parseInt(computedStyle.getPropertyValue('height').replace('px', ''), 10);
-			//
-			//	// term.element.click();
-			//	// console.log('term on focus');
-			//
-			//	if (!vscode.postMessage) console.log('postMessage error 2');
-			//	vscode.postMessage({
-			//		command: 'cli-focus'
-			//	});
-			//});
 
 			if (!term) {
 				if (!vscode.postMessage) console.log('postMessage error 3');
@@ -264,14 +232,13 @@ window.addEventListener('message', (event) => {
 
 		case 'term-hide':
 
-		    /*
-			const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-			if (xtermScreen) {
-				xtermScreen.style.width = '1%';
-				xtermScreen.style.height = '1%';
-			}
-			*/
-
+			/*
+				const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+				if (xtermScreen) {
+					xtermScreen.style.width = '1%';
+					xtermScreen.style.height = '1%';
+				}
+	        */
 			break;
 
 		case 'term-show':
@@ -472,14 +439,14 @@ class FontMeasurer {
 
 		let scaledCharWidth: number;
 		let scaledLineHeight: number;
-		console.log(`rendererType: ${this.config.rendererType}`);
-		if (this.config.rendererType === 'dom') {
-			scaledCharWidth = font.charWidth * window.devicePixelRatio;
-			scaledLineHeight = Math.floor(scaledCharHeight);
-		} else {
-			scaledCharWidth = Math.floor(font.charWidth * window.devicePixelRatio) + font.letterSpacing;
-			scaledLineHeight = Math.floor(scaledCharHeight * font.lineHeight);
-		};
+		// console.log(`rendererType: ${this.config.rendererType}`);
+		//if (this.config.rendererType === 'dom') {
+		//	scaledCharWidth = font.charWidth * window.devicePixelRatio;
+		//	scaledLineHeight = Math.floor(scaledCharHeight);
+		//} else {
+		scaledCharWidth = Math.floor(font.charWidth * window.devicePixelRatio) + font.letterSpacing;
+		scaledLineHeight = Math.floor(scaledCharHeight * font.lineHeight);
+		//};
 
 		const cols = Math.max(Math.floor(scaledWidthAvailable / scaledCharWidth), 1);
 		const rows = Math.max(Math.floor(scaledHeightAvailable / scaledLineHeight), 1);
