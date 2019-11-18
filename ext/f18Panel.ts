@@ -61,15 +61,18 @@ function globalHandler(error: Error) {
             f18Panel.webPanel.dispose();
 
             // ako je neuspjesno kreirana instanca, ponovi
-            const regex = /F18 (\w+) - \d+/;
-            const caption = error.message;
-            const modul = caption.replace(regex, "$1")
-            if (modulExists(modul)) {
-                console.log(`unhandledRejection novi pokusaj kreiranja: ${modul}`);
-                F18Panel.create(modul);
-            }
-            else console.log(`unhandledRejection - ne znam sta uraditi sa: ${caption}`);
-
+            // const regex = /F18 (\w+) - \d+/;
+            // const caption = error.message;
+            //const modul = caption.replace(regex, "$1")
+            //if (modulExists(modul)) {
+            //    vscode.window.showErrorMessage(caption);
+                //console.log(`unhandledRejection novi pokusaj kreiranja: ${modul}`);
+                //F18Panel.create(modul);
+            //}
+            //else {
+                vscode.window.showErrorMessage(`Problem sa pokretanjem: ${error.message}`);
+                //console.log(`unhandledRejection - ne znam sta uraditi sa: ${caption}`);
+            //}
         }
     });
 }
@@ -78,6 +81,7 @@ export class F18Panel {
 
     public static F18: F18Panel | undefined;
     public static downloadNew: boolean;
+    public static webGL: boolean;
     public static isDownloadedBinary: boolean = false;
     public static firstTerminal: boolean = true;
     public static instances: F18Panel[] = [];
@@ -90,6 +94,7 @@ export class F18Panel {
 
         F18Panel.F18 = new F18Panel(modulF18, vscode.ViewColumn.One);
         F18Panel.downloadNew = vscode.workspace.getConfiguration('f18').get('download');
+        F18Panel.webGL = vscode.workspace.getConfiguration('f18').get('webGL');
         //F18Panel.downloadNew = true;
 
         // ako se ne zeli download, stavi marker da je download izvrsen
@@ -628,7 +633,8 @@ export class F18Panel {
             fontSize: this.fontSize,
             letterSpacing: LETTER_SPACING,
             lineHeight: LINE_HEIGHT,
-            termName: this.panelCaption
+            termName: this.panelCaption,
+            webGL: F18Panel.webGL
         };
         this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
         if (this.modul !== 'cmd')
@@ -636,7 +642,7 @@ export class F18Panel {
 
         sendInitCmds.forEach((data: string) => {
             //this.terminalInstance!.sendText(element);
-            console.log(`sendInitCmds: ${data}`);
+            // console.log(`sendInitCmds: ${data}`);
             this._ptyProcess.write(data + '\r' );
         });
 

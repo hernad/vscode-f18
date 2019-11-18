@@ -3,8 +3,10 @@
 
 
 import { Terminal } from 'xterm';
-//import { MyWebLinksAddon } from './MyWebLinksAddon';
 import { WebglAddon } from 'xterm-addon-webgl';
+
+//import { MyWebLinksAddon } from './MyWebLinksAddon';
+
 
 
 // @ts-ignore
@@ -132,6 +134,7 @@ window.addEventListener('message', (event) => {
 			const terminalElement = document.getElementById('terminal');
 
 			termOptions = JSON.parse(message.data);
+			const webGL = termOptions.webGL;
 
 			const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
 			term = new Terminal({ ...termOptions, "windowsMode": isWindows });
@@ -201,9 +204,13 @@ window.addEventListener('message', (event) => {
 			*/
 
 			term.open(terminalElement);
-			term.loadAddon(new WebglAddon());
-
-
+			if (webGL) {				
+			    console.log('webGL YES');
+				// term.setOption('minimumContrastRatio', 10);
+				term.loadAddon(new WebglAddon());
+			} else {
+				console.log('webGL NO!');
+			}
 
 			if (!term) {
 				if (!vscode.postMessage) console.log('postMessage error 3');

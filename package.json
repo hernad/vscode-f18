@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent-dev",
-	"version": "3.3.1",
+	"version": "3.4.5",
 	"description": "F18 klijent DEV",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -126,6 +126,11 @@
 							"pwsh.exe",
 							"powershell.exe"
 						]
+					},
+					"f18.webGL": {
+						"description": "Koristiti webGL",
+						"type": "boolean",
+						"default": false
 					}
 				}
 			}
