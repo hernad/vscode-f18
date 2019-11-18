@@ -365,6 +365,11 @@ export class F18Panel {
                     this.xtermWrite(e);
             });
 
+            this._ptyProcess.onExit( (e) => {
+                console.log(`pty Exit: ${e.exitCode}`);
+                this.webPanel.dispose();
+            });
+
             //    },
             //    () => {
             //        console.log(`terminal ${this.panelCaption} se ne može kreirati?!`);
@@ -408,6 +413,7 @@ export class F18Panel {
             if (!this.terminalDisposed) {
                 //this.terminalInstance.dispose();
                 this.terminalDisposed = true;
+                this._ptyProcess.kill();
             }
 
         });
