@@ -3,7 +3,7 @@
 	"version": "3.4.5",
 	"description": "F18 klijent DEV",
 	"engines": {
-		"vscode": "^1.30.0"
+		"vscode": "^1.40.0"
 	},
 	"keywords": [
 		"F18",

@@ -66,12 +66,12 @@ function globalHandler(error: Error) {
             //const modul = caption.replace(regex, "$1")
             //if (modulExists(modul)) {
             //    vscode.window.showErrorMessage(caption);
-                //console.log(`unhandledRejection novi pokusaj kreiranja: ${modul}`);
-                //F18Panel.create(modul);
+            //console.log(`unhandledRejection novi pokusaj kreiranja: ${modul}`);
+            //F18Panel.create(modul);
             //}
             //else {
-                vscode.window.showErrorMessage(`Problem sa pokretanjem: ${error.message}`);
-                //console.log(`unhandledRejection - ne znam sta uraditi sa: ${caption}`);
+            vscode.window.showErrorMessage(`Problem sa pokretanjem: ${error.message}`);
+            //console.log(`unhandledRejection - ne znam sta uraditi sa: ${caption}`);
             //}
         }
     });
@@ -334,7 +334,7 @@ export class F18Panel {
             dim();
 
             const ptyForkOptions: IPtyForkOptions = {
-                name: 'cmd.exe',
+                name:  Helper.is_windows() ? 'cmd.exe' : 'xterm-256color',
                 cols: this.cols,
                 rows: this.rows,
                 cwd: process.cwd()
@@ -349,23 +349,23 @@ export class F18Panel {
             };
 
             let pty;
-            if (Helper.is_windows())  {
+            if (Helper.is_windows()) {
                 pty = Global.pty.spawn('cmd.exe', '', ptyForkOptions);
             } else {
                 pty = Global.pty.spawn('/bin/bash', undefined, ptyForkOptions);
             }
 
-            
+
             this._ptyProcess = pty;
             //this._ptyProcess.write('echo Hello World\r' );
-            
+
             this._ptyProcess.on('data', (e: string) => {
                 //console.log(`pty.onData: ${e}`);
                 if (!this.webPanelDisposed)
                     this.xtermWrite(e);
             });
 
-            this._ptyProcess.onExit( (e) => {
+            this._ptyProcess.onExit((e) => {
                 console.log(`pty Exit: ${e.exitCode}`);
                 this.webPanel.dispose();
             });
@@ -489,8 +489,9 @@ export class F18Panel {
                     //    //vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
                     //} else {
                     //this.terminalInstance.sendText(message.data, false);
+
                     this._ptyProcess.write(message.data);
-                    // console.log(`cli-input: ${message.data} -> pty`);
+                    // console.log(`cli-input: ${JSON.stringify(message.data)} -> pty`);
                     //}
                     //}
                     break;
@@ -627,6 +628,7 @@ export class F18Panel {
             sendInitCmds.push(runExe);
         }
 
+
         const termOptions = {
             cols: this.cols,
             rows: this.rows,
@@ -634,13 +636,24 @@ export class F18Panel {
             bellStyle: 'sound',
             cursorStyle: 'block', // cursorStyle: 'block', 'underline','bar',
             rendererType: RENDERER_TYPE,
-            experimentalCharAtlas: 'dynamic',
             fontFamily: this.fontFamily,
             fontSize: this.fontSize,
             letterSpacing: LETTER_SPACING,
             lineHeight: LINE_HEIGHT,
             termName: this.panelCaption,
-            webGL: F18Panel.webGL
+            webGL: F18Panel.webGL,
+            theme: { background: "#1e1e1e", foreground: "#cccccc", cursor: "#cccccc", cursorAccent: "#1e1e1e", selection: "rgba(255, 255, 255, 0.25)", black: "#000000", red: "rgb(251, 122, 1)", green: "#0dbc79", yellow: "#e5e510", blue: "rgb(30, 29, 105)", magenta: "#bc3fbc", cyan: "#11a8cd", white: "#f8f5f5", brightBlack: "#666666", brightRed: "rgb(236, 10, 10)", brightGreen: "#23d18b", brightYellow: "#f5f543", brightBlue: "#3b8eea", brightMagenta: "#d670d6", brightCyan: "#29b8db", brightWhite: "#e5e5e5" },
+            scrollback: 1000,
+            drawBoldTextInBrightColors: true,
+            fontWeight: "normal",
+            fontWeightBold: "bold",
+            // bellStyle: "none",
+            macOptionIsMeta: false,
+            macOptionClickForcesSelection: false,
+            rightClickSelectsWord: false,
+            fastScrollModifier: "alt",
+            fastScrollSensitivity: 5,
+            scrollSensitivity: 1
         };
         this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
         if (this.modul !== 'cmd')
@@ -649,7 +662,7 @@ export class F18Panel {
         sendInitCmds.forEach((data: string) => {
             //this.terminalInstance!.sendText(element);
             // console.log(`sendInitCmds: ${data}`);
-            this._ptyProcess.write(data + '\r' );
+            this._ptyProcess.write(data + '\r');
         });
 
         // console.log(`terminalInstance: ${JSON.stringify(this.terminalInstance)}`);
@@ -731,8 +744,8 @@ export class F18Panel {
         */
 
         const scriptPathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'build', mainScript));
-        const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
-
+        //const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
+        const scriptUri = this.webPanel.webview.asWebviewUri(scriptPathOnDisk);
         /*
         const scriptReact1OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', reactScript1));
         const scriptReact1Uri = scriptReact1OnDisk.with({ scheme: 'vscode-resource' });
@@ -742,13 +755,13 @@ export class F18Panel {
         */
 
         const xermStylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', xtermStyle));
-        const xtermStyleUri = xermStylePathOnDisk.with({ scheme: 'vscode-resource' });
+        const xtermStyleUri = this.webPanel.webview.asWebviewUri(xermStylePathOnDisk);
 
         // const xermFullScreenStylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', xtermFullScreenStyle));
         // const xtermFullScreenStyleUri = xermFullScreenStylePathOnDisk.with({ scheme: 'vscode-resource' });
 
         const stylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', mainStyle));
-        const styleUri = stylePathOnDisk.with({ scheme: 'vscode-resource' });
+        const styleUri = this.webPanel.webview.asWebviewUri(stylePathOnDisk);
 
         // Use a nonce to whitelist which scripts can bereact.development.js run
         const nonce = getNonce();

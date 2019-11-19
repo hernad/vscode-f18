@@ -137,6 +137,7 @@ window.addEventListener('message', (event) => {
 			const webGL = termOptions.webGL;
 
 			const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
+			// console.log(`termOptions: ${JSON.stringify({ ...termOptions, "windowsMode": isWindows })}`);
 			term = new Terminal({ ...termOptions, "windowsMode": isWindows });
 
 
