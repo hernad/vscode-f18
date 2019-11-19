@@ -329,7 +329,7 @@ export class F18Panel {
                     else
                         dim();
                 }
-            }, 300);
+            }, 700);
 
             dim();
 
