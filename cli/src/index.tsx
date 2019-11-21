@@ -38,14 +38,14 @@ function handleVisibilityChange() {
 		});
 
 
-		const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+		const xtermCanvas = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
 
-		if (xtermScreen)
-			xtermScreen.style.opacity = '0.5';
+		if (xtermCanvas)
+			xtermCanvas.style.opacity = '0.5';
 
 		setTimeout(() => {
-			if (xtermScreen)
-				xtermScreen.style.opacity = '1.0';
+			if (xtermCanvas)
+				xtermCanvas.style.opacity = '1.0';
 		}, 500);
 
 
@@ -55,18 +55,22 @@ function handleVisibilityChange() {
 
 
 function termShow() {
-	const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-	if (xtermScreen) {
-		xtermScreen.style.width = '100%';
-		xtermScreen.style.height = '100%';
+	console.log('termShow');
+	const xtermCanvas = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+	if (xtermCanvas) {
+		xtermCanvas.style.width = '100%';
+		xtermCanvas.style.height = '100%';
+	} else {
+		console.log('termShow: gdje je xTermCanvas?!');
 	}
-	//vscode.postMessage({
-	//	command: 'cli-input',
 	//	data: '\x1b[24~' // K_F12
-	//});
+	vscode.postMessage({
+		command: 'cli-focus'
+	});
 
-	//if (term) term.focus();
-}
+	if (term) term.focus();
+};
+
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 
 
@@ -137,6 +141,7 @@ window.addEventListener('message', (event) => {
 			const webGL = termOptions.webGL;
 
 			const isWindows = ['Windows', 'Win16', 'Win32', 'WinCE'].indexOf(navigator.platform) >= 0;
+			// console.log(`termOptions: ${JSON.stringify({ ...termOptions, "windowsMode": isWindows })}`);
 			term = new Terminal({ ...termOptions, "windowsMode": isWindows });
 
 
@@ -156,9 +161,11 @@ window.addEventListener('message', (event) => {
 				const match = data.match(regexVsCodeCmd);
 
 				if (!match) {
+					console.log(`onTitleChange !match data ${JSON.stringify(data)}`);
 					return;
 				}
 
+				console.log(`onTitleChange ${match[1]} : ${match[2]}`);
 				if (match[1] == 'f18.klijent' && match[2] == 'start') {
 					// F18 klijent: f18.klijent - start
 					termShow();
@@ -239,19 +246,20 @@ window.addEventListener('message', (event) => {
 
 		case 'term-hide':
 
-			/*
-				const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-				if (xtermScreen) {
+		    console.log('xterm term-hide');
+			const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
+			if (xtermScreen) {
 					xtermScreen.style.width = '1%';
 					xtermScreen.style.height = '1%';
-				}
-	        */
+			} else {
+				console.log('gdje je xterm-text-layer ?!');
+			}
 			break;
 
 		case 'term-show':
 		case 'focus-back':
 
-			termShow();
+			//termShow();
 			break;
 
 	}
@@ -273,52 +281,6 @@ interface ITerminalFont {
 	charHeight?: number;
 }
 
-/*
-
-export type FontWeight = 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
-
-export interface ITerminalConfiguration {
-	shell: {
-		linux: string;
-		osx: string;
-		windows: string;
-	};
-	shellArgs: {
-		linux: string[];
-		osx: string[];
-		windows: string[];
-	};
-	macOptionIsMeta: boolean;
-	macOptionClickForcesSelection: boolean;
-	rendererType: 'auto' | 'canvas' | 'dom';
-	rightClickBehavior: 'default' | 'copyPaste' | 'selectWord';
-	cursorBlinking: boolean;
-	cursorStyle: string;
-	drawBoldTextInBrightColors: boolean;
-	fontFamily: string;
-	fontWeight: FontWeight;
-	fontWeightBold: FontWeight;
-	// fontLigatures: boolean;
-	fontSize: number;
-	letterSpacing: number;
-	lineHeight: number;
-	setLocaleVariables: boolean;
-	scrollback: number;
-	commandsToSkipShell: string[];
-	cwd: string;
-	confirmOnExit: boolean;
-	enableBell: boolean;
-	env: {
-		linux: { [key: string]: string };
-		osx: { [key: string]: string };
-		windows: { [key: string]: string };
-	};
-	showExitAlert: boolean;
-	experimentalBufferImpl: 'JsArray' | 'TypedArray';
-	splitCwd: 'workspaceRoot' | 'initial' | 'inherited';
-	windowsEnableConpty: boolean;
-}
-*/
 
 class Dimension {
 	public width: number;
