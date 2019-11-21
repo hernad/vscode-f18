@@ -642,15 +642,27 @@ export class F18Panel {
             termName: this.panelCaption,
             webGL: F18Panel.webGL
         };
-        this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) });
-        if (this.modul !== 'cmd')
-            this.webPanel.webview.postMessage({ command: 'term-hide' });
+        this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) })
+           .then(() => {
+               if (this.modul !== 'cmd') {
+                 this.webPanel.webview.postMessage({ command: 'term-hide' })
+                   .then( () => {
+                      sendInitCmds.forEach((data: string) => {
+                        //this.terminalInstance!.sendText(element);
+                        // console.log(`sendInitCmds: ${data}`);
+                        this._ptyProcess.write(data + '\r' );
+                      });
+                   });
+               } else {
+                  sendInitCmds.forEach((data: string) => {
+                    this._ptyProcess.write(data + '\r' );
+                  });
+               }
 
-        sendInitCmds.forEach((data: string) => {
-            //this.terminalInstance!.sendText(element);
-            // console.log(`sendInitCmds: ${data}`);
-            this._ptyProcess.write(data + '\r' );
-        });
+           });
+        
+
+        
 
         // console.log(`terminalInstance: ${JSON.stringify(this.terminalInstance)}`);
 
