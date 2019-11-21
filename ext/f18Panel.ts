@@ -579,11 +579,15 @@ export class F18Panel {
         if (Helper.is_windows()) {
             if (shell() != 'cmd.exe') {
                 sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
+                sendInitCmds.push('');
                 sendInitCmds.push('cls');
+                /*
                 // ako mode con: => ... Lines: 3000 => exit
                 sendInitCmds.push(
                     '$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }'
                 );
+                */
+                sendInitCmds.push('');
                 sendInitCmds.push(`cd ${Global.folderPath}`);
                 sendInitCmds.push(`$env:PATH='${Global.folderPath}\\bin;${Global.folderPath};' + $env:PATH`);
                 sendInitCmds.push(`$env:F18_HOME='${f18HomePath}'`);
@@ -593,12 +597,16 @@ export class F18Panel {
 
             } else {
                 sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
+                sendInitCmds.push('');
                 sendInitCmds.push('cls');
+                /*
                 // ako mode con: => ... Lines: 3000 => exit
                 sendInitCmds.push(
                     'powershell "$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }"'
                 );
                 sendInitCmds.push('if %errorlevel% neq 0 exit');
+                */
+                sendInitCmds.push('');
                 sendInitCmds.push(`cd ${Global.folderPath}`);
                 sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
                 sendInitCmds.push(`set F18_HOME=${f18HomePath}`);
