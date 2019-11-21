@@ -334,7 +334,7 @@ export class F18Panel {
             dim();
 
             const ptyForkOptions: IPtyForkOptions = {
-                name:  Helper.is_windows() ? 'cmd.exe' : 'xterm-256color',
+                name:  Helper.is_windows() ? shell() : 'xterm-256color',
                 cols: this.cols,
                 rows: this.rows,
                 cwd: process.cwd()
@@ -350,9 +350,9 @@ export class F18Panel {
 
             let pty;
             if (Helper.is_windows()) {
-                pty = Global.pty.spawn('cmd.exe', '', ptyForkOptions);
+                pty = Global.pty.spawn(shell(), '', ptyForkOptions);
             } else {
-                pty = Global.pty.spawn('/bin/bash', undefined, ptyForkOptions);
+                pty = Global.pty.spawn(shell(), undefined, ptyForkOptions);
             }
 
 
