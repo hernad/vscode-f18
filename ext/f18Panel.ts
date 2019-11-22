@@ -7,9 +7,10 @@ import { Global, vscode_version_match } from './global';
 import { execHashList, revision } from './constants';
 import { IConnection } from './IConnection';
 import { PostgresConnection } from './postgresConnection';
-import { string } from 'prop-types';
+// import { string } from 'prop-types';
 import { IPtyForkOptions, IPty } from 'node-pty';
-import { isUndefined } from 'lodash';
+import { Disposable } from 'vscode';
+// import { isUndefined } from 'lodash';
 
 // import { isContext } from 'vm';
 
@@ -58,7 +59,9 @@ process.on('unhandledRejection', function (reason: Error, p) {
 function globalHandler(error: Error) {
     F18Panel.instances.forEach((f18Panel: F18Panel) => {
         if (error.message.includes(f18Panel.panelCaption)) {
-            f18Panel.webPanel.dispose();
+            //if (f18Panel.
+            if (!f18Panel.webPanelDisposed)
+                f18Panel.webPanel.dispose();
 
             // ako je neuspjesno kreirana instanca, ponovi
             // const regex = /F18 (\w+) - \d+/;
@@ -79,7 +82,7 @@ function globalHandler(error: Error) {
 
 export class F18Panel {
 
-    public static F18: F18Panel | undefined;
+    // public static F18: F18Panel | undefined;
     public static downloadNew: boolean;
     public static webGL: boolean;
     public static isDownloadedBinary: boolean = false;
@@ -88,11 +91,11 @@ export class F18Panel {
     public webPanel: vscode.WebviewPanel;
     public lostFocus: boolean = false;
 
-    public static create(modulF18: string) {
+    public static createF18Instance(modulF18: string) {
         // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
         // const column = undefined;
 
-        F18Panel.F18 = new F18Panel(modulF18, vscode.ViewColumn.One);
+        new F18Panel(modulF18, vscode.ViewColumn.One);
         F18Panel.downloadNew = vscode.workspace.getConfiguration('f18').get('download');
         F18Panel.webGL = vscode.workspace.getConfiguration('f18').get('webGL');
         //F18Panel.downloadNew = true;
@@ -102,6 +105,7 @@ export class F18Panel {
         //  F18Panel.isDownloadedBinary = true;
 
 
+        /*
         vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
             // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
 
@@ -123,6 +127,7 @@ export class F18Panel {
             //    F18Panel.currentPanelNum = 1;
 
         });
+        */
 
     }
 
@@ -158,11 +163,12 @@ export class F18Panel {
     //private static currentPanelNum = 1;
 
     public readonly panelCaption: string;
-    private webPanelIsLive: boolean;
+    private webPanelIsAlive: boolean;
     private readonly extensionPath: string;
-    // private disposables: vscode.Disposable[] = [];
+    //private disposables: vscode.Disposable[] = [];
 
     // private terminalInstance: vscode.Terminal;
+    public webPanelDisposed: boolean;
     private readonly modul: string;
     private connection: IConnection;
     private adminConnection: IConnection;
@@ -173,13 +179,15 @@ export class F18Panel {
     private height: number;
     private fontFamily: string;
     private fontSize: number;
-    private terminalDisposed: boolean;
-    private webPanelDisposed: boolean;
+    private terminalKilled: boolean;
+
     private switchPosPM: string;
     private termBuffer: string[] = [];
     private _ptyProcess: IPty;
 
+
     private constructor(cModul: string, column: vscode.ViewColumn) {
+
 
         this.extensionPath = Global.context.extensionPath;
         this.modul = cModul;
@@ -188,9 +196,9 @@ export class F18Panel {
         this.width = 0;
         this.height = 0;
         this.fontSize = 16;
-        this.terminalDisposed = false;
+        this.terminalKilled = false;
         this.webPanelDisposed = false;
-        this.webPanelIsLive = false;
+        this.webPanelIsAlive = false;
 
         const tmpFS = vscode.workspace.getConfiguration('f18').get('fontSize');
         if (tmpFS !== undefined) {
@@ -225,16 +233,7 @@ export class F18Panel {
         this.panelNum = nLast + 1;
         this.panelCaption = `F18 ${this.modul} - ${this.panelNum}`;
 
-        const getConnectionThenRun = () => PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
-            this.connection = connection;
-            PostgresConnection.getDefaultConnection('admin').then((adminConnection: IConnection) => {
-                this.adminConnection = adminConnection;
-                this.afterConnect();
-            }).catch(() => {
-                this.adminConnection = undefined;
-                this.afterConnect();
-            });
-        })
+
 
         const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
 
@@ -251,14 +250,28 @@ export class F18Panel {
         try {
             if (!F18Panel.isDownloadedBinary && runSelect)
                 vscode.commands.executeCommand('f18.selectDatabase')
-                    .then(() => setTimeout(getConnectionThenRun, 770)); // timeout potreban da se propagira promjena konfiguracije
+                    .then(() => setTimeout(this.getConnectionThenRun, 770)); // timeout potreban da se propagira promjena konfiguracije
             else
-                getConnectionThenRun();
+                this.getConnectionThenRun();
         } catch {
             throw (this.panelCaption);
         }
     }
 
+
+    private getConnectionThenRun() {
+        return PostgresConnection.getDefaultConnection()
+            .then((connection: IConnection) => {
+                this.connection = connection;
+                PostgresConnection.getDefaultConnection('admin').then((adminConnection: IConnection) => {
+                    this.adminConnection = adminConnection;
+                    this.afterConnect();
+                }).catch(() => {
+                    this.adminConnection = undefined;
+                    this.afterConnect();
+                });
+            });
+    }
 
     private afterConnect() {
 
@@ -279,7 +292,7 @@ export class F18Panel {
                 ]
             }
         );
-        this.webPanelDisposed = false;
+
         this.configurePanel();
         F18Panel.instances.push(this);
 
@@ -304,7 +317,7 @@ export class F18Panel {
             //    .then(
             //        (processId: number) => {
             // console.log(`kreiran terminal ${processId}`);
-            this.terminalDisposed = false;
+            this.terminalKilled = false;
             const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
             const configMerged = {
                 ...config,
@@ -317,7 +330,7 @@ export class F18Panel {
             let count = 0;
             const dim = () => setTimeout(() => {
                 // console.log(`term-get-dimensions webPanelIsLive ${this.webPanelIsLive}`);
-                if (this.webPanelIsLive) {
+                if (this.webPanelIsAlive) {
                     this.webPanel.webview.postMessage({
                         command: 'term-get-dimensions',
                         data: JSON.stringify(configMerged)
@@ -334,10 +347,11 @@ export class F18Panel {
             dim();
 
             const ptyForkOptions: IPtyForkOptions = {
-                name:  Helper.is_windows() ? shell() : 'xterm-256color',
+                name: Helper.is_windows() ? shell() : 'xterm-256color',
                 cols: this.cols,
                 rows: this.rows,
-                cwd: process.cwd()
+                cwd: process.cwd(),
+                env: process.env
                 /*
                 env: Object.assign(
                     {},
@@ -348,7 +362,7 @@ export class F18Panel {
                 */
             };
 
-            let pty;
+            let pty: IPty;
             if (Helper.is_windows()) {
                 pty = Global.pty.spawn(shell(), '', ptyForkOptions);
             } else {
@@ -359,23 +373,21 @@ export class F18Panel {
             this._ptyProcess = pty;
             //this._ptyProcess.write('echo Hello World\r' );
 
-            this._ptyProcess.on('data', (e: string) => {
-                //console.log(`pty.onData: ${e}`);
+            this._ptyProcess.onData((e: string) => {
+                // console.log(`pty.onData: ${JSON.stringify(e)}`);
                 if (!this.webPanelDisposed)
                     this.xtermWrite(e);
             });
 
             this._ptyProcess.onExit((e) => {
                 console.log(`pty Exit: ${e.exitCode}`);
-                this.webPanel.dispose();
+                this.terminalKilled = true;
+                if (!this.webPanelDisposed) {
+                    this.webPanel.dispose();
+                }
             });
 
-            //    },
-            //    () => {
-            //        console.log(`terminal ${this.panelCaption} se ne može kreirati?!`);
-            //        throw new Error(this.panelCaption);
-            //    }
-            //);
+
         }
 
 
@@ -405,15 +417,28 @@ export class F18Panel {
     public configurePanel() {
 
         this.webPanel.onDidDispose(() => {
+            /*
+            F18Panel.instances.forEach((f18Panel: F18Panel) => {
+                if (f18Panel.panelCaption === this.panelCaption) {
+                    // f18Panel.terminalDisposed = true; // ovaj terminal je vec u procesu zatvaranja
+                    f18Panel.webPanel.dispose();
+                }
+    
+            });
+            */
+            if (!this.webPanelDisposed) {
+                this.webPanelDisposed = true;
+                const filtered = F18Panel.instances.filter((f18Panel: F18Panel) => {
+                    return f18Panel.panelCaption !== this.panelCaption;
+                });
+                // izbaciti iz liste instanci ovu koju gasimo
+                F18Panel.instances = filtered;
+            }
 
-            if (this.webPanelDisposed) return;
+            if (!this.terminalKilled) {
 
-            this.webPanelDisposed = true;
-            // ovo se desi kada nasilno ugasimo tab (kada ne izadjemo iz F18 regularno)
-            if (!this.terminalDisposed) {
-                //this.terminalInstance.dispose();
-                this.terminalDisposed = true;
-                this._ptyProcess.kill();
+                this.terminalKilled = true;
+                this._ptyProcess.write( '\x1b[24;5~' ); // K_CTRL_F12
             }
 
         });
@@ -434,7 +459,7 @@ export class F18Panel {
             switch (message.command) {
 
                 case 'pong':
-                    this.webPanelIsLive = true;
+                    this.webPanelIsAlive = true;
                     break;
 
                 case 'ready':
@@ -467,12 +492,6 @@ export class F18Panel {
                     // vscode.window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
                     this._ptyProcess.resize(this.cols, this.rows);
 
-                    // @ts-ignore
-                    //if (this.terminalInstance && this.terminalInstance.resize) {
-                    // @ts-ignore
-                    //this.terminalInstance.resize(this.cols, this.rows);
-                    //};
-
                     break;
 
                 case 'cli-input':
@@ -487,13 +506,10 @@ export class F18Panel {
                     // Pc	No. of columns
                     //if ((new RegExp("\\x1b\\[\\d+;\\d+R")).test(message.data)) {
                     //    //vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
-                    //} else {
-                    //this.terminalInstance.sendText(message.data, false);
-
+                    //} 
                     this._ptyProcess.write(message.data);
                     // console.log(`cli-input: ${JSON.stringify(message.data)} -> pty`);
-                    //}
-                    //}
+
                     break;
 
                 //case 'term-show':
@@ -509,6 +525,8 @@ export class F18Panel {
                     break;
             }
         });
+
+        // this.webPanel.webview.postMessage({ command: 'ping' });
     }
 
 
@@ -665,26 +683,26 @@ export class F18Panel {
         };
 
         this.webPanel.webview.postMessage({ command: 'term-create', data: JSON.stringify(termOptions) })
-           .then(() => {
-               if (this.modul !== 'cmd') {
-                 this.webPanel.webview.postMessage({ command: 'term-hide' })
-                   .then( () => {
-                      sendInitCmds.forEach((data: string) => {
-                        //this.terminalInstance!.sendText(element);
-                        // console.log(`sendInitCmds: ${data}`);
-                        this._ptyProcess.write(data + '\r' );
-                      });
-                   });
-               } else {
-                  sendInitCmds.forEach((data: string) => {
-                    this._ptyProcess.write(data + '\r' );
-                  });
-               }
+            .then(() => {
+                if (this.modul !== 'cmd') {
+                    this.webPanel.webview.postMessage({ command: 'term-hide' })
+                        .then(() => {
+                            sendInitCmds.forEach((data: string) => {
+                                //this.terminalInstance!.sendText(element);
+                                // console.log(`sendInitCmds: ${data}`);
+                                this._ptyProcess.write(data + '\r');
+                            });
+                        });
+                } else {
+                    sendInitCmds.forEach((data: string) => {
+                        this._ptyProcess.write(data + '\r');
+                    });
+                }
 
-           });
-        
+            });
 
-    
+
+
         // console.log(`terminalInstance: ${JSON.stringify(this.terminalInstance)}`);
 
 
@@ -714,28 +732,6 @@ export class F18Panel {
         }
     }
 
-
-    public dispose() {
-
-        if (!this.terminalDisposed) {
-            this.terminalDisposed = true;
-            //this.terminalInstance.dispose();
-            this._ptyProcess.kill();
-        }
-
-        if (!this.webPanelDisposed && this.webPanel) {
-            this.webPanelDisposed = true;
-            this.webPanel.dispose();
-        }
-
-        // while (this.disposables.length) {
-        // 	const x = this.disposables.pop();
-        // 	if (x) {
-        // 		x.dispose();
-        // 	}
-        // }
-        F18Panel.F18 = undefined;
-    }
 
 
 

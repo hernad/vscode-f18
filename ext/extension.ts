@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('f18.start.cmd', () => {
-			F18Panel.create('cmd');
+			F18Panel.createF18Instance('cmd');
 		})
 	)
 
@@ -44,25 +44,25 @@ export function activate(context: vscode.ExtensionContext) {
 					() => vscode.commands.executeCommand('postgres.selectDatabase').then(() => console.log('selected database'))
 				),
 				vscode.commands.registerCommand('f18.start.pos', () => {
-					F18Panel.create('pos');
+					F18Panel.createF18Instance('pos');
 				}),
 				vscode.commands.registerCommand('f18.start.fin', () => {
-					F18Panel.create('fin');
+					F18Panel.createF18Instance('fin');
 				}),
 				vscode.commands.registerCommand('f18.start.kalk', () => {
-					F18Panel.create('kalk');
+					F18Panel.createF18Instance('kalk');
 				}),
 				vscode.commands.registerCommand('f18.start.fakt', () => {
-					F18Panel.create('fakt');
+					F18Panel.createF18Instance('fakt');
 				}),
 				vscode.commands.registerCommand('f18.start.os', () => {
-					F18Panel.create('os');
+					F18Panel.createF18Instance('os');
 				}),
 				vscode.commands.registerCommand('f18.start.ld', () => {
-					F18Panel.create('ld');
+					F18Panel.createF18Instance('ld');
 				}),
 				vscode.commands.registerCommand('f18.start.epdv', () => {
-					F18Panel.create('epdv');
+					F18Panel.createF18Instance('epdv');
 				})
 			);
 		});

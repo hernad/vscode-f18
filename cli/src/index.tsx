@@ -4,14 +4,10 @@
 
 import { Terminal } from 'xterm';
 import { WebglAddon } from 'xterm-addon-webgl';
-
 //import { MyWebLinksAddon } from './MyWebLinksAddon';
-
-
 
 // @ts-ignore
 const vscode = acquireVsCodeApi();
-
 
 let term: any;
 let termOptions: any;
@@ -48,8 +44,6 @@ function handleVisibilityChange() {
 				xtermCanvas.style.opacity = '1.0';
 		}, 500);
 
-
-
 	}
 }
 
@@ -63,7 +57,7 @@ function termShow() {
 	} else {
 		console.log('termShow: gdje je xTermCanvas?!');
 	}
-	//	data: '\x1b[24~' // K_F12
+	
 	vscode.postMessage({
 		command: 'cli-focus'
 	});
@@ -105,7 +99,6 @@ window.addEventListener('message', (event) => {
 			}
 			const html = document.body.parentElement;
 			const fm = new FontMeasurer(config, document.body);
-
 			const rowsCols = fm.evaluateColsAndRows(html.clientWidth, html.clientHeight);
 
 			const data = JSON.stringify({
@@ -132,7 +125,6 @@ window.addEventListener('message', (event) => {
 
 			//headerWithWrapper.innerHTML = '<div id="terminal" class="terminal-wrapper"></div><a id="google" href="#input1">termin</a><input type="text" id="input1" minlength="4" maxlength="8" size="10">';
 			headerWithWrapper.innerHTML = '<div id="terminal" class="terminal-wrapper"></div>';
-
 			const container = document.getElementById('root');
 			container.appendChild(headerWithWrapper);
 			const terminalElement = document.getElementById('terminal');
@@ -147,7 +139,7 @@ window.addEventListener('message', (event) => {
 
 			// hvata sve evente - i keystrokes i mouse evente
 			term.onData((data: string) => {
-				// console.log(`cli-input: ${data}`);
+				// console.log(`cli-input: ${JSON.stringify(data)}`);
 				if (!vscode.postMessage) console.log('postMessage error 1');
 				vscode.postMessage({
 					command: 'cli-input',
@@ -159,12 +151,10 @@ window.addEventListener('message', (event) => {
 
 				const regexVsCodeCmd = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
 				const match = data.match(regexVsCodeCmd);
-
 				if (!match) {
 					console.log(`onTitleChange !match data ${JSON.stringify(data)}`);
 					return;
 				}
-
 				console.log(`onTitleChange ${match[1]} : ${match[2]}`);
 				if (match[1] == 'f18.klijent' && match[2] == 'start') {
 					// F18 klijent: f18.klijent - start
@@ -212,11 +202,11 @@ window.addEventListener('message', (event) => {
 
 			term.open(terminalElement);
 			if (webGL) {				
-			    console.log('webGL YES');
+			    // console.log('webGL YES');
 				// term.setOption('minimumContrastRatio', 10);
 				term.loadAddon(new WebglAddon());
 			} else {
-				console.log('webGL NO!');
+				// console.log('webGL NO!');
 			}
 
 			if (!term) {
@@ -258,9 +248,9 @@ window.addEventListener('message', (event) => {
 
 		case 'term-show':
 		case 'focus-back':
-
-			//termShow();
+			termShow();
 			break;
+
 
 	}
 });
