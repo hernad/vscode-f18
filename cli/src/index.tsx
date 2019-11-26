@@ -3,7 +3,7 @@
 
 
 import { Terminal } from '../xterm/lib/xterm';
-import { WebglAddon } from '../xterm/lib/xterm-addon-webgl';
+// import { WebglAddon } from '../xterm/lib/xterm-addon-webgl';
 //import { MyWebLinksAddon } from './MyWebLinksAddon';
 
 // @ts-ignore
@@ -211,8 +211,7 @@ window.addEventListener('message', (event) => {
 			term.open(terminalElement);
 			if (webGL) {				
 			    // console.log('webGL YES');
-				// term.setOption('minimumContrastRatio', 10);
-				term.loadAddon(new WebglAddon());
+				// term.loadAddon(new WebglAddon());
 			} else {
 				// console.log('webGL NO!');
 			}
