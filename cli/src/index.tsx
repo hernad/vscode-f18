@@ -1,9 +1,9 @@
 
-/// <reference path="../typings/xterm.d.ts"/>
+/// <reference path="../xterm/typings/xterm.d.ts"/>
 
 
-import { Terminal } from '../lib/xterm';
-import { WebglAddon } from '../lib/xterm-addon-webgl';
+import { Terminal } from '../xterm/lib/xterm';
+import { WebglAddon } from '../xterm/lib/xterm-addon-webgl';
 //import { MyWebLinksAddon } from './MyWebLinksAddon';
 
 // @ts-ignore
