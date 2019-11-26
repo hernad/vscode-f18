@@ -384,6 +384,7 @@ export class F18Panel {
 
             this._ptyProcess.onExit((e) => {
                 console.log(`pty Exit: ${e.exitCode}`);
+                this._ptyProcess.kill();
                 this.terminalKilled = true;
                 if (!this.webPanelDisposed) {
                     this.webPanel.dispose();
