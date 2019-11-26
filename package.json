@@ -1,6 +1,6 @@
 {
 	"name": "f18-klijent-dev",
-	"version": "4.2.0",
+	"version": "4.3.0",
 	"description": "F18 klijent DEV",
 	"engines": {
 		"vscode": "^1.40.0"
@@ -146,7 +146,7 @@
 	},
 	"scripts": {
 		"node_modules": "cd cli && yarn && cd .. && yarn",
-		"build": "cd cli && webpack && cd .. && tsc -p tsconfig.json",
+		"build": "cd cli && yarn && webpack && cd .. && tsc -p tsconfig.json",
 		"vscode:prepublish": "cd cli && webpack && cd .. && tsc -p tsconfig.json",
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"extension-publish": "vsce publish --yarn"

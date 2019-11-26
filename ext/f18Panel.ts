@@ -374,7 +374,7 @@ export class F18Panel {
             //this._ptyProcess.write('echo Hello World\r' );
 
             this._ptyProcess.onData((e: string) => {
-                // console.log(`pty.onData: ${JSON.stringify(e)}`);
+                console.log(`pty.onData: ${JSON.stringify(e)}`);
                 if (!this.webPanelDisposed)
                     this.xtermWrite(e);
             });
@@ -628,7 +628,7 @@ export class F18Panel {
                 sendInitCmds.push(`cd ${Global.folderPath}`);
                 sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
                 sendInitCmds.push(`set F18_HOME=${f18HomePath}`);
-                sendInitCmds.push('set F18_ESHELL=1');
+                sendInitCmds.push('set F18_ESHELLy=1');
                 sendInitCmds.push(`cd %F18_HOME%`);
                 (this.modul !== 'cmd') ? sendInitCmds.push('cls') : sendInitCmds.push('echo %CD%');
             }
@@ -645,6 +645,8 @@ export class F18Panel {
             sendInitCmds.push('export F18_ESHELL=1');
             sendInitCmds.push(`export F18_HOME=${f18HomePath}`);
             sendInitCmds.push(`cd $F18_HOME`);
+            // sendInitCmds.push(`echo -e "\\e[?1000;1006;1015h"`);  // enable mouse tracking
+
             (this.modul !== 'cmd') ? sendInitCmds.push('clear') : sendInitCmds.push('pwd');
         }
 
@@ -659,7 +661,7 @@ export class F18Panel {
             cols: this.cols,
             rows: this.rows,
             cursorBlink: true,
-            bellStyle: 'sound',
+            bellStyle: 'none',
             cursorStyle: 'block', // cursorStyle: 'block', 'underline','bar',
             rendererType: RENDERER_TYPE,
             fontFamily: this.fontFamily,
@@ -788,14 +790,15 @@ export class F18Panel {
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
 				<meta name="theme-color" content="#000000">
-				<title>F18 screen</title>
+                <title>F18 screen</title>
+                
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
 				<link rel="stylesheet" type="text/css" href="${xtermStyleUri}">
-				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000; img-src vscode-resource: https: http:; script-src 'unsafe-eval' 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline' http: https: data:;">
+				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000; media-src data: https: http:;img-src vscode-resource: https: http:; script-src 'unsafe-eval' 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline' http: https: data:;">
 				<base href="${vscode.Uri.file(this.extensionPath).with({ scheme: 'vscode-resource' })}/">
 			</head>
 
-			<body>
+            <body>
 				<noscript>You need to enable JavaScript to run this app.</noscript>
                 <div id="root"></div>
 				<script nonce="${nonce}" src="${scriptUri}"></script>
