@@ -374,7 +374,7 @@ export class F18Panel {
             //this._ptyProcess.write('echo Hello World\r' );
 
             this._ptyProcess.onData((e: string) => {
-                console.log(`pty.onData: ${JSON.stringify(e)}`);
+                // console.log(`pty.onData: ${JSON.stringify(e)}`);
                 if (!this.webPanelDisposed)
                     this.xtermWrite(e);
             });
@@ -745,7 +745,7 @@ export class F18Panel {
         const mainScript = 'dist/bundle.js';
 
         // stilovi vscode-xterm trebaju
-        const xtermStyle = 'node_modules/xterm/css/xterm.css';
+        const xtermStyle = 'css/xterm.css';
 
         // const xtermFullScreenStyle = 'node_modules/xterm/dist/addons/fullscreen/fullscreen.css';
         const mainStyle = 'index.css';

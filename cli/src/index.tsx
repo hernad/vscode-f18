@@ -1,9 +1,9 @@
 
-/// <reference path="../node_modules/xterm/typings/xterm.d.ts"/>
+/// <reference path="../typings/xterm.d.ts"/>
 
 
-import { Terminal } from 'xterm';
-import { WebglAddon } from 'xterm-addon-webgl';
+import { Terminal } from '../lib/xterm';
+import { WebglAddon } from '../lib/xterm-addon-webgl';
 //import { MyWebLinksAddon } from './MyWebLinksAddon';
 
 // @ts-ignore
@@ -147,7 +147,7 @@ window.addEventListener('message', (event) => {
 
 			// hvata sve evente - i keystrokes i mouse evente
 			term.onData((data: string) => {
-				console.log(`cli-input: ${JSON.stringify(data)}`);
+				// console.log(`cli-input: ${JSON.stringify(data)}`);
 				if (!vscode.postMessage) console.log('postMessage error 1');
 				vscode.postMessage({
 					command: 'cli-input',
