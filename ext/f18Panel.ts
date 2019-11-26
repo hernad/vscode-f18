@@ -8,7 +8,7 @@ import { execHashList, revision } from './constants';
 import { IConnection } from './IConnection';
 import { PostgresConnection } from './postgresConnection';
 // import { string } from 'prop-types';
-import { IPtyForkOptions, IPty } from 'node-pty';
+import { IPtyForkOptions, IPty, IWindowsPtyForkOptions } from 'node-pty';
 import { Disposable } from 'vscode';
 // import { isUndefined } from 'lodash';
 
@@ -346,12 +346,13 @@ export class F18Panel {
 
             dim();
 
-            const ptyForkOptions: IPtyForkOptions = {
+            // winpty-agent radi podrske misa
+            const ptyForkOptions: IPtyForkOptions | IWindowsPtyForkOptions = {
                 name: Helper.is_windows() ? shell() : 'xterm-256color',
                 cols: this.cols,
                 rows: this.rows,
                 cwd: process.cwd(),
-                env: process.env
+                env: process.env,
                 /*
                 env: Object.assign(
                     {},
@@ -360,6 +361,8 @@ export class F18Panel {
                         .map((key: string) => ({ [key]: process.env[key] }))
                 ),
                 */
+               useConpty: false
+
             };
 
             let pty: IPty;
@@ -628,7 +631,7 @@ export class F18Panel {
                 sendInitCmds.push(`cd ${Global.folderPath}`);
                 sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
                 sendInitCmds.push(`set F18_HOME=${f18HomePath}`);
-                sendInitCmds.push('set F18_ESHELLy=1');
+                sendInitCmds.push('set F18_ESHELL=1');
                 sendInitCmds.push(`cd %F18_HOME%`);
                 (this.modul !== 'cmd') ? sendInitCmds.push('cls') : sendInitCmds.push('echo %CD%');
             }
