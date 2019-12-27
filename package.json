@@ -1,7 +1,7 @@
 {
-	"name": "f18-klijent-dev",
+	"name": "f18-klijent",
 	"version": "4.4.0",
-	"description": "F18 klijent DEV",
+	"description": "F18 klijent [v4]",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
