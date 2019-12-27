@@ -142,7 +142,7 @@
 		"pg": "^7.8.0",
 		"proxy-from-env": "^1.0.0",
 		"rimraf": "^2.6.3",
-		"yarn": "^1.15.2"
+		"yarn": "^1.17.3"
 	},
 	"scripts": {
 		"node_modules": "cd cli && yarn && cd .. && yarn",
