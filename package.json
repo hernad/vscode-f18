@@ -1,15 +1,16 @@
 {
 	"name": "f18-klijent",
-	"version": "4.4.2",
-	"description": "F18 klijent [eShell]",
+	"displayName": "F18 klijent [eShell]",
+	"description": "F18 klijent for eShell host",
+	"publisher": "bringout",
+	"version": "4.4.4",
 	"engines": {
-		"vscode": "^1.41.303"
+		"vscode": "^1.41.0"
 	},
 	"keywords": [
 		"F18",
 		"eShell"
 	],
-	"publisher": "bringout",
 	"activationEvents": [
 		"*"
 	],
