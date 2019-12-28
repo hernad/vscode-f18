@@ -3,7 +3,7 @@
 	"displayName": "F18 klijent [eShell]",
 	"description": "F18 klijent for eShell host",
 	"publisher": "bringout",
-	"version": "4.4.6",
+	"version": "4.4.7",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -12,13 +12,14 @@
 		"eShell"
 	],
 	"activationEvents": [
-		"onCommand:f18-klijent.f18.start.pos",
-		"onCommand:f18-klijent.f18.start.fin",
-		"onCommand:f18-klijent.f18.start.kalk",
-		"onCommand:f18-klijent.f18.start.os",
-		"onCommand:f18-klijent.f18.start.epdv",
-		"onCommand:f18-klijent.f18.start.ld",
-		"onCommand:f18-klijent.f18.start.cmd"
+		"onCommand:f18-klijent.f18StartPOS",
+		"onCommand:f18-klijent.f18StartFIN",
+		"onCommand:f18-klijent.f18StartKALK",
+		"onCommand:f18-klijent.f18StartFAKT",
+		"onCommand:f18-klijent.f18StartOS",
+		"onCommand:f18-klijent.f18StartEPDV",
+		"onCommand:f18-klijent.f18StartLD",
+		"onCommand:f18-klijent.f18StartCMD"
 	],
 	"main": "./build/ext/extension.js",
 	"contributes": {
@@ -29,42 +30,42 @@
 				"category": "F18"
 			},
 			{
-				"command": "f18.start.pos",
+				"command": "f18StartPOS",
 				"title": "start POS",
 				"category": "F18"
 			},
 			{
-				"command": "f18.start.fin",
+				"command": "f18StartFIN",
 				"title": "start FIN",
 				"category": "F18"
 			},
 			{
-				"command": "f18.start.fakt",
+				"command": "f18StartFAKT",
 				"title": "start FAKT",
 				"category": "F18"
 			},
 			{
-				"command": "f18.start.kalk",
+				"command": "f18StartKALK",
 				"title": "start KALK",
 				"category": "F18"
 			},
 			{
-				"command": "f18.start.epdv",
+				"command": "f18StartEPDV",
 				"title": "start ePDV",
 				"category": "F18"
 			},
 			{
-				"command": "f18.start.os",
+				"command": "f18StartOS",
 				"title": "start OS",
 				"category": "F18"
 			},
 			{
-				"command": "f18.start.ld",
+				"command": "f18StartLD",
 				"title": "start LD",
 				"category": "F18"
 			},
 			{
-				"command": "f18.start.cmd",
+				"command": "f18StartCMD",
 				"title": "start cmd prompt",
 				"category": "Developer"
 			}
