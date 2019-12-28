@@ -3,7 +3,7 @@
 	"displayName": "F18 klijent [eShell]",
 	"description": "F18 klijent for eShell host",
 	"publisher": "bringout",
-	"version": "4.4.5",
+	"version": "4.4.6",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -12,7 +12,13 @@
 		"eShell"
 	],
 	"activationEvents": [
-		"*"
+		"onCommand:f18-klijent.f18.start.pos",
+		"onCommand:f18-klijent.f18.start.fin",
+		"onCommand:f18-klijent.f18.start.kalk",
+		"onCommand:f18-klijent.f18.start.os",
+		"onCommand:f18-klijent.f18.start.epdv",
+		"onCommand:f18-klijent.f18.start.ld",
+		"onCommand:f18-klijent.f18.start.cmd"
 	],
 	"main": "./build/ext/extension.js",
 	"contributes": {
