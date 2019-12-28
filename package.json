@@ -1,7 +1,7 @@
 {
 	"name": "f18-klijent",
-	"version": "4.4.1",
-	"description": "F18 klijent [v4]",
+	"version": "4.4.2",
+	"description": "F18 klijent [eShell]",
 	"engines": {
 		"vscode": "^1.41.303"
 	},
