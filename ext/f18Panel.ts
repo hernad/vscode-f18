@@ -304,7 +304,7 @@ export class F18Panel {
             // platform: 'windows-x64'
             revision,
             cleanup: true,
-            execPath: (Helper.is_windows() ? 'F18.exe' : 'F18'),
+            execPath: (Helper.is_windows() ? 'F18-klijent.exe' : 'F18-klijent'),
             execHash: execHashList[Helper.os_platform()]
         };
 
