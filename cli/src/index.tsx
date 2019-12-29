@@ -243,6 +243,7 @@ window.addEventListener('message', (event) => {
 
 		case 'term-hide':
 
+		
 		    console.log('xterm term-hide');
 			const xtermScreen = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
 			if (xtermScreen) {
@@ -252,6 +253,7 @@ window.addEventListener('message', (event) => {
 				console.log('gdje je xterm-text-layer ?!');
 			}
 			break;
+		
 
 		case 'term-show':
 		case 'focus-back':

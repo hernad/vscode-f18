@@ -654,7 +654,6 @@ export class F18Panel {
             sendInitCmds.push('export F18_ESHELL=1');
             sendInitCmds.push(`export F18_HOME=${f18HomePath}`);
             sendInitCmds.push(`cd $F18_HOME`);
-            // sendInitCmds.push(`echo -e "\\e[?1000;1006;1015h"`);  // enable mouse tracking
 
             (this.modul !== 'cmd') ? sendInitCmds.push('clear') : sendInitCmds.push('pwd');
         }
@@ -700,7 +699,7 @@ export class F18Panel {
                         .then(() => {
                             sendInitCmds.forEach((data: string) => {
                                 //this.terminalInstance!.sendText(element);
-                                // console.log(`sendInitCmds: ${data}`);
+                                //console.log(`sendInitCmds: ${data}`);
                                 this._ptyProcess.write(data + '\r');
                             });
                         });
@@ -742,8 +741,6 @@ export class F18Panel {
             this.webPanel.webview.postMessage({ command: 'term-write', data });
         }
     }
-
-
 
 
     private _getHtmlForWebview() {
