@@ -4,11 +4,16 @@ BINTRAY_USER=bringout
 BINTRAY_REPOS=F18
 BINTRAY_HOST=https://dl.bintray.com/$BINTRAY_USER/$BINTRAY_REPOS
 
+# F18 execute application
+F18_CLI=F18-klijent
+
 VERSION=$1
 
 [ -z "$VERSION" ] && echo navesti verziju && exit 1
 
-ZIPS="F18-linux-x64_$VERSION.zip F18-linux-x86_$VERSION.zip F18-windows-x64_$VERSION.zip F18-windows-x86_$VERSION.zip"
+#ZIPS="F18-linux-x64_$VERSION.zip F18-linux-x86_$VERSION.zip F18-windows-x64_$VERSION.zip F18-windows-x86_$VERSION.zip"
+
+ZIPS="F18-linux-x64_$VERSION.zip F18-windows-x64_$VERSION.zip F18-windows-x86_$VERSION.zip"
 
 mkdir -p tmp
 
@@ -25,8 +30,8 @@ for zip in $ZIPS ; do
   if [[ "$?" == "0" ]] ; then
     echo $(pwd)
     unzip tmp/$DOWNLOAD -d tmp
-    [ -f tmp/F18 ] && md5sum tmp/F18 >> md5.txt 
-    [ -f tmp/F18.exe ] && md5sum tmp/F18.exe >> md5.txt
+    [ -f tmp/$F18_CLI ] && md5sum tmp/F18 >> md5.txt 
+    [ -f tmp/$F18_CLI.exe ] && md5sum tmp/F18.exe >> md5.txt
     rm -rf tmp/*
   else
      echo ERROR !
