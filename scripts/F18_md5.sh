@@ -5,7 +5,7 @@ BINTRAY_REPOS=F18
 BINTRAY_HOST=https://dl.bintray.com/$BINTRAY_USER/$BINTRAY_REPOS
 
 # F18 execute application
-F18_CLI=F18-klijent
+F18_CLI="F18-klijent"
 
 VERSION=$1
 
@@ -30,8 +30,8 @@ for zip in $ZIPS ; do
   if [[ "$?" == "0" ]] ; then
     echo $(pwd)
     unzip tmp/$DOWNLOAD -d tmp
-    [ -f tmp/$F18_CLI ] && md5sum tmp/F18 >> md5.txt 
-    [ -f tmp/$F18_CLI.exe ] && md5sum tmp/F18.exe >> md5.txt
+    [ -f tmp/$F18_CLI ] && md5sum tmp/$F18_CLI >> md5.txt 
+    [ -f tmp/$F18_CLI.exe ] && md5sum tmp/$F18_CLI.exe >> md5.txt
     rm -rf tmp/*
   else
      echo ERROR !
