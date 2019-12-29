@@ -567,17 +567,22 @@ export class F18Panel {
         //this.terminalInstance.hide();
 
         const cmdSeparator = (shell() == 'cmd.exe') ? '&' : ';';
+        const cF18Execute = Helper.is_windows() ? 'F18-klijent.exe' : 'F18-klijent'
 
         if (!Global.folderPath) {
             Global.folderPath = path.join(Global.context.extensionPath, '..', 'F18', 'F18_0');
-            Global.execPath = path.join(Global.folderPath, (Helper.is_windows() ? 'F18.exe' : 'F18'));
+            Global.execPath = path.join(Global.folderPath, cF18Execute);
             if (!fs.existsSync(Global.execPath))
                 vscode.window.showErrorMessage(`F18_0 exec ne postoji: ${Global.execPath}`);
 
         }
 
         // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3
-        const linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so.1 ]]; then ln -sf /lib64/libpcre.so.1 ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
+        let linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so.1 ]]; then ln -sf /lib64/libpcre.so.1 ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
+
+        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libpq.so.5 ]]; then ln -sf ${Global.folderPath}/libpq.so ${Global.folderPath}/libpq.so.5; fi`;
+        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libcrypto.so.1.1 ]]; then ln -sf ${Global.folderPath}/libcrypto.so ${Global.folderPath}/libcrypto.so.1.1; fi`;
+        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libssl.so.1.1 ]]; then ln -sf ${Global.folderPath}/libssl.so ${Global.folderPath}/libssl.so.1.1; fi`;
 
         let adminParams = '';
         if (this.adminConnection !== undefined) {
