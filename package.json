@@ -1,9 +1,9 @@
 {
-	"name": "f18-cli",
-	"displayName": "F18-cli [eShell]",
+	"name": "f18-client",
+	"displayName": "F18-client [eShell]",
 	"description": "F18 klijent for eShell host",
 	"publisher": "bringout",
-	"version": "5.0.1",
+	"version": "5.0.0",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -184,7 +184,6 @@
 		"url": "https://github.com/hernad/vscode-f18"
 	},
 	"__metadata": {
-		"id": "c4d5e082-cad8-4946-9c01-282a049f8afd",
 		"publisherDisplayName": "bring.out doo Sarajevo",
 		"publisherId": "c96dd534-07ec-488e-ba11-b474391a086c"
 	}
