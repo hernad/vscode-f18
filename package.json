@@ -1,9 +1,9 @@
 {
-	"name": "f18klijent",
-	"displayName": "F18-klijent [eShell]",
-	"description": "Fklijent for eShell host",
+	"name": "f18-klijent",
+	"displayName": "F18 klijent [eShell]",
+	"description": "F18 klijent host eShell",
 	"publisher": "bringout",
-	"version": "4.0.2",
+	"version": "5.0.3",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
