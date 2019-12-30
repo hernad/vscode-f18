@@ -7,7 +7,7 @@ import * as ptyType from 'node-pty';
 import * as httpsType from 'https-proxy-agent';
 import { Constants } from './constants'
 import * as vscode from 'vscode';
-import { IConnection } from './IConnection';
+//import { IConnection } from './IConnection';
 
 export class Global {
   public static keytar: typeof keytarType = getCoreNodeModule('keytar');

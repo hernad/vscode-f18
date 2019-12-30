@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { Pool, Client, types, ClientConfig } from 'pg';
+import { Client, ClientConfig } from 'pg';
 import { IConnection } from "./IConnection";
 import { OutputChannel } from './outputChannel';
 
