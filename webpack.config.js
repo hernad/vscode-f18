@@ -56,6 +56,10 @@ const config = {
           "yauzl": {
             common: 'yauzl',
             commonjs2: 'yauzl'
+          },
+          "spdlog": {
+            common: 'spdlog',
+            commonjs2: 'spdlog'
           }
    },
   resolve: {

@@ -1,8 +1,14 @@
+webview
+===========
+
 <video id='video' controls="controls" preload='none' width="600" poster="http://media.w3.org/2010/05/sintel/poster.png">
 <source id='webm' src="http://media.w3.org/2010/05/sintel/trailer.webm" type='video/webm'/>
 <p>Your user agent does not support the HTML5 Video element.</p>
 </video>
 
+
+terminal
+============
 
 echo -e "\e[2J"  # clear screen
 
@@ -20,3 +26,10 @@ CSI P s ; P s ; P s ; P s ; P s T
 Initiate highlight mouse tracking. Parameters are [func;startx;starty;firstrow;lastrow]. See the section Mouse Tracking.
 
 echo -e "\e["
+
+
+webpack
+==========
+
+Activating extension 'bringout.f18-klijent' failed: Cannot read property 'open' of null.
+
