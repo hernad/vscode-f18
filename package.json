@@ -3,7 +3,7 @@
 	"displayName": "F18-klijent [eShell]",
 	"description": "Fklijent for eShell host",
 	"publisher": "bringout",
-	"version": "4.0.1",
+	"version": "4.0.2",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -183,9 +183,5 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/hernad/vscode-f18"
-	},
-	"__metadata": {
-		"publisherDisplayName": "bring.out doo Sarajevo",
-		"publisherId": "c96dd534-07ec-488e-ba11-b474391a086c"
 	}
 }
