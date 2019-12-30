@@ -18,7 +18,7 @@ const config = {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
     path: path.resolve(__dirname, 'dist'),
     filename: 'extension.js',
-    libraryTarget: 'commonjs2',
+    libraryTarget: 'commonjs',
     devtoolModuleFilenameTemplate: '../[resource-path]'
   },
   /*
@@ -76,7 +76,7 @@ const config = {
             loader: 'ts-loader',
             options: {
                 //compilerOptions: {
-                //    "module": "esnext" // override `tsconfig.json` so that TypeScript emits native JavaScript modules.
+                //    "module": "es6" // override `tsconfig.json` so that TypeScript emits native JavaScript modules.
                 //}
             }
           }

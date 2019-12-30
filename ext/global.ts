@@ -26,25 +26,48 @@ export class Global {
 }
 
 export function getCoreNodeModule(moduleName: string) {
-  try {
 
+  // webpack generates this
+  //try {
+  // /usr/share/code/resources/app/node_modules.asar.unpacked/
+  // return require("./ext sync recursive ^.*\\/node_modules\\.asar\\.unpacked\\/.*$")(`${vscode.env.appRoot}/node_modules.asar.unpacked/${moduleName}`);
+  //}
+
+  // now webpack generates this:
+  // return __webpack_require__("./ext sync recursive")(coreModule);
+
+  // at the and 
+  // https://github.com/webpack/webpack/issues/4175
+
+
+  function requireDynamically(path) {
+    path = path.split('\\').join('/'); // Normalize windows slashes
+    return eval(`require('${path}');`); // Ensure Webpack does not analyze the require statement
+  }
+
+
+  let coreModule = `${vscode.env.appRoot}/node_modules.asar/${moduleName}`;
+  try {
     // /usr/share/code/resources/app/node_modules.asar/keytar
-    return require(`${vscode.env.appRoot}/node_modules.asar/${moduleName}`);
+    return requireDynamically(coreModule);
   } catch (err) {
-    console.log(`coreNodeModule1: ${vscode.env.appRoot}/node_modules.asar/${moduleName}`);
+
+    console.log(`coreNodeModule1: ${coreModule}`);
   }
 
   try {
+    let coreModule = `${vscode.env.appRoot}/node_modules.asar.unpacked/${moduleName}`;
     // /usr/share/code/resources/app/node_modules.asar.unpacked/
-    return require(`${vscode.env.appRoot}/node_modules.asar.unpacked/${moduleName}`);
+    return requireDynamically(coreModule);
   } catch (err) {
-    console.log(`ERR-coreNodeModule2: ${vscode.env.appRoot}/node_modules.asar.unpacked/${moduleName}`);
+    console.log(`ERR-coreNodeModule2: ${coreModule}`);
   }
 
   try {
-    return require(`${vscode.env.appRoot}/node_modules/${moduleName}`);
+    let coreModule = `${vscode.env.appRoot}/node_modules/${moduleName}`;
+    return requireDynamically(coreModule);
   } catch (err) {
-    console.log(`ERR-coreNodeModule3: ${vscode.env.appRoot}/node_modules/${moduleName}`);
+    console.log(`ERR-coreNodeModule3: ${coreModule}`);
   }
 
   return null;
@@ -55,3 +78,5 @@ export function vscode_version_match(major: number, minor: number) {
   return vscode.version.match(new RegExp(`${major}\.${minor}\.*`, ''));
 
 }
+
+
