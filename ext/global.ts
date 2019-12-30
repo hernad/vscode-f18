@@ -26,6 +26,8 @@ export class Global {
 }
 
 function getCoreNodeModule(moduleName: string) {
+
+  console.log(`getCoreModule ${moduleName}`);
   try {
     return require(`${vscode.env.appRoot}/node_modules.asar/${moduleName}`);
   } catch(err) { }
