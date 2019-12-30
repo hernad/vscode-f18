@@ -7,9 +7,9 @@ export class Constants {
 
 const revisionS = '4.20.5';
 const execHashListS: any = {
-  'linux-x64': '5747f8cade6d0020293dd163a6e31a64',
-  'windows-x64': '3354d69db90ae9986e28d766e670ddb0',
-  'windows-x86': 'f14da57c067cac7de8937b9c020f6f68'
+  'linux-x64': 'a19a926b3c74f95204b6138e9600246d',
+  'windows-x64': '2ee339f1e46bb4a0b955ec2391493a98',
+  'windows-x86': 'b84c64c5fc9132d2703fa7185ea7f0e7'
 };
 
 
