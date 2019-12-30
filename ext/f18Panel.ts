@@ -650,6 +650,7 @@ export class F18Panel {
                 sendInitCmds.push(linuxFixes);
                 F18Panel.firstTerminal = false;
             }
+            sendInitCmds.push(`export PATH=${Global.folderPath}:$PATH`);
             sendInitCmds.push(`export LD_LIBRARY_PATH=${Global.folderPath}`);
             sendInitCmds.push('export F18_ESHELL=1');
             sendInitCmds.push(`export F18_HOME=${f18HomePath}`);
