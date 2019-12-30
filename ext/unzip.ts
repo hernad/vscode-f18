@@ -12,8 +12,6 @@ import { revisionInfoType } from './types';
 
 const yauzl = Global.yauzl;
 
-let yauzlOpen = Helper.promisify(yauzl.open);
-
 // https://github.com/thejoshwolfe/yauzl/blob/master/examples/unzip.js
 
 
@@ -23,15 +21,17 @@ export function unzipError() {
     zipfile.emit('error');
     zipfile.close();
     // zipfile.emit('end');
-    
+
 }
 
 export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Progress<{}>, resolve: any, error: any) {
-    
+
     //vscode.window.showInformationMessage(path.dirname(__filename));
     progress.report({ message: "Start unzip" });
 
-    const destDir = revisionInfo.folderPath;
+	const destDir = revisionInfo.folderPath;
+	const yauzlOpen = Helper.promisify(yauzl.open);
+
     try {
        zipfile = await yauzlOpen(revisionInfo.zipPath, { lazyEntries: true });
     } catch {
@@ -43,13 +43,13 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
         vscode.window.showErrorMessage('zip error/2 ?');
         error();
     });
-		    
+
     let handleCount = 0;
-    
+
 	function incrementHandleCount() {
 		handleCount++;
 	}
-    
+
     function decrementHandleCount() {
 		handleCount--;
 		if (handleCount === 0) {
@@ -61,15 +61,15 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
     // vscode.window.showInformationMessage(`number of entries: ${zipfile.entryCount}`);
     let openReadStream = Helper.promisify(zipfile.openReadStream.bind(zipfile));
     //let openReadStream = promisify(zipfile.openReadStream);
-    
+
     let count = 0;
-    
+
     zipfile.readEntry();
-    
+
     //zipfile.on('error')
 
     zipfile.on('entry', async(entry: any) => {
-        
+
         let increment = Math.round(1/zipfile.entryCount * 100);
 
         count++;
@@ -87,7 +87,7 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
 			// ensure parent directory exists
 			Helper.mkdirp(path.join(destDir, path.dirname(entry.fileName)), async () => {
                 // vscode.window.showInformationMessage(`file: ${entry.fileName}`);
-                
+
                 let readStream: any = await openReadStream(entry);
                 readStream.on('end', () => {
                     // console.log("<EOF>");
@@ -98,18 +98,18 @@ export async function unzip(revisionInfo: revisionInfoType, progress: vscode.Pro
                    //}, 500);
 
                 });
-    
+
                 let writeStream = fs.createWriteStream(path.join(destDir, entry.fileName));
 				incrementHandleCount();
                 writeStream.on('close', decrementHandleCount);
-                
+
                 readStream.pipe(writeStream);
-                    
+
 			});
 		}
     });
-    
-   
+
+
 	zipfile.on('end', () => {
 
         if (count !== zipfile.entryCount) {
