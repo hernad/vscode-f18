@@ -16,7 +16,7 @@ export class Global {
   public static httpsProxyAgent: typeof httpsType = getCoreNodeModule('https-proxy-agent');
   public static pty: typeof ptyType = getCoreNodeModule('node-pty');
   public static context: vscode.ExtensionContext;
-  public static contextPostgres: vscode.ExtensionContext; 
+  public static contextPostgres: vscode.ExtensionContext;
   public static execPath: string;
   public static folderPath: string;
 
@@ -25,14 +25,27 @@ export class Global {
   }
 }
 
-function getCoreNodeModule(moduleName: string) {
+export function getCoreNodeModule(moduleName: string) {
   try {
+
+    // /usr/share/code/resources/app/node_modules.asar/keytar
     return require(`${vscode.env.appRoot}/node_modules.asar/${moduleName}`);
-  } catch(err) { }
+  } catch (err) {
+    console.log(`coreNodeModule1: ${vscode.env.appRoot}/node_modules.asar/${moduleName}`);
+  }
+
+  try {
+    // /usr/share/code/resources/app/node_modules.asar.unpacked/
+    return require(`${vscode.env.appRoot}/node_modules.asar.unpacked/${moduleName}`);
+  } catch (err) {
+    console.log(`ERR-coreNodeModule2: ${vscode.env.appRoot}/node_modules.asar.unpacked/${moduleName}`);
+  }
 
   try {
     return require(`${vscode.env.appRoot}/node_modules/${moduleName}`);
-  } catch(err) { }
+  } catch (err) {
+    console.log(`ERR-coreNodeModule3: ${vscode.env.appRoot}/node_modules/${moduleName}`);
+  }
 
   return null;
 }

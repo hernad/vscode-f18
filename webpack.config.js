@@ -45,26 +45,22 @@ const config = {
            commonjs: 'vscode',
            commonjs2: 'vscode'
          },
-         "node-pty": {
-            commonjs: 'node-pty',
-            commonjs2: 'node-pty'
-          },
-          "keytar": {
-            commonjs: 'keytar',
-            commonjs2: 'keytar'
-          },
-          "yauzl": {
-            common: 'yauzl',
-            commonjs2: 'yauzl'
-          },
-          "spdlog": {
-            common: 'spdlog',
-            commonjs2: 'spdlog'
-          },
-          "https-proxy-agent": {
-            common: 'https-proxy-agent',
-            commonjs2: 'https-proxy-agent'
-          }
+         //"node-pty": {
+         //   commonjs: 'node-pty',
+         //   commonjs2: 'node-pty'
+         // },
+          //"keytar": {
+          //  commonjs: 'keytar',
+          //  commonjs2: 'keytar'
+          //},
+          //"yauzl": {
+          //  common: 'yauzl',
+          //  commonjs2: 'yauzl'
+          //},
+          //"https-proxy-agent": {
+          //  common: 'https-proxy-agent',
+          //  commonjs2: 'https-proxy-agent'
+          //}
    },
   resolve: {
     // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
