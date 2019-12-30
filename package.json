@@ -1,12 +1,13 @@
 {
-	"name": "fcli",
-	"displayName": "FClient [eShell]",
+	"name": "f18-client",
+	"displayName": "F18-client [eShell]",
 	"description": "Fklijent for eShell host",
 	"publisher": "bringout",
-	"version": "5.0.0",
+	"version": "13.0.0",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
+	"license": "MIT",
 	"keywords": [
 		"eShell"
 	],
