@@ -14,7 +14,7 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [ 
-                "${workspaceRoot}/ext"
+                "${workspaceRoot}/dist"
             ]
         },
         {

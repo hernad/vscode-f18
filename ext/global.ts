@@ -7,7 +7,7 @@ import * as ptyType from 'node-pty';
 import * as httpsType from 'https-proxy-agent';
 import { Constants } from './constants'
 import * as vscode from 'vscode';
-import { IConnection } from './IConnection';
+//import { IConnection } from './IConnection';
 
 export class Global {
   public static keytar: typeof keytarType = getCoreNodeModule('keytar');
@@ -16,7 +16,7 @@ export class Global {
   public static httpsProxyAgent: typeof httpsType = getCoreNodeModule('https-proxy-agent');
   public static pty: typeof ptyType = getCoreNodeModule('node-pty');
   public static context: vscode.ExtensionContext;
-  public static contextPostgres: vscode.ExtensionContext; 
+  public static contextPostgres: vscode.ExtensionContext;
   public static execPath: string;
   public static folderPath: string;
 
@@ -25,16 +25,50 @@ export class Global {
   }
 }
 
-function getCoreNodeModule(moduleName: string) {
+export function getCoreNodeModule(moduleName: string) {
 
-  console.log(`getCoreModule ${moduleName}`);
+  // webpack generates this
+  //try {
+  // /usr/share/code/resources/app/node_modules.asar.unpacked/
+  // return require("./ext sync recursive ^.*\\/node_modules\\.asar\\.unpacked\\/.*$")(`${vscode.env.appRoot}/node_modules.asar.unpacked/${moduleName}`);
+  //}
+
+  // now webpack generates this:
+  // return __webpack_require__("./ext sync recursive")(coreModule);
+
+  // at the and 
+  // https://github.com/webpack/webpack/issues/4175
+
+
+  function requireDynamically(path) {
+    path = path.split('\\').join('/'); // Normalize windows slashes
+    return eval(`require('${path}');`); // Ensure Webpack does not analyze the require statement
+  }
+
+
+  let coreModule = `${vscode.env.appRoot}/node_modules.asar/${moduleName}`;
   try {
-    return require(`${vscode.env.appRoot}/node_modules.asar/${moduleName}`);
-  } catch(err) { }
+    // /usr/share/code/resources/app/node_modules.asar/keytar
+    return requireDynamically(coreModule);
+  } catch (err) {
+
+    console.log(`ERR-coreNodeMod1: ${coreModule}`);
+  }
 
   try {
-    return require(`${vscode.env.appRoot}/node_modules/${moduleName}`);
-  } catch(err) { }
+    let coreModule = `${vscode.env.appRoot}/node_modules.asar.unpacked/${moduleName}`;
+    // /usr/share/code/resources/app/node_modules.asar.unpacked/
+    return requireDynamically(coreModule);
+  } catch (err) {
+    console.log(`ERR-coreNodeMod2: ${coreModule}`);
+  }
+
+  try {
+    let coreModule = `${vscode.env.appRoot}/node_modules/${moduleName}`;
+    return requireDynamically(coreModule);
+  } catch (err) {
+    console.log(`ERR-coreNodeMod3: ${coreModule}`);
+  }
 
   return null;
 }
@@ -44,3 +78,5 @@ export function vscode_version_match(major: number, minor: number) {
   return vscode.version.match(new RegExp(`${major}\.${minor}\.*`, ''));
 
 }
+
+
