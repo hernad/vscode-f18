@@ -60,6 +60,10 @@ const config = {
           "spdlog": {
             common: 'spdlog',
             commonjs2: 'spdlog'
+          },
+          "https-proxy-agent": {
+            common: 'https-proxy-agent',
+            commonjs2: 'https-proxy-agent'
           }
    },
   resolve: {
