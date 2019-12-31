@@ -1,4 +1,4 @@
- import * as vscode from 'vscode';
+import * as vscode from 'vscode';
 import { unzipError } from './unzip';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -7,7 +7,7 @@ import { Helper } from './helper';
 import { Fetcher } from './fetcher';
 import { unzip } from './unzip';
 import * as md5File from 'md5-file/promise';
-import { F18Panel } from './f18Panel';
+// import { F18Panel } from './f18Panel';
 
 /*
  
