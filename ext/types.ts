@@ -8,4 +8,5 @@ export type revisionInfoType = {
     url: string, 
     zipPath: string, 
     cleanup: boolean,
+    execUtils: string[]
 };

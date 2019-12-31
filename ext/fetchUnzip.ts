@@ -43,6 +43,12 @@ export function vscodeFetchUnzip(options: any = {}): Thenable<{}> {
 
         p.then((params: any) => {
             if (fs.existsSync(params.revisionInfo.execPath)) fs.chmodSync(params.revisionInfo.execPath, 0o755);
+            if (params.revisionInfo.execUtils) {
+                params.revisionInfo.execUtils.forEach((element: string) => {
+                    // chmod +x curl, psql ...
+                    fs.chmodSync( path.join( params.revisionInfo.folderPath, element), 0o755);                
+            })};
+
             if (fs.existsSync(params.revisionInfo.zipPath)) fs.unlinkSync(params.revisionInfo.zipPath);
             // vscode.window.showInformationMessage('kraj resolve funkcije after unzip!');
             progress.report({ increment: 100, message: params.message });

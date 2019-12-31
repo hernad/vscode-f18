@@ -1,6 +1,6 @@
 // https://github.com/GoogleChrome/puppeteer/blob/master/lib/BrowserFetcher.js
 
-import * as os from 'os';
+//import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Global } from './global';
@@ -9,10 +9,9 @@ import * as URL from 'url';
 import * as removeRecursive from 'rimraf';
 import { revisionInfoType, progressCallbackType } from './types';
 import { revision } from './constants';
+//const { Helper, assert } = require('./helper');
+import { Helper, assert } from './helper';
 
-//import { exec } from 'child_process';
-
-const { Helper, assert } = require('./helper');
 const ProxyAgent = Global.httpsProxyAgent;
 
 // @ts-ignore
@@ -100,7 +99,7 @@ export class Fetcher {
 	// lista lokalnih verzija
 	public async localRevisions(): Promise<string[]> {
 		if (!await existsAsync(this._downloadsFolder)) return [];
-		const fileNames = await readdirAsync(this._downloadsFolder);
+		const fileNames : any = await readdirAsync(this._downloadsFolder);
 		return fileNames
 			.map((fileName: string) => this._parseFolderPath(fileName))
 			.filter((entry: any) => entry && entry.platform === this._platform)
@@ -124,7 +123,10 @@ export class Fetcher {
 		// else throw new Error('Unsupported platform: ' + this._platform);
 		const url = downloadURL(this._downloadHost, this._platform, this._packageName, revision);
 		const local = fs.existsSync(folderPath);
-		return { revision, execPath: this._execPath, folderPath, local, url, zipPath: this._zipPath, cleanup: this._cleanup, execHash: this._execHash };
+		const execUtils = Helper.is_windows() ? [ "psql.exe", "pg_dump.exe", "pg_restore.exe", "curl.exe"] : [ "psql", "pg_dump", "pg_restore", "curl"];
+
+		return { revision, execPath: this._execPath, folderPath, local, url, zipPath: this._zipPath, 
+			   cleanup: this._cleanup, execHash: this._execHash, execUtils };
 	}
 
 

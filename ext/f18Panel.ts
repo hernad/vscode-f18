@@ -7,12 +7,8 @@ import { Global, vscode_version_match } from './global';
 import { execHashList, revision } from './constants';
 import { IConnection } from './IConnection';
 import { PostgresConnection } from './postgresConnection';
-// import { string } from 'prop-types';
 import { IPtyForkOptions, IPty, IWindowsPtyForkOptions } from 'node-pty';
 import { Disposable } from 'vscode';
-// import { isUndefined } from 'lodash';
-
-// import { isContext } from 'vm';
 
 /* canvas-nowebgl
 const LINE_HEIGHT = 0.915;
@@ -583,6 +579,8 @@ export class F18Panel {
         linuxFixes += `; if [[ ! -e ${Global.folderPath}/libpq.so.5 ]]; then ln -sf ${Global.folderPath}/libpq.so ${Global.folderPath}/libpq.so.5; fi`;
         linuxFixes += `; if [[ ! -e ${Global.folderPath}/libcrypto.so.1.1 ]]; then ln -sf ${Global.folderPath}/libcrypto.so ${Global.folderPath}/libcrypto.so.1.1; fi`;
         linuxFixes += `; if [[ ! -e ${Global.folderPath}/libssl.so.1.1 ]]; then ln -sf ${Global.folderPath}/libssl.so ${Global.folderPath}/libssl.so.1.1; fi`;
+        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libcurl.so.4 ]]; then ln -sf ${Global.folderPath}/libcurl.so ${Global.folderPath}/libcurl.so.4; fi`;
+        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libz.so.1 ]]; then ln -sf ${Global.folderPath}/libz.so ${Global.folderPath}/libz.so.1; fi`;
 
         let adminParams = '';
         if (this.adminConnection !== undefined) {
