@@ -5,11 +5,18 @@ export class Constants {
   public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
-const revisionS = '4.21.7';
+// F18-linux-x64_4.21.8.zip
+// 69a79475911481614961efe7f3452b3d  tmp/F18-klijent
+// F18-windows-x64_4.21.8.zip
+// 4c18c67d706c8009b42d85f3166b4434  tmp/F18-klijent.exe
+// F18-windows-x86_4.21.8.zip
+// 14dfcb27c6c31f3e8a1720c9b78229f6  tmp/F18-klijent.exe
+
+const revisionS = '4.21.8';
 const execHashListS: any = {
-  'linux-x64': '85616004ad46523de39b58aad507f830',
-  'windows-x64': '6c4dfebda1e34e39e5e119ddab55c827',
-  'windows-x86': 'd748ff7882a26fd049756adcee86e9c7'
+  'linux-x64': '69a79475911481614961efe7f3452b3d',
+  'windows-x64': '4c18c67d706c8009b42d85f3166b4434',
+  'windows-x86': '14dfcb27c6c31f3e8a1720c9b78229f6'
 };
 
 const revisionE = '20191122.2';
