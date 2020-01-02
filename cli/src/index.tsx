@@ -176,6 +176,13 @@ window.addEventListener('message', (event) => {
 						command: 'pdf-view',
 						data: fileName
 					})
+				} else {
+					// 'f18.start.fin_pg'
+					//  we want: commands.executeCommand(`f18.start.${onStart}`);
+					vscode.postMessage( {
+						command: 'run-command',
+						data: match[1]
+					});
 				}
 
 			});

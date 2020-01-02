@@ -86,74 +86,14 @@ export class F18Panel {
     public static instances: F18Panel[] = [];
     public webPanel: vscode.WebviewPanel;
     public lostFocus: boolean = false;
+    
+    public static createF18Instance(modulF18: string, cVarijanta: string) {
 
-    public static createF18Instance(modulF18: string) {
-        // const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
-        // const column = undefined;
-
-        new F18Panel(modulF18, vscode.ViewColumn.One);
+        new F18Panel(modulF18, cVarijanta);
         F18Panel.downloadNew = vscode.workspace.getConfiguration('f18').get('download');
         F18Panel.webGL = vscode.workspace.getConfiguration('f18').get('webGL');
-        //F18Panel.downloadNew = true;
-
-        // ako se ne zeli download, stavi marker da je download izvrsen
-        //if (!downloadBinary)
-        //  F18Panel.isDownloadedBinary = true;
-
-
-        /*
-        vscode.window.onDidCloseTerminal((terminal: vscode.Terminal) => {
-            // vscode.window.showInformationMessage(`onDidCloseTerminal, name: ${terminal.name}`);
-
-            F18Panel.instances.forEach((f18Panel: F18Panel) => {
-                if (f18Panel.panelCaption === terminal.name) {
-                    f18Panel.terminalDisposed = true; // ovaj terminal je vec u procesu zatvaranja
-                    f18Panel.webPanel.dispose();
-                }
-
-            });
-            const filtered = F18Panel.instances.filter((f18Panel: F18Panel) => {
-                return f18Panel.panelCaption !== terminal.name;
-            });
-
-            // izbaciti iz liste instanci ovu koju gasimo
-            F18Panel.instances = filtered;
-
-            //if (F18Panel.instances.length == 0)
-            //    F18Panel.currentPanelNum = 1;
-
-        });
-        */
-
+    
     }
-
-    /*
-
-    function selectTerminal(): Thenable<vscode.Terminal> {
-        interface TerminalQuickPickItem extends vscode.QuickPickItem {
-            terminal: vscode.Terminal;
-        }
-        const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
-        const items: TerminalQuickPickItem[] = terminals.map(t => {
-            return {
-                label: `name: ${t.name}`,
-                terminal: t
-            };
-        });
-        return vscode.window.showQuickPick(items).then(item => {
-            return item.terminal;
-        });
-    }
-
-    function ensureTerminalExists(): boolean {
-        if ((<any>vscode.window).terminals.length === 0) {
-            vscode.window.showErrorMessage('No active terminals');
-            return false;
-        }
-        return true;
-    }
-
-    */
 
     private static readonly viewType = 'F18';
     //private static currentPanelNum = 1;
@@ -166,6 +106,7 @@ export class F18Panel {
     // private terminalInstance: vscode.Terminal;
     public webPanelDisposed: boolean;
     private readonly modul: string;
+    private readonly varijanta: string;
     private connection: IConnection;
     private adminConnection: IConnection;
     private readonly panelNum: number;
@@ -182,11 +123,11 @@ export class F18Panel {
     private _ptyProcess: IPty;
 
 
-    private constructor(cModul: string, column: vscode.ViewColumn) {
-
+    private constructor(cModul: string, cVarijanta) {
 
         this.extensionPath = Global.context.extensionPath;
         this.modul = cModul;
+        this.varijanta = cVarijanta
         this.cols = 120;
         this.rows = 40;
         this.width = 0;
@@ -213,7 +154,7 @@ export class F18Panel {
             ? (this.fontFamily = tmpFF as string)
             : vscode.window.showErrorMessage('config editor.fontFamily?!');
 
-        console.log(`fontFamily: ${this.fontFamily}`);
+        //console.log(`fontFamily: ${this.fontFamily}`);
 
         // instances = [ 'fin 1', 'kalk 1', 'fin 2', 'fakt 1', 'fin 3' ] => next kalk = 2
         let nLast = 0;
@@ -229,19 +170,7 @@ export class F18Panel {
         this.panelNum = nLast + 1;
         this.panelCaption = `F18 ${this.modul} - ${this.panelNum}`;
 
-
-
         const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
-
-        /*
-        (<any>vscode).window.onDidWriteTerminalData((e: any) => {
-            //console.log(`onDidWriteData ${JSON.stringify(e)}`);
-            if (!this.webPanelDisposed && e && e.terminal && this.terminalInstance && (this.terminalInstance.name == e.terminal.name))
-                this.termWrite(e.data);
-                console.log(`term: ${e.data}`);
-        });
-        */
-
 
         try {
             if (!F18Panel.isDownloadedBinary && runSelect)
@@ -308,11 +237,6 @@ export class F18Panel {
 
             console.log('createPty');
 
-            //this.terminalInstance = vscode.window.createTerminal(this.panelCaption, shell());
-            //this.terminalInstance.processId
-            //    .then(
-            //        (processId: number) => {
-            // console.log(`kreiran terminal ${processId}`);
             this.terminalKilled = false;
             const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
             const configMerged = {
@@ -417,15 +341,7 @@ export class F18Panel {
     public configurePanel() {
 
         this.webPanel.onDidDispose(() => {
-            /*
-            F18Panel.instances.forEach((f18Panel: F18Panel) => {
-                if (f18Panel.panelCaption === this.panelCaption) {
-                    // f18Panel.terminalDisposed = true; // ovaj terminal je vec u procesu zatvaranja
-                    f18Panel.webPanel.dispose();
-                }
-    
-            });
-            */
+
             if (!this.webPanelDisposed) {
                 this.webPanelDisposed = true;
                 const filtered = F18Panel.instances.filter((f18Panel: F18Panel) => {
@@ -438,7 +354,7 @@ export class F18Panel {
             if (!this.terminalKilled) {
 
                 this.terminalKilled = true;
-                this._ptyProcess.write( '\x1b[24;5~' ); // K_CTRL_F12
+                // this._ptyProcess.write( '\x1b[24;5~' ); // K_CTRL_F12
             }
 
         });
@@ -518,14 +434,15 @@ export class F18Panel {
                 //    break;
 
                 case 'pdf-view':
-
                     const fileUri: vscode.Uri = vscode.Uri.file(message.data);
                     //console.log(`vscode-resource: ${fileUri.with({ scheme: 'vscode-resource' }).toString()}`);
                     vscode.commands.executeCommand("pdf.view", fileUri.with({ scheme: 'vscode-resource' }).toString());
                     break;
+                case 'run-command':
+                	// e.g. message.data = 'f18.start.fin_pg'
+					vscode.commands.executeCommand(message.data);
             }
         });
-
         // this.webPanel.webview.postMessage({ command: 'ping' });
     }
 
@@ -541,7 +458,6 @@ export class F18Panel {
     }
 
     public createClientTerminal() {
-
 
         console.log(`createClientTerminal`);
         // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
@@ -588,7 +504,15 @@ export class F18Panel {
         }
         let runExe: string;
         if (this.modul !== 'cmd') {
-            runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${this.connection.database} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
+            const db_name_cy = this.connection.database;
+            const currentYear = new Date().getFullYear();
+            const cCurrentYear = currentYear.toString().trim();
+            const cPreviousYear = (currentYear - 1).toString().trim();
+            //e.g. 'bringout_2020' -> 'bringout_2019';
+            const db_name_py = db_name_cy.replace( `_${cCurrentYear}`, `_${cPreviousYear}`);
+            const db_name = (this.varijanta == 'pg') ? db_name_py : db_name_cy
+            console.log( `db_name=${db_name}, py: ${db_name_py} cy: ${db_name_cy}`);
+            runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${db_name} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
         };
 
         //console.log(runExe);

@@ -60,6 +60,42 @@
 				"title": "start LD",
 				"category": "F18"
 			},
+
+			{
+				"command": "f18.start.pos_pg",
+				"title": "start POS predhodna godina",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.fin_pg",
+				"title": "start FIN predhodna godina",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.fakt_pg",
+				"title": "start FAKT predhodna godina",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.kalk_pg",
+				"title": "start KALK predhodna godina",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.epdv_pg",
+				"title": "start ePDV predhodna godina",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.os_pg",
+				"title": "start OS predhodna godina",
+				"category": "F18"
+			},
+			{
+				"command": "f18.start.ld_pg",
+				"title": "start LD prehodna godina",
+				"category": "F18"
+			},
 			{
 				"command": "f18.start.cmd",
 				"title": "start cmd prompt",
