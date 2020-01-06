@@ -6,11 +6,11 @@ export class Constants {
 }
 
 
-const revisionS = '4.22.1';
+const revisionS = '4.22.4';
 const execHashListS: any = {
-  'linux-x64': '77c9408ca510aa84e1c4d44a6327d70e',
-  'windows-x64': '8dc0752fba5da6ff7fe2b05bb4af2c90',
-  'windows-x86': 'e4823757abe3860fb72a8ddb387edb68'
+  'linux-x64': '3879e35e2777b593b9050826c73c36d0',
+  'windows-x64': 'ab876dc6501405c07d0106ee39ac2bcc',
+  'windows-x86': 'ba7d9a3d32d34ff3f615d87a73f9e922'
 };
 
 const revisionE = '4.21.15';
