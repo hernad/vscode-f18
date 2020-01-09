@@ -3,7 +3,7 @@
 	"displayName": "F18 klijent [eShell]",
 	"description": "F18 klijent host eShell",
 	"publisher": "bringout",
-	"version": "5.0.31",
+	"version": "5.0.32",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
