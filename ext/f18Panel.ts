@@ -257,12 +257,12 @@ export class F18Panel {
                     })
                 } else {
                     count++;
-                    if (count > 3)
+                    if (count > 5)
                         throw new Error(this.panelCaption)
                     else
                         dim();
                 }
-            }, 700);
+            }, 1200);
 
             dim();
 
@@ -512,7 +512,7 @@ export class F18Panel {
             const db_name_py = db_name_cy.replace( `_${cCurrentYear}`, `_${cPreviousYear}`);
             const db_name = (this.varijanta == 'pg') ? db_name_py : db_name_cy
             console.log( `db_name=${db_name}, py: ${db_name_py} cy: ${db_name_cy}`);
-            runExe = `${Global.execPath} 2>${this.modul}_${this.panelNum}.log --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${db_name} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
+            runExe = `${Global.execPath} --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${db_name} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
         };
 
         //console.log(runExe);
