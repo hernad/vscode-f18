@@ -479,7 +479,7 @@ export class F18Panel {
         //this.terminalInstance.hide();
 
         const cmdSeparator = (shell() == 'cmd.exe') ? '&' : ';';
-        const cF18Execute = Helper.is_windows() ? 'F18-klijent.exe' : 'F18-klijent 2>/dev/null'
+        const cF18Execute = Helper.is_windows() ? 'F18-klijent.exe' : 'F18-klijent'
 
         if (!Global.folderPath) {
             Global.folderPath = path.join(Global.context.extensionPath, '..', 'F18', 'F18_0');
@@ -511,9 +511,10 @@ export class F18Panel {
             const cPreviousYear = (currentYear - 1).toString().trim();
             //e.g. 'bringout_2020' -> 'bringout_2019';
             const db_name_py = db_name_cy.replace( `_${cCurrentYear}`, `_${cPreviousYear}`);
-            const db_name = (this.varijanta == 'pg') ? db_name_py : db_name_cy
-            console.log( `db_name=${db_name}, py: ${db_name_py} cy: ${db_name_cy}`);
-            runExe = `${Global.execPath} --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${db_name} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
+            const db_name = (this.varijanta == 'pg') ? db_name_py : db_name_cy;
+            //console.log( `db_name=${db_name}, py: ${db_name_py} cy: ${db_name_cy}`);
+            const cStdErr = Helper.is_windows() ? '2>NUL' : '2>/dev/null'; 
+            runExe = `${Global.execPath} ${cStdErr} --dbf-prefix ${this.panelNum} -h ${this.connection.host} -y ${this.connection.port} ${adminParams}  -u ${this.connection.user} -p ${this.connection.password} -d ${db_name} --${this.modul} ${this.switchPosPM} ${cmdSeparator} exit`;
         };
 
         //console.log(runExe);
