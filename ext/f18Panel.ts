@@ -479,11 +479,12 @@ export class F18Panel {
         //this.terminalInstance.hide();
 
         const cmdSeparator = (shell() == 'cmd.exe') ? '&' : ';';
-        const cF18Execute = Helper.is_windows() ? 'F18-klijent.exe' : 'F18-klijent'
+        const cF18Execute = Helper.is_windows() ? 'F18-klijent.exe' : 'F18-klijent 2>/dev/null'
 
         if (!Global.folderPath) {
             Global.folderPath = path.join(Global.context.extensionPath, '..', 'F18', 'F18_0');
             Global.execPath = path.join(Global.folderPath, cF18Execute);
+
             if (!fs.existsSync(Global.execPath))
                 vscode.window.showErrorMessage(`F18_0 exec ne postoji: ${Global.execPath}`);
 
