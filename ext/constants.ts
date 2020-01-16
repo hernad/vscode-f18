@@ -5,19 +5,21 @@ export class Constants {
   public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
-const revisionS = '4.22.26';
+
+const revisionS = '4.22.30';
 const execHashListS: any = {
+  'linux-x64': 'aee8a161c1e211ea5843c79de5b6b7e9',
+  'windows-x64': '1740afc470d04cf01e31f9d1dc1f63d6',
+  'windows-x86': '3dc0dc796d1989f5a1691d5aa60e7323'
+};
+
+const revisionE = '4.22.26';
+const execHashListE: any = {
   'linux-x64': '2e553fa9a77429500c9981294f8cb3c4',
   'windows-x64': 'f5d37b8c76f30c10fdd505d1ec8fa979',
   'windows-x86': 'aec90982041d30ee90da01710f549f6c'
 };
 
-const revisionE = '4.21.15';
-const execHashListE: any = {
-  'linux-x64': '72e82c3e39a8887140cacc9d0687ef4a',
-  'windows-x64': 'd7ff4eb59f920f63c033d9c29402902a',
-  'windows-x86': '482b8728a03b1eef34a4391070e0815a'
-};
 
 
 const revisionX = '4.23.0';
