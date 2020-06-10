@@ -9,6 +9,9 @@ F18_CLI="F18-klijent"
 
 VERSION=$1
 
+UNAME=`uname`
+
+
 [ -z "$VERSION" ] && echo navesti verziju && exit 1
 
 #ZIPS="F18-linux-x64_$VERSION.zip F18-linux-x86_$VERSION.zip F18-windows-x64_$VERSION.zip F18-windows-x86_$VERSION.zip"
@@ -30,7 +33,9 @@ for zip in $ZIPS ; do
   if [[ "$?" == "0" ]] ; then
     echo $(pwd)
     unzip tmp/$DOWNLOAD -d tmp
-    [ -f tmp/$F18_CLI ] && md5sum tmp/$F18_CLI >> md5.txt 
+    if [[ $zip != F18-windows* ]] ; then
+        [ -f tmp/$F18_CLI ] && md5sum tmp/$F18_CLI >> md5.txt
+    fi
     [ -f tmp/$F18_CLI.exe ] && md5sum tmp/$F18_CLI.exe >> md5.txt
     rm -rf tmp/*
   else
