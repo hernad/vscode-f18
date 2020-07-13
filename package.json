@@ -3,7 +3,7 @@
 	"displayName": "F18 klijent [eShell]",
 	"description": "F18 klijent host eShell",
 	"publisher": "bringout",
-	"version": "5.1.51",
+	"version": "5.1.53",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -60,7 +60,6 @@
 				"title": "start LD",
 				"category": "F18"
 			},
-
 			{
 				"command": "f18.start.pos_pg",
 				"title": "start POS predhodna godina",
@@ -191,7 +190,9 @@
 		"build": "cd cli && yarn && webpack && cd .. && webpack --mode development && tsc -p tsconfig.json",
 		"vscode:prepublish": "cd cli && webpack && cd .. && webpack --mode production && tsc -p tsconfig.json",
 		"postinstall": "node ./node_modules/vscode/bin/install",
-		"extension-publish": "vsce publish --yarn"
+		"extension-publish": "vsce publish --yarn",
+		"package": "vsce package",
+		"publish-openvsx-windows": ""		
 	},
 	"devDependencies": {
 		"@types/jest": "^24.0.13",
@@ -210,6 +211,7 @@
 		"source-map-loader": "^0.2.4",
 		"ts-loader": "^6.2.1",
 		"typescript": "^3.6.4",
+		"vsce": "^1.77.0",
 		"vscode": "^1.1.30",
 		"webpack": "^4.41.5",
 		"webpack-cli": "^3.3.10",
