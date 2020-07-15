@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as vscode from 'vscode';
+import { window, Uri, commands, workspace, ViewColumn, WebviewPanel } from 'vscode';
 import { vscodeFetchUnzip } from './fetchUnzip';
 import { Helper } from './helper';
 import { Global, vscode_version_match } from './global';
@@ -39,14 +39,14 @@ function modulExists(modul: string) {
 }
 
 process.on('uncaughtException', function (error: Error) {
-    // vscode.window.showErrorMessage(error.message)
+    // window.showErrorMessage(error.message)
     console.log(`uncaughtExceptionF18: ${error.message}`);
     globalHandler(error);
 });
 
 
 process.on('unhandledRejection', function (reason: Error, p) {
-    // vscode.window.showErrorMessage(`promise unhandled rejection ${reason}`);
+    // window.showErrorMessage(`promise unhandled rejection ${reason}`);
     globalHandler(reason);
 
 });
@@ -64,12 +64,12 @@ function globalHandler(error: Error) {
             // const caption = error.message;
             //const modul = caption.replace(regex, "$1")
             //if (modulExists(modul)) {
-            //    vscode.window.showErrorMessage(caption);
+            //    window.showErrorMessage(caption);
             //console.log(`unhandledRejection novi pokusaj kreiranja: ${modul}`);
             //F18Panel.create(modul);
             //}
             //else {
-            vscode.window.showErrorMessage(`Problem sa pokretanjem: ${error.message}`);
+            window.showErrorMessage(`Problem sa pokretanjem: ${error.message}`);
             //console.log(`unhandledRejection - ne znam sta uraditi sa: ${caption}`);
             //}
         }
@@ -84,14 +84,14 @@ export class F18Panel {
     public static isDownloadedBinary: boolean = false;
     public static firstTerminal: boolean = true;
     public static instances: F18Panel[] = [];
-    public webPanel: vscode.WebviewPanel;
+    public webPanel: WebviewPanel;
     public lostFocus: boolean = false;
     
     public static createF18Instance(modulF18: string, cVarijanta: string) {
 
         new F18Panel(modulF18, cVarijanta);
-        F18Panel.downloadNew = vscode.workspace.getConfiguration('f18').get('download');
-        F18Panel.webGL = vscode.workspace.getConfiguration('f18').get('webGL');
+        F18Panel.downloadNew = workspace.getConfiguration('f18').get('download');
+        F18Panel.webGL = workspace.getConfiguration('f18').get('webGL');
     
     }
 
@@ -137,22 +137,22 @@ export class F18Panel {
         this.webPanelDisposed = false;
         this.webPanelIsAlive = false;
 
-        const tmpFS = vscode.workspace.getConfiguration('f18').get('fontSize');
+        const tmpFS = workspace.getConfiguration('f18').get('fontSize');
         if (tmpFS !== undefined) {
             this.fontSize = tmpFS as number;
-            // vscode.window.showErrorMessage(`fontsize: ${this.fontSize}`);
+            // window.showErrorMessage(`fontsize: ${this.fontSize}`);
         }
 
         if (cModul === "pos") {
-            this.switchPosPM = "--pos-pm " + vscode.workspace.getConfiguration('f18').get('posPM');
+            this.switchPosPM = "--pos-pm " + workspace.getConfiguration('f18').get('posPM');
         } else
             this.switchPosPM = "";
 
         this.fontFamily = Helper.is_windows() ? DEFAULT_WINDOWS_FONT_FAMILY : DEFAULT_LINUX_FONT_FAMILY;
-        const tmpFF = vscode.workspace.getConfiguration('editor', null).get('fontFamily');
+        const tmpFF = workspace.getConfiguration('editor', null).get('fontFamily');
         tmpFF !== undefined
             ? (this.fontFamily = tmpFF as string)
-            : vscode.window.showErrorMessage('config editor.fontFamily?!');
+            : window.showErrorMessage('config editor.fontFamily?!');
 
         //console.log(`fontFamily: ${this.fontFamily}`);
 
@@ -170,11 +170,11 @@ export class F18Panel {
         this.panelNum = nLast + 1;
         this.panelCaption = `F18 ${this.modul} - ${this.panelNum}`;
 
-        const runSelect = vscode.workspace.getConfiguration('f18').get('selectDatabaseOnStart');
+        const runSelect = workspace.getConfiguration('f18').get('selectDatabaseOnStart');
 
         try {
             if (!F18Panel.isDownloadedBinary && runSelect)
-                vscode.commands.executeCommand('f18.selectDatabase')
+                commands.executeCommand('f18.selectDatabase')
                     .then(() => setTimeout(this.getConnectionThenRun, 770)); // timeout potreban da se propagira promjena konfiguracije
             else
                 this.getConnectionThenRun();
@@ -201,10 +201,10 @@ export class F18Panel {
     private afterConnect() {
 
         console.log(`afterConnect`);
-        this.webPanel = vscode.window.createWebviewPanel(
+        this.webPanel = window.createWebviewPanel(
             F18Panel.viewType,
             this.panelCaption,
-            { viewColumn: vscode.ViewColumn.Active, preserveFocus: false },
+            { viewColumn: ViewColumn.Active, preserveFocus: false },
             {
                 enableScripts: true,
                 retainContextWhenHidden: true,
@@ -212,8 +212,8 @@ export class F18Panel {
 
                 // And restric the webview to only loading content from our extension's `media` directory.
                 localResourceRoots: [
-                    vscode.Uri.file(path.join(this.extensionPath, 'cli')),
-                    vscode.Uri.file(path.join(this.extensionPath, 'build'))
+                    Uri.file(path.join(this.extensionPath, 'cli')),
+                    Uri.file(path.join(this.extensionPath, 'build'))
                 ]
             }
         );
@@ -238,7 +238,7 @@ export class F18Panel {
             console.log('createPty');
 
             this.terminalKilled = false;
-            const config = vscode.workspace.getConfiguration('f18'); //.get('fullScreen');
+            const config = workspace.getConfiguration('f18'); //.get('fullScreen');
             const configMerged = {
                 ...config,
                 rendererType: RENDERER_TYPE,
@@ -324,7 +324,7 @@ export class F18Panel {
                             createPty();
                         },
                         () => {
-                            vscode.window.showErrorMessage('catch fetch');
+                            window.showErrorMessage('catch fetch');
                             createPty();
                         }
                     );
@@ -363,8 +363,8 @@ export class F18Panel {
         this.webPanel.onDidChangeViewState((e) => {
 
             if (e.webviewPanel.active) {
-                // vscode.window.showInformationMessage(`on change view: state active ${e.webviewPanel.title}`);
-                // vscode.commands.executeCommand("default:type", { "text": '\t\t\t\t' } );
+                // window.showInformationMessage(`on change view: state active ${e.webviewPanel.title}`);
+                // commands.executeCommand("default:type", { "text": '\t\t\t\t' } );
             }
 
         });
@@ -384,16 +384,16 @@ export class F18Panel {
                     break;
 
                 case 'alert':
-                    vscode.window.showErrorMessage(message.data);
+                    window.showErrorMessage(message.data);
                     break;
 
                 case 'quit':
-                    vscode.window.showErrorMessage(message.data);
+                    window.showErrorMessage(message.data);
                     this.webPanel.dispose();
                     break;
 
                 case 'dimensions-error':
-                    vscode.window.showErrorMessage(`received message data: ${message.data}`);
+                    window.showErrorMessage(`received message data: ${message.data}`);
                     this.webPanel.dispose();
                     break;
 
@@ -405,7 +405,7 @@ export class F18Panel {
                 case 'cli-focus':
 
                     //this.terminalInstance.sendText('\x1b[I');
-                    // vscode.window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
+                    // window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
                     this._ptyProcess.resize(this.cols, this.rows);
 
                     break;
@@ -421,7 +421,7 @@ export class F18Panel {
                     // Pl	No. of lines
                     // Pc	No. of columns
                     //if ((new RegExp("\\x1b\\[\\d+;\\d+R")).test(message.data)) {
-                    //    //vscode.window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
+                    //    //window.showInformationMessage('ulovio response NA CPR - e.g: ESC[2;2R]');
                     //} 
                     this._ptyProcess.write(message.data);
                     // console.log(`cli-input: ${JSON.stringify(message.data)} -> pty`);
@@ -434,13 +434,13 @@ export class F18Panel {
                 //    break;
 
                 case 'pdf-view':
-                    const fileUri: vscode.Uri = vscode.Uri.file(message.data);
+                    const fileUri: Uri = Uri.file(message.data);
                     //console.log(`vscode-resource: ${fileUri.with({ scheme: 'vscode-resource' }).toString()}`);
-                    vscode.commands.executeCommand("pdf.view", fileUri.with({ scheme: 'vscode-resource' }).toString());
+                    commands.executeCommand("pdf.view", fileUri.with({ scheme: 'vscode-resource' }).toString());
                     break;
                 case 'run-command':
                 	// e.g. message.data = 'f18.start.fin_pg'
-					vscode.commands.executeCommand(message.data);
+					commands.executeCommand(message.data);
             }
         });
         // this.webPanel.webview.postMessage({ command: 'ping' });
@@ -454,7 +454,7 @@ export class F18Panel {
 
         this.rows = dims.rows;
         this.cols = dims.cols - 1;
-        // vscode.window.showInformationMessage(`rows: ${this.rows}, cols: ${this.cols}`);
+        // window.showInformationMessage(`rows: ${this.rows}, cols: ${this.cols}`);
     }
 
     public createClientTerminal() {
@@ -486,7 +486,7 @@ export class F18Panel {
             Global.execPath = path.join(Global.folderPath, cF18Execute);
 
             if (!fs.existsSync(Global.execPath))
-                vscode.window.showErrorMessage(`F18_0 exec ne postoji: ${Global.execPath}`);
+                window.showErrorMessage(`F18_0 exec ne postoji: ${Global.execPath}`);
 
         }
 
@@ -654,7 +654,7 @@ export class F18Panel {
             this.webPanel.webview.postMessage({ command: 'term-write', data });
         } else {
             this.lostFocus = true;
-            // vscode.window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
+            // window.showInformationMessage(`${this.panelCaption} webpanel is not active - term data to buffer`);
             this.termBuffer.unshift(data);
         }
     }
@@ -691,24 +691,24 @@ export class F18Panel {
         //<script src="./node_modules/react-dom/umd/react-dom.development.js"></script>
         */
 
-        const scriptPathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'build', mainScript));
+        const scriptPathOnDisk = Uri.file(path.join(this.extensionPath, 'build', mainScript));
         //const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
         const scriptUri = this.webPanel.webview.asWebviewUri(scriptPathOnDisk);
         /*
-        const scriptReact1OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', reactScript1));
+        const scriptReact1OnDisk = Uri.file(path.join(this.extensionPath, 'cli', reactScript1));
         const scriptReact1Uri = scriptReact1OnDisk.with({ scheme: 'vscode-resource' });
 
-        const scriptReact2OnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', reactScript2));
+        const scriptReact2OnDisk = Uri.file(path.join(this.extensionPath, 'cli', reactScript2));
         const scriptReact2Uri = scriptReact2OnDisk.with({ scheme: 'vscode-resource' });
         */
 
-        const xermStylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', xtermStyle));
+        const xermStylePathOnDisk = Uri.file(path.join(this.extensionPath, 'cli', xtermStyle));
         const xtermStyleUri = this.webPanel.webview.asWebviewUri(xermStylePathOnDisk);
 
-        // const xermFullScreenStylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', xtermFullScreenStyle));
+        // const xermFullScreenStylePathOnDisk = Uri.file(path.join(this.extensionPath, 'cli', xtermFullScreenStyle));
         // const xtermFullScreenStyleUri = xermFullScreenStylePathOnDisk.with({ scheme: 'vscode-resource' });
 
-        const stylePathOnDisk = vscode.Uri.file(path.join(this.extensionPath, 'cli', mainStyle));
+        const stylePathOnDisk = Uri.file(path.join(this.extensionPath, 'cli', mainStyle));
         const styleUri = this.webPanel.webview.asWebviewUri(stylePathOnDisk);
 
         // Use a nonce to whitelist which scripts can bereact.development.js run
@@ -725,7 +725,7 @@ export class F18Panel {
 				<link rel="stylesheet" type="text/css" href="${styleUri}">
 				<link rel="stylesheet" type="text/css" href="${xtermStyleUri}">
 				<meta http-equiv="Content-Security-Policy" content="default-src http://localhost:5000; media-src data: https: http:;img-src vscode-resource: https: http:; script-src 'unsafe-eval' 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline' http: https: data:;">
-				<base href="${vscode.Uri.file(this.extensionPath).with({ scheme: 'vscode-resource' })}/">
+				<base href="${Uri.file(this.extensionPath).with({ scheme: 'vscode-resource' })}/">
 			</head>
 
             <body>
@@ -757,7 +757,7 @@ function getNonce() {
 
 function shell(): string {
     if (Helper.is_windows()) {
-        return vscode.workspace.getConfiguration('f18').get('winShell');
+        return workspace.getConfiguration('f18').get('winShell');
     } else {
         return '/bin/bash';
     }
