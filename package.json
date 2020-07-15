@@ -4,9 +4,9 @@
 	"displayName": "F18 klijent [eShell]",
 	"description": "F18 klijent host eShell",
 	"publisher": "bringout",
-	"version": "5.1.53",
+	"version": "5.2.0",
 	"engines": {
-		"vscode": "^1.41.0"
+		"vscode": "^1.47.0"
 	},
 	"license": "MIT",
 	"keywords": [
