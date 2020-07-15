@@ -191,9 +191,7 @@
 		"build": "cd cli && yarn && webpack && cd .. && webpack --mode development && tsc -p tsconfig.json",
 		"vscode:prepublish": "cd cli && webpack && cd .. && webpack --mode production && tsc -p tsconfig.json",
 		"extension-publish": "vsce publish --yarn",
-		"package": "vsce package",
-		"download-api": "vscode-dts dev",
-		"postinstall": "yarn run download-api"
+		"package": "vsce package"
 	},
 	"devDependencies": {
 		"@types/jest": "^24.0.13",
@@ -213,7 +211,6 @@
 		"ts-loader": "^6.2.1",
 		"typescript": "^3.9.6",
 		"vsce": "^1.77.0",
-		"vscode-dts": "^0.3.1",
 		"webpack": "^4.41.5",
 		"webpack-cli": "^3.3.10",
 		"webpack-node-externals": "^1.7.2",
