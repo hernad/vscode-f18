@@ -24,3 +24,6 @@ cli/node_modules
 cli/yarn.lock
 
 cli/out
+dist
+md5.txt
+vscode.proposed.d.ts
