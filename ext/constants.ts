@@ -79,7 +79,7 @@ if (execHashLst[Helper.os_platform()] === '0') {
   console.log(`Za ${Helper.os_platform()} verzija ${rev} ne postoji`);
   // za npr windows-x64 nije definisan, uzeti predhodne verzije
   //   windows-x64-prev, windows-x64-prev-rel
-  rev = execHashLst[Helper.os_platform() + '-prev-rel'];
+  rev = execHashLst[Helper.os_platform() + '-prev-rev'];
   execHashLst[Helper.os_platform()] = execHashLst[Helper.os_platform() + '-prev'];
   console.log(`... koristi se verzija ${rev} hash ${execHashLst[Helper.os_platform()]}`);
 }
