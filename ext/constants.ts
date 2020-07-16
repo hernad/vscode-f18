@@ -15,17 +15,17 @@ export class Constants {
 // F18-windows-x86_4.22.64.zip
 // 5f2ca84c5b61df1072d73cfc3a02912a  tmp/F18-klijent.exe
 
-const revisionS = '4.22.64';
+const revisionS = '4.22.65';
 const execHashListS: any = {
-  'linux-x64': 'cf89a428c13d2790fa70a1d124e7b1ea',
-  'windows-x64': 'c5ca0cccfa3fff0668187e885089d222',
-  'windows-x86': '5f2ca84c5b61df1072d73cfc3a02912a',
+  'linux-x64': '19d9ffc057437e4d97ecf85cc1240cf7',
+  'windows-x64': '0',
+  'windows-x86': '0',
 
-  'windows-x64-prev': '0',
-  'windows-x64-prev-rev': '4.22.60',
+  'windows-x64-prev': 'c5ca0cccfa3fff0668187e885089d222',
+  'windows-x64-prev-rev': '4.22.64',
 
-  'windows-x86-prev': '0',
-  'windows-x86-prev-rev': '4.22.60'
+  'windows-x86-prev': '5f2ca84c5b61df1072d73cfc3a02912a',
+  'windows-x86-prev-rev': '4.22.64'
 };
 
 
