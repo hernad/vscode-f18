@@ -460,23 +460,6 @@ export class F18Panel {
     public createClientTerminal() {
 
         console.log(`createClientTerminal`);
-        // [vscode#view-pdf]/tmp/jedan.pdf[vscode#end]
-        //const regexCursorPosition = new RegExp("\\x1b\\[\\d+;\\d+H", "g");
-        //const regexClearLineCurRight = new RegExp("\\x1b\\[0K", "g"); // windows terminal
-        //const regexVsCodeCmd = new RegExp("\\[vscode#(\\S+)\\](.*)\\[vscode#end\\]");
-
-        //if (vscode_version_match(1, 31)) {
-        // ver 1.31.403
-        // kad nema this.terminal.show [uncaught exception]: TypeError: Cannot read property 'classList' of undefined
-
-        // console.log( `createClientTerminal ${this.rows} / ${this.cols}` );
-
-        //this.terminalInstance.hide();
-        // @ts-ignore
-        //this.terminalInstance.resize(this.cols, this.rows);
-
-        //if (vscode_version_match(1, 31)) 
-        //this.terminalInstance.hide();
 
         const cmdSeparator = (shell() == 'cmd.exe') ? '&' : ';';
         const cF18Execute = Helper.is_windows() ? 'F18-klijent.exe' : 'F18-klijent'
@@ -490,17 +473,10 @@ export class F18Panel {
 
         }
 
-        // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3
-        let linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so.1 ]]; then ln -sf /lib64/libpcre.so.1 ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
-
-        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libpq.so.5 ]]; then ln -sf ${Global.folderPath}/libpq.so ${Global.folderPath}/libpq.so.5; fi`;
-        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libcrypto.so.1.1 ]]; then ln -sf ${Global.folderPath}/libcrypto.so ${Global.folderPath}/libcrypto.so.1.1; fi`;
-        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libssl.so.1.1 ]]; then ln -sf ${Global.folderPath}/libssl.so ${Global.folderPath}/libssl.so.1.1; fi`;
-        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libcurl.so.4 ]]; then ln -sf ${Global.folderPath}/libcurl.so ${Global.folderPath}/libcurl.so.4; fi`;
-        linuxFixes += `; if [[ ! -e ${Global.folderPath}/libz.so.1 ]]; then ln -sf ${Global.folderPath}/libz.so ${Global.folderPath}/libz.so.1; fi`;
-
+        
         let adminParams = '';
-        if (this.adminConnection !== undefined) {
+        if (this.adminConnection && this.adminConnection.user && this.adminConnection.password) {
+            console.log('setting admin params ..');
             adminParams = `-ua ${this.adminConnection.user} -pa ${this.adminConnection.password}`;
         }
         let runExe: string;
@@ -529,15 +505,10 @@ export class F18Panel {
 
         if (Helper.is_windows()) {
             if (shell() != 'cmd.exe') {
+                console.log(`start windows: ${shell()}`);
                 sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
                 sendInitCmds.push('');
                 sendInitCmds.push('cls');
-                /*
-                // ako mode con: => ... Lines: 3000 => exit
-                sendInitCmds.push(
-                    '$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }'
-                );
-                */
                 sendInitCmds.push('');
                 sendInitCmds.push(`cd ${Global.folderPath}`);
                 sendInitCmds.push(`$env:PATH='${Global.folderPath}\\bin;${Global.folderPath};' + $env:PATH`);
@@ -547,17 +518,10 @@ export class F18Panel {
                 (this.modul !== 'cmd') ? sendInitCmds.push('cls') : sendInitCmds.push('(Resolve-Path .\).Path');
 
             } else {
-                sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`);
-                sendInitCmds.push('');
-                sendInitCmds.push('cls');
-                /*
-                // ako mode con: => ... Lines: 3000 => exit
-                sendInitCmds.push(
-                    'powershell "$lines=(cmd /c mode con 2>&1 | Select-String -Pattern Lines: | Select-String 3000) ; if  ([bool]$lines) { exit 1 }"'
-                );
-                sendInitCmds.push('if %errorlevel% neq 0 exit');
-                */
-                sendInitCmds.push('');
+                console.log('start windows cmd.exe');
+                sendInitCmds.push(`mode con: cols=${this.cols} lines=${this.rows}`); sendInitCmds.push('');
+                sendInitCmds.push('cls'); sendInitCmds.push('');
+                sendInitCmds.push('chcp 852'); sendInitCmds.push('');
                 sendInitCmds.push(`cd ${Global.folderPath}`);
                 sendInitCmds.push(`set PATH=${Global.folderPath}\\bin;${Global.folderPath};%PATH%`);
                 sendInitCmds.push(`set F18_HOME=${f18HomePath}`);
@@ -567,6 +531,16 @@ export class F18Panel {
             }
 
         } else {
+
+            // soft link (x64: /lib64/libpcre.so | x86: /usr/lib/libpcre.so.1) -> libpcre.so.3
+            let linuxFixes = `if ! ldconfig -p|grep -q libpcre.so.3 ;then if [[ -e /lib64/libpcre.so.1 ]]; then ln -sf /lib64/libpcre.so.1 ${Global.folderPath}/libpcre.so.3; else ln -sf /usr/lib/libpcre.so.1 ${Global.folderPath}/libpcre.so.3 ;fi; fi`;
+
+            linuxFixes += `; if [[ ! -e ${Global.folderPath}/libpq.so.5 ]]; then ln -sf ${Global.folderPath}/libpq.so ${Global.folderPath}/libpq.so.5; fi`;
+            linuxFixes += `; if [[ ! -e ${Global.folderPath}/libcrypto.so.1.1 ]]; then ln -sf ${Global.folderPath}/libcrypto.so ${Global.folderPath}/libcrypto.so.1.1; fi`;
+            linuxFixes += `; if [[ ! -e ${Global.folderPath}/libssl.so.1.1 ]]; then ln -sf ${Global.folderPath}/libssl.so ${Global.folderPath}/libssl.so.1.1; fi`;
+            linuxFixes += `; if [[ ! -e ${Global.folderPath}/libcurl.so.4 ]]; then ln -sf ${Global.folderPath}/libcurl.so ${Global.folderPath}/libcurl.so.4; fi`;
+            linuxFixes += `; if [[ ! -e ${Global.folderPath}/libz.so.1 ]]; then ln -sf ${Global.folderPath}/libz.so ${Global.folderPath}/libz.so.1; fi`;
+
             sendInitCmds.push(`stty cols ${this.cols} rows ${this.rows}`);
             sendInitCmds.push(`if stty size | grep '${this.rows} ${this.cols}' ; then echo size-ok; else exit 1; fi`);
             sendInitCmds.push(`cd ${Global.folderPath}`);
