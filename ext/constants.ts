@@ -1,24 +1,33 @@
 'use strict';
 import * as vscode from 'vscode';
+import { Helper } from './helper';
+import { exec } from 'child_process';
+
 export class Constants {
   public static PostgresExtensionId = 'postgres';
   public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
 
-const revisionS = '4.22.62';
+const revisionS = '4.22.63';
 const execHashListS: any = {
-  'linux-x64': '8af7ee1ddfae4c956fa197a6ae656706',
-  'windows-x64': '17e23ca061fc99d1be19f4b0a543d6b1',
-  'windows-x86': 'a69d097ce103c7801204546bf80086f9'
+  'linux-x64': '43b564e0a1e549c589884b64bd2defd8',
+  'windows-x64': '0',
+  'windows-x86': '0',
+
+  'windows-x64-prev': '0193afc4af06c5c922141d3b4a2e4b3b',
+  'windows-x64-prev-rev': '4.22.60',
+
+  'windows-x86-prev': '8f57d6bd6b725efaeb96f7f59009c1a8',
+  'windows-x86-prev-rev': '4.22.60'
 };
 
 
-const revisionE = '4.22.57';
+const revisionE = '4.22.60';
 const execHashListE: any = {
-  'linux-x64': 'd86b86f8579541f5e486fdc48f0b6604',
-  'windows-x64': '173ccf0dc6bedb567f03dc52341634f2',
-  'windows-x86': 'c1f07f06cbdd497ae4c68a7dc4ab4236'
+  'linux-x64': '56bf82507de44aa0261400060c32404b',
+  'windows-x64': '0193afc4af06c5c922141d3b4a2e4b3b',
+  'windows-x86': '8f57d6bd6b725efaeb96f7f59009c1a8'
 };
 
 
@@ -44,5 +53,36 @@ const revisionAll: any = {
 
 const versionChannel: string = vscode.workspace.getConfiguration('f18').get('verChannel');
 
-export const revision = revisionAll[versionChannel];
-export const execHashList = execHashListAll[versionChannel];
+// versionChannel = 'S' => rev = '4.66.22';
+let rev = revisionAll[versionChannel];
+// versionChannel = 'S' => execHashLst = { 'linux-x64': 'hash01', 'windows-x64': '0', 'windows-x86': '0'}
+let execHashLst = execHashListAll[versionChannel]
+
+if (execHashLst[Helper.os_platform()] === '0') {
+  //  4.22.62 postoji samo linux verzija
+  //  
+  //  const revisionS = '4.22.62';
+  //  const execHashListS: any = {
+  //    'linux-x64': '43b564e0a1e549c589884b64bd2defd8',
+  //    'windows-x64': '0',
+  //    'windows-x86': '0',
+  //  
+  //    #za windows-x64 i windows-x86 koristiti 4.22.60
+  //
+  //    'windows-x64-prev': '0193afc4af06c5c922141d3b4a2e4b3b',
+  //    'windows-x64-prev-rev': '4.22.60',
+  //  
+  //    'windows-x86-prev': '8f57d6bd6b725efaeb96f7f59009c1a8',
+  //    'windows-x86-prev-rev': '4.22.60'
+  //  };
+
+  console.log(`Za ${Helper.os_platform()} verzija ${rev} ne postoji`);
+  // za npr windows-x64 nije definisan, uzeti predhodne verzije
+  //   windows-x64-prev, windows-x64-prev-rel
+  rev = execHashLst[Helper.os_platform() + '-prev-rel'];
+  execHashLst[Helper.os_platform()] = execHashLst[Helper.os_platform() + '-prev'];
+  console.log(`... koristi se verzija ${rev} hash ${execHashLst[Helper.os_platform()]}`);
+}
+
+export const revision = rev;
+export const execHashList = execHashLst;
