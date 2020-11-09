@@ -3,7 +3,7 @@
 	"displayName": "F18 klijent [eShell]",
 	"description": "F18 klijent host eShell",
 	"publisher": "bringout",
-	"version": "5.2.23",
+	"version": "5.2.24",
 	"engines": {
 		"vscode": "^1.47.0"
 	},
@@ -119,6 +119,11 @@
 							"os",
 							"ld"
 						]
+					},
+					"f18.onStartDelay": {
+						"description": "F18 pauza pri inicijalnom pokretanju (ms)",
+						"type": "number",
+						"default": 2000
 					},
 					"f18.posPM": {
 						"description": "F18 POS prodajno mjesto",

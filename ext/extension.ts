@@ -85,6 +85,7 @@ export function activate(context: ExtensionContext) {
 
 
 	const fullScreen = workspace.getConfiguration('f18').get('fullScreen');
+	const onStartDelay: number = workspace.getConfiguration('f18').get('onStartDelay');
 
 	if (fullScreen) commands.executeCommand('workbench.action.toggleFullScreen');
 
@@ -101,6 +102,6 @@ export function activate(context: ExtensionContext) {
 		const onStart: string = workspace.getConfiguration('f18').get('onStart');
 		if (onStart.trim() !== '')
 			commands.executeCommand(`f18.start.${onStart}`);
-	}, 1000);
+	}, onStartDelay);
 }
 
