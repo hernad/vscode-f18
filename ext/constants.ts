@@ -34,11 +34,15 @@ const execHashListE: any = {
 };
 
 
-const revisionX = '4.22.60';
+
+const revisionX = '4.22.85';
 const execHashListX: any = {
-  'linux-x64': '56bf82507de44aa0261400060c32404b',
-  'windows-x64': '0193afc4af06c5c922141d3b4a2e4b3b',
-  'windows-x86': '8f57d6bd6b725efaeb96f7f59009c1a8'
+  'linux-x64': '0',
+  'linux-x64-prev' : 'f0ef32d054e694b2026256543dee3adb',
+  'linux-x64-prev-rev': '4.22.72',
+
+  'windows-x64': '80cabf1a8f19aace45ca388d93c7f6e8',
+  'windows-x86': '8cf62a52880c8570fdc14cfc622e0bc7',
 };
 
 
