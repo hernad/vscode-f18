@@ -35,15 +35,16 @@ const execHashListE: any = {
 
 
 
-const revisionX = '4.22.85';
+const revisionX = '4.22.86';
 const execHashListX: any = {
   'linux-x64': '0',
   'linux-x64-prev' : 'f0ef32d054e694b2026256543dee3adb',
   'linux-x64-prev-rev': '4.22.72',
 
-  'windows-x64': '80cabf1a8f19aace45ca388d93c7f6e8',
-  'windows-x86': '8cf62a52880c8570fdc14cfc622e0bc7',
+  'windows-x64': '55c2591ca06ad34055edd0fe774019bd',
+  'windows-x86': '1d4235ad60e428b6509aff18795c540d',
 };
+
 
 
 const execHashListAll: any = {
