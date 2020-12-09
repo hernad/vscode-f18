@@ -29,14 +29,14 @@ const execHashListE: any = {
 };
 
 
-const revisionX = '4.22.90';
+const revisionX = '4.22.91';
 const execHashListX: any = {
   'linux-x64': '0',
   'linux-x64-prev' : 'f0ef32d054e694b2026256543dee3adb',
   'linux-x64-prev-rev': '4.22.72',
 
-  'windows-x64': '8e5d116325f51c921bce1233bd239d51',
-  'windows-x86': '09438e87b3e20231bf808c19eeb30576',
+  'windows-x64': 'bcdecbaacbc40b66ffa8f3c8fdb96c7c',
+  'windows-x86': '4e7fb7f07cb144c98a5f0106cf3b8610',
 };
 
 
