@@ -9,9 +9,9 @@ export class Constants {
 }
 
 
-const revisionS = '4.22.98';
+const revisionS = '4.22.99';
 const execHashListS: any = {
-  'linux-x64': '335621ba5a25febb6a83fe342507fb73',
+  'linux-x64': 'ce92cb66d8160b7b927270d1b7af56ce',
 
   'windows-x64': '0',
   'windows-x64-prev': 'd91d50009d53c80e3a5081bd65c6fa5f',
