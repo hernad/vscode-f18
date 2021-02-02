@@ -11,6 +11,7 @@ VERSION=$1
 
 UNAME=`uname`
 
+LD_LIBRARY_PATH=
 
 [ -z "$VERSION" ] && echo navesti verziju && exit 1
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+LD_LIBRARY_PATH=
+
 echo PREREQ: "yarn install"
 
 echo publish to openvsx ...

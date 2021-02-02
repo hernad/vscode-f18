@@ -9,8 +9,18 @@ export class Constants {
 }
 
 
-const revisionS = '4.23.12';
+const revisionS = '4.23.14';
 const execHashListS: any = {
+  'linux-x64': '0',
+  'linux-x64-prev' : '002aa51b67b081873e067dc8cda1dedf',
+  'linux-x64-prev-rev': '4.23.4',
+
+  'windows-x64': '66d60c70a987bcbdb1e00de0c7ec3795',
+  'windows-x86': '63af1989b5f0698a1725e243f75f954b',
+};
+
+const revisionE = '4.23.12';
+const execHashListE: any = {
   'linux-x64': '0',
   'linux-x64-prev' : '002aa51b67b081873e067dc8cda1dedf',
   'linux-x64-prev-rev': '4.23.4',
@@ -19,15 +29,7 @@ const execHashListS: any = {
   'windows-x86': '1440c7dc0088bd7e7f4d9136bd05b854',
 };
 
-const revisionE = '4.23.2';
-const execHashListE: any = {
-  'linux-x64': '0',
-  'linux-x64-prev' : '472b86108c70dba80805cd64f0861bf1',
-  'linux-x64-prev-rev': '4.23.1',
 
-  'windows-x64': '7bdfda3c75b3abe7762bd123a98d914c',
-  'windows-x86': '2560950a5c7432f4d908134263b0d80d',
-};
 
 /*
 const revisionE = '4.23.1';
