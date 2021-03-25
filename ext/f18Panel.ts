@@ -229,7 +229,7 @@ export class F18Panel {
             // https://dl.bintray.com/bringout/F18/:F18-windows-x86_4.23.30.zip
             // https://dl.bintray.com/bringout/F18/:F18-linux-x64_4.23.29.zip
             // host: 'https://dl.bintray.com/bringout',
-            host: 'http://download.bring.out.ba'
+            host: 'http://download.bring.out.ba',
             packageName: 'F18',
             // platform: 'windows-x64'
             revision,
