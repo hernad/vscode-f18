@@ -1,8 +1,8 @@
 #!/bin/bash
 
-BINTRAY_USER=bringout
-BINTRAY_REPOS=F18
-BINTRAY_HOST=https://dl.bintray.com/$BINTRAY_USER/$BINTRAY_REPOS
+#BINTRAY_USER=bringout
+HTTPD_REPOS=F18
+HTTPD_HOST=http://download.bring.out.ba/$HTTPD_REPOS
 
 # F18 execute application
 F18_CLI="F18-klijent"
@@ -27,8 +27,8 @@ echo "" > md5.txt
 for zip in $ZIPS ; do
   echo $zip >> md5.txt
   echo =================== $zip ==========================================
-  echo curl -sL $BINTRAY_HOST/$zip --output tmp/$DOWNLOAD
-  curl -sL $BINTRAY_HOST/$zip --output tmp/$DOWNLOAD
+  echo curl -sL $HTTPD_HOST/$zip --output tmp/$DOWNLOAD
+  curl -sL $HTTPD_HOST/$zip --output tmp/$DOWNLOAD
   ls -lh tmp/$DOWNLOAD
 
   if [[ "$?" == "0" ]] ; then

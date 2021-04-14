@@ -9,14 +9,14 @@ export class Constants {
 }
 
 
-const revisionS = '4.23.30';
+const revisionS = '4.23.31';
 const execHashListS: any = {
   'linux-x64': '0',
   'linux-x64-prev' : 'ca32fc024c8b9da9b66cf1bec4160ec5',
   'linux-x64-prev-rev': '4.23.29',
 
-  'windows-x64': 'dc0e7199a12543115502392b9561d19a',
-  'windows-x86': 'a54ccd8fbddd4dc2479b41db9d98ff5d',
+  'windows-x64': '80e2cbffab4c4ebd6e222d16ad481797',
+  'windows-x86': '0f46f1af2d8cb28e61d29884728a89c9',
 };
 
 
