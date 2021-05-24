@@ -8,14 +8,22 @@ export class Constants {
   public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
-const revisionS = '4.23.40';
+
+// back na najstariju koja radi
+// F18-windows-x64_4.23.36.zip
+// f6e447707d8598de35a2d1c66ccfaadb  tmp/F18-klijent.exe
+// F18-windows-x86_4.23.36.zip
+// c58603b7df6a3bbe7b987c1faab97d56  tmp/F18-klijent.exe
+
+
+const revisionS = '4.23.36';
 const execHashListS: any = {
   'linux-x64': '0',
   'linux-x64-prev' : '8cd7fcd4355044911a052c7aa17bb461',
   'linux-x64-prev-rev': '4.23.38',
 
-  'windows-x64': '3712d5abe03cbde38e4ddbffd5768cb3',
-  'windows-x86': '34956d044b27ec857c8537d00ef09304',
+  'windows-x64': 'f6e447707d8598de35a2d1c66ccfaadb',
+  'windows-x86': 'c58603b7df6a3bbe7b987c1faab97d56',
 };
 
 /*
