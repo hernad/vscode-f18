@@ -15,30 +15,36 @@ export class Constants {
 // F18-windows-x86_4.23.36.zip
 // c58603b7df6a3bbe7b987c1faab97d56  tmp/F18-klijent.exe
 
+// F18-linux-x64_4.23.41.zip
+// F18-windows-x64_4.23.41.zip
+// 6e9436c1a259c4d5397a8690613c0036  tmp/F18-klijent.exe
+// F18-windows-x86_4.23.41.zip
+// 32f4e15b847753b73f84c587b59ebd31  tmp/F18-klijent.exe
 
-const revisionS = '4.23.36';
+/*
+const revisionS = '4.23.41';
 const execHashListS: any = {
   'linux-x64': '0',
   'linux-x64-prev' : '8cd7fcd4355044911a052c7aa17bb461',
   'linux-x64-prev-rev': '4.23.38',
 
-  'windows-x64': 'f6e447707d8598de35a2d1c66ccfaadb',
-  'windows-x86': 'c58603b7df6a3bbe7b987c1faab97d56',
-};
-
-/*
-const execHashListS: any = {
-  'linux-x64': '8cd7fcd4355044911a052c7aa17bb461',
-
-  'windows-x64': '0',
-  'windows-x64-prev': 'f6e447707d8598de35a2d1c66ccfaadb',
-  'windows-x64-prev-rev': '4.23.36',
-
-  'windows-x86': '0',
-  'windows-x86-prev': 'c58603b7df6a3bbe7b987c1faab97d56',
-  'windows-x86-prev-rev': '4.23.36',
+  'windows-x64': '6e9436c1a259c4d5397a8690613c0036',
+  'windows-x86': '32f4e15b847753b73f84c587b59ebd31',
 };
 */
+
+const revisionS = '4.23.43';
+const execHashListS: any = {
+  'linux-x64': '4a76831a18eaf5aa20068bd321d0546f',
+
+  'windows-x64': '0',
+  'windows-x64-prev': '6e9436c1a259c4d5397a8690613c0036',
+  'windows-x64-prev-rev': '4.23.41',
+
+  'windows-x86': '0',
+  'windows-x86-prev': '32f4e15b847753b73f84c587b59ebd31',
+  'windows-x86-prev-rev': '4.23.41',
+};
 
 
 
