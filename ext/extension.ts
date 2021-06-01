@@ -1,6 +1,6 @@
 import { ExtensionContext, commands, window, extensions, workspace } from 'vscode';
 import { Global } from './global';
-import { F18Panel } from './f18Panel';
+import { F18Panels } from './f18Panel';
 import { PostgresConnection } from './postgresConnection';
 import { IConnection } from './IConnection';
 
@@ -11,7 +11,7 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(
 		commands.registerCommand('f18.start.cmd', () => {
-			F18Panel.createF18Instance('cmd', '');
+			F18Panels.createF18Instance('cmd', '');
 		})
 	)
 
@@ -31,53 +31,53 @@ export function activate(context: ExtensionContext) {
 
 		// console.log(`step ${result}`);
 		PostgresConnection.getDefaultConnection().then((connection: IConnection) => {
-			// console.log(connection.database);
+			console.log(connection.database);
 			
 			context.subscriptions.push(
 				commands.registerCommand('f18.selectDatabase',
 					() => commands.executeCommand('postgres.selectDatabase').then(() => console.log('selected database'))
 				),
 				commands.registerCommand('f18.start.pos', () => {
-					F18Panel.createF18Instance('pos', '');
+					F18Panels.createF18Instance('pos', '');
 				}),
 				commands.registerCommand('f18.start.fin', () => {
-					F18Panel.createF18Instance('fin', '');
+					F18Panels.createF18Instance('fin', '');
 				}),
 				commands.registerCommand('f18.start.kalk', () => {
-					F18Panel.createF18Instance('kalk', '');
+					F18Panels.createF18Instance('kalk', '');
 				}),
 				commands.registerCommand('f18.start.fakt', () => {
-					F18Panel.createF18Instance('fakt', '');
+					F18Panels.createF18Instance('fakt', '');
 				}),
 				commands.registerCommand('f18.start.os', () => {
-					F18Panel.createF18Instance('os', '');
+					F18Panels.createF18Instance('os', '');
 				}),
 				commands.registerCommand('f18.start.ld', () => {
-					F18Panel.createF18Instance('ld', '');
+					F18Panels.createF18Instance('ld', '');
 				}),
 				commands.registerCommand('f18.start.epdv', () => {
-					F18Panel.createF18Instance('epdv', '');
+					F18Panels.createF18Instance('epdv', '');
 				}),
 				commands.registerCommand('f18.start.pos_pg', () => {
-					F18Panel.createF18Instance('pos', 'pg');
+					F18Panels.createF18Instance('pos', 'pg');
 				}),
 				commands.registerCommand('f18.start.fin_pg', () => {
-					F18Panel.createF18Instance('fin', 'pg');
+					F18Panels.createF18Instance('fin', 'pg');
 				}),
 				commands.registerCommand('f18.start.kalk_pg', () => {
-					F18Panel.createF18Instance('kalk', 'pg');
+					F18Panels.createF18Instance('kalk', 'pg');
 				}),
 				commands.registerCommand('f18.start.fakt_pg', () => {
-					F18Panel.createF18Instance('fakt', 'pg');
+					F18Panels.createF18Instance('fakt', 'pg');
 				}),
 				commands.registerCommand('f18.start.os_pg', () => {
-					F18Panel.createF18Instance('os', 'pg');
+					F18Panels.createF18Instance('os', 'pg');
 				}),
 				commands.registerCommand('f18.start.ld_pg', () => {
-					F18Panel.createF18Instance('ld', 'pg');
+					F18Panels.createF18Instance('ld', 'pg');
 				}),
 				commands.registerCommand('f18.start.epdv_pg', () => {
-					F18Panel.createF18Instance('epdv', 'pg');
+					F18Panels.createF18Instance('epdv', 'pg');
 				})
 			);
 		});

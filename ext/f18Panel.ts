@@ -53,7 +53,7 @@ process.on('unhandledRejection', function (reason: Error, p) {
 
 
 function globalHandler(error: Error) {
-    F18Panel.instances.forEach((f18Panel: F18Panel) => {
+    F18Panels.instances.forEach((f18Panel: F18Panel) => {
         if (error.message.includes(f18Panel.panelCaption)) {
             //if (f18Panel.
             if (!f18Panel.webPanelDisposed)
@@ -76,24 +76,14 @@ function globalHandler(error: Error) {
     });
 }
 
-export class F18Panel {
 
-    // public static F18: F18Panel | undefined;
-    public static downloadNew: boolean;
-    public static webGL: boolean;
-    public static isDownloadedBinary: boolean = false;
-    public static firstTerminal: boolean = true;
-    public static instances: F18Panel[] = [];
+class F18Panel {
+
+    
     public webPanel: WebviewPanel;
     public lostFocus: boolean = false;
     
-    public static createF18Instance(modulF18: string, cVarijanta: string) {
-
-        new F18Panel(modulF18, cVarijanta);
-        F18Panel.downloadNew = workspace.getConfiguration('f18').get('download');
-        F18Panel.webGL = workspace.getConfiguration('f18').get('webGL');
     
-    }
 
     private static readonly viewType = 'F18';
     //private static currentPanelNum = 1;
@@ -109,7 +99,7 @@ export class F18Panel {
     private readonly varijanta: string;
     private connection: IConnection;
     private adminConnection: IConnection;
-    private readonly panelNum: number;
+    readonly panelNum: number;
     private cols: number;
     private rows: number;
     private width: number;
@@ -123,7 +113,7 @@ export class F18Panel {
     private _ptyProcess: IPty;
 
 
-    private constructor(cModul: string, cVarijanta) {
+    constructor(cModul: string, cVarijanta) {
 
         this.extensionPath = Global.context.extensionPath;
         this.modul = cModul;
@@ -158,7 +148,7 @@ export class F18Panel {
 
         // instances = [ 'fin 1', 'kalk 1', 'fin 2', 'fakt 1', 'fin 3' ] => next kalk = 2
         let nLast = 0;
-        F18Panel.instances.forEach(f18Panel => {
+        F18Panels.instances.forEach(f18Panel => {
             const regexp = new RegExp(`F18 ${this.modul} - (\\d+)`);
             if (regexp.test(f18Panel.panelCaption)) {
                 const match = f18Panel.panelCaption.match(regexp);
@@ -173,7 +163,7 @@ export class F18Panel {
         const runSelect = workspace.getConfiguration('f18').get('selectDatabaseOnStart');
 
         try {
-            if (!F18Panel.isDownloadedBinary && runSelect)
+            if (!F18Panels.isDownloadedBinary && runSelect)
                 commands.executeCommand('f18.selectDatabase')
                     .then(() => setTimeout(this.getConnectionThenRun, 770)); // timeout potreban da se propagira promjena konfiguracije
             else
@@ -185,13 +175,17 @@ export class F18Panel {
 
 
     private getConnectionThenRun() {
+        console.log('getConnectionThenRun');
         return PostgresConnection.getDefaultConnection()
             .then((connection: IConnection) => {
                 this.connection = connection;
+                console.log('getConnectionThenRun-2');
                 PostgresConnection.getDefaultConnection('admin').then((adminConnection: IConnection) => {
                     this.adminConnection = adminConnection;
+                    console.log('getConnectionThenRun-2a');
                     this.afterConnect();
                 }).catch(() => {
+                    console.log('getConnectionThenRun-3');
                     this.adminConnection = undefined;
                     this.afterConnect();
                 });
@@ -219,7 +213,7 @@ export class F18Panel {
         );
 
         this.configurePanel();
-        F18Panel.instances.push(this);
+        F18Panels.instances.push(this);
 
         this.webPanel.webview.html = this._getHtmlForWebview();
 
@@ -320,11 +314,11 @@ export class F18Panel {
         }
 
         try {
-            if (!F18Panel.isDownloadedBinary && F18Panel.downloadNew) {
+            if (!F18Panels.isDownloadedBinary && F18Panels.downloadNew) {
                 vscodeFetchUnzip(fetchOptions).
                     then(
                         () => {
-                            F18Panel.isDownloadedBinary = true;
+                            F18Panels.isDownloadedBinary = true;
                             createPty();
                         },
                         () => {
@@ -348,11 +342,11 @@ export class F18Panel {
 
             if (!this.webPanelDisposed) {
                 this.webPanelDisposed = true;
-                const filtered = F18Panel.instances.filter((f18Panel: F18Panel) => {
+                const filtered = F18Panels.instances.filter((f18Panel: F18Panel) => {
                     return f18Panel.panelCaption !== this.panelCaption;
                 });
                 // izbaciti iz liste instanci ovu koju gasimo
-                F18Panel.instances = filtered;
+                F18Panels.instances = filtered;
             }
 
             if (!this.terminalKilled) {
@@ -548,9 +542,9 @@ export class F18Panel {
             sendInitCmds.push(`stty cols ${this.cols} rows ${this.rows}`);
             sendInitCmds.push(`if stty size | grep '${this.rows} ${this.cols}' ; then echo size-ok; else exit 1; fi`);
             sendInitCmds.push(`cd ${Global.folderPath}`);
-            if (F18Panel.firstTerminal) {
+            if (F18Panels.firstTerminal) {
                 sendInitCmds.push(linuxFixes);
-                F18Panel.firstTerminal = false;
+                F18Panels.firstTerminal = false;
             }
             sendInitCmds.push(`export PATH=${Global.folderPath}:$PATH`);
             sendInitCmds.push(`export LD_LIBRARY_PATH=${Global.folderPath}`);
@@ -580,7 +574,7 @@ export class F18Panel {
             letterSpacing: LETTER_SPACING,
             lineHeight: LINE_HEIGHT,
             termName: this.panelCaption,
-            webGL: F18Panel.webGL,
+            webGL: F18Panels.webGL,
             theme: { background: "#1e1e1e", foreground: "#cccccc", cursor: "#cccccc", cursorAccent: "#1e1e1e", selection: "rgba(255, 255, 255, 0.25)", black: "#000000", red: "rgb(251, 122, 1)", green: "#0dbc79", yellow: "#e5e510", blue: "rgb(30, 29, 105)", magenta: "#bc3fbc", cyan: "#11a8cd", white: "#f8f5f5", brightBlack: "#666666", brightRed: "rgb(236, 10, 10)", brightGreen: "#23d18b", brightYellow: "#f5f543", brightBlue: "#3b8eea", brightMagenta: "#d670d6", brightCyan: "#29b8db", brightWhite: "#e5e5e5" },
             scrollback: 1000,
             drawBoldTextInBrightColors: true,
@@ -721,6 +715,25 @@ export class F18Panel {
         */
 
         return strHtml;
+    }
+}
+
+export class F18Panels {
+    // public static F18: F18Panel | undefined;
+    public static downloadNew: boolean;
+    public static webGL: boolean;
+    public static isDownloadedBinary: boolean = false;
+    public static firstTerminal: boolean = true;
+    public static instances: F18Panel[] = [];
+
+    public static createF18Instance(modulF18: string, cVarijanta: string) {
+
+        let instance = new F18Panel(modulF18, cVarijanta);
+        console.log(`panel = ${instance.panelNum} ${instance.panelCaption}`);
+
+        F18Panels.downloadNew = workspace.getConfiguration('f18').get('download');
+        F18Panels.webGL = workspace.getConfiguration('f18').get('webGL');
+    
     }
 }
 
