@@ -17,9 +17,11 @@ export function activate(context: ExtensionContext) {
 
 	context.subscriptions.push(
 		commands.registerCommand('f18.focus', () => {
-			F18Panels.instances[0].webPanel.reveal(ViewColumn.Active, false);
-			//F18Panels.instances[0].webPanel.webview.postMessage({ command: 'ping' });
-			F18Panels.instances[0].webPanel.webview.postMessage({ command: 'focus-back' });
+			if (F18Panels.last_instance) {
+				F18Panels.last_instance.webPanel.reveal(ViewColumn.Active, false);
+				//F18Panels.instances[0].webPanel.webview.postMessage({ command: 'ping' });
+				F18Panels.last_instance.webPanel.webview.postMessage({ command: 'focus-back' });
+			}
 		})
 	)
 

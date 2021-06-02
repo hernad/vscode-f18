@@ -405,6 +405,7 @@ class F18Panel {
                     //this.terminalInstance.sendText('\x1b[I');
                     // window.showInformationMessage(`dobio fokus ${this.webPanel.title}`);
                     this._ptyProcess.resize(this.cols, this.rows);
+                    F18Panels.last_instance = this;
 
                     break;
 
@@ -725,6 +726,7 @@ export class F18Panels {
     public static isDownloadedBinary: boolean = false;
     public static firstTerminal: boolean = true;
     public static instances: F18Panel[] = [];
+    public static last_instance: F18Panel;
 
     public static createF18Instance(modulF18: string, cVarijanta: string) {
 

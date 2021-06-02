@@ -34,7 +34,6 @@ function handleVisibilityChange() {
 		});
 
 		const xtermCanvas = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
-
 		if (xtermCanvas)
 			xtermCanvas.style.opacity = '0.5';
 		setTimeout(() => {
@@ -52,7 +51,12 @@ function bebeep() {
 	beep.play();
 }
 function termShow() {
+
 	console.log('termShow');
+	vscode.postMessage({
+		command: 'cli-focus'
+	});
+
 	const xtermCanvas = document.getElementsByClassName("xterm-text-layer").item(0) as HTMLElement;
 	if (xtermCanvas) {
 		xtermCanvas.style.width = '100%';
