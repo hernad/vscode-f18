@@ -3,7 +3,7 @@
 	"displayName": "F18 klijent [eShell]",
 	"description": "F18 klijent host eShell",
 	"publisher": "bringout",
-	"version": "5.4.14",
+	"version": "5.5.0",
 	"engines": {
 		"vscode": "^1.47.0"
 	},
@@ -183,7 +183,7 @@
 	"dependencies": {
 		"lodash": "^4.17.19",
 		"md5-file": "^4.0.0",
-		"pg": "^8.3.3",
+		"pg": "^8.6.0",
 		"proxy-from-env": "^1.0.0",
 		"rimraf": "^2.6.3"
 	},
