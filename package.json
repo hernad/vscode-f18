@@ -3,7 +3,7 @@
 	"displayName": "F18 klijent [eShell]",
 	"description": "F18 klijent host eShell",
 	"publisher": "bringout",
-	"version": "5.5.0",
+	"version": "5.5.2",
 	"engines": {
 		"vscode": "^1.47.0"
 	},
@@ -185,7 +185,7 @@
 		"md5-file": "^4.0.0",
 		"pg": "^8.6.0",
 		"proxy-from-env": "^1.0.0",
-		"rimraf": "^2.6.3"
+		"rimraf": "^3.0.2"
 	},
 	"scripts": {
 		"webpack": "webpack --mode development",
