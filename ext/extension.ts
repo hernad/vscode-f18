@@ -1,4 +1,4 @@
-import { ExtensionContext, commands, window, extensions, workspace } from 'vscode';
+import { ExtensionContext, commands, window, extensions, workspace, ViewColumn } from 'vscode';
 import { Global } from './global';
 import { F18Panels } from './f18Panel';
 import { PostgresConnection } from './postgresConnection';
@@ -12,6 +12,14 @@ export function activate(context: ExtensionContext) {
 	context.subscriptions.push(
 		commands.registerCommand('f18.start.cmd', () => {
 			F18Panels.createF18Instance('cmd', '');
+		})
+	)
+
+	context.subscriptions.push(
+		commands.registerCommand('f18.focus', () => {
+			F18Panels.instances[0].webPanel.reveal(ViewColumn.Active, false);
+			//F18Panels.instances[0].webPanel.webview.postMessage({ command: 'ping' });
+			F18Panels.instances[0].webPanel.webview.postMessage({ command: 'focus-back' });
 		})
 	)
 
