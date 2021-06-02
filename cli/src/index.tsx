@@ -71,7 +71,7 @@ function termShow() {
 		//const elm = document.querySelector('.xterm-helper-textarea');
 	    //(elm as HTMLElement).focus();
 		term.focus();
-		setTimeout(function(){ alert("Hello");
+		setTimeout(function() {
 			term.setOption('cursorBlink', false);
 			term.clearSelection();
 			term.focus();
