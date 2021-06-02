@@ -19,7 +19,6 @@ export function activate(context: ExtensionContext) {
 		commands.registerCommand('f18.focus', () => {
 			if (F18Panels.last_instance) {
 				F18Panels.last_instance.webPanel.reveal(ViewColumn.Active, false);
-				//F18Panels.instances[0].webPanel.webview.postMessage({ command: 'ping' });
 				F18Panels.last_instance.webPanel.webview.postMessage({ command: 'focus-back' });
 			}
 		})

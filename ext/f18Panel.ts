@@ -347,13 +347,17 @@ class F18Panel {
                 });
                 // izbaciti iz liste instanci ovu koju gasimo
                 F18Panels.instances = filtered;
+                if (F18Panels.instances.length > 0)
+                  // last_instance posljednji u nizu
+                  F18Panels.last_instance = F18Panels.instances[F18Panels.instances.length-1];
             }
 
             if (!this.terminalKilled) {
-
                 this.terminalKilled = true;
                 // this._ptyProcess.write( '\x1b[24;5~' ); // K_CTRL_F12
             }
+
+            commands.executeCommand('f18.focus');
 
         });
 
