@@ -71,13 +71,13 @@ function termShow() {
 		bebeep();
 		//term.selectAll();
 		//term.setOption('cursorStyle', 'block');
-		term.setOption('cursorBlink', true);
+		//term.setOption('cursorBlink', true);
 		//const elm = document.querySelector('.xterm-helper-textarea');
 	    //(elm as HTMLElement).focus();
 		term.focus();
 		setTimeout(function() {
-			term.setOption('cursorBlink', false);
-			term.clearSelection();
+			//term.setOption('cursorBlink', false);
+			//term.clearSelection();
 			term.focus();
 		    xtermCanvas.style.opacity = '1.0';
 	    }, 1000);
