@@ -21,18 +21,21 @@ export class Constants {
 // F18-windows-x86_4.23.41.zip
 // 32f4e15b847753b73f84c587b59ebd31  tmp/F18-klijent.exe
 
-/*
-const revisionS = '4.23.41';
+
+const revisionS = '4.23.44';
 const execHashListS: any = {
   'linux-x64': '0',
-  'linux-x64-prev' : '8cd7fcd4355044911a052c7aa17bb461',
-  'linux-x64-prev-rev': '4.23.38',
+  'linux-x64-prev' : '4a76831a18eaf5aa20068bd321d0546f',
+  'linux-x64-prev-rev': '4.23.43',
 
-  'windows-x64': '6e9436c1a259c4d5397a8690613c0036',
-  'windows-x86': '32f4e15b847753b73f84c587b59ebd31',
+  'windows-x64': '5dd37c40ee55914a718efd2f14c7868d',
+
+  'windows-x86': '0',
+  'windows-x86-prev': '32f4e15b847753b73f84c587b59ebd31',
+  'windows-x86-prev-rev': '4.23.41',
 };
-*/
 
+/*
 const revisionS = '4.23.43';
 const execHashListS: any = {
   'linux-x64': '4a76831a18eaf5aa20068bd321d0546f',
@@ -45,7 +48,7 @@ const execHashListS: any = {
   'windows-x86-prev': '32f4e15b847753b73f84c587b59ebd31',
   'windows-x86-prev-rev': '4.23.41',
 };
-
+*/
 
 
 /*
