@@ -22,13 +22,13 @@ export class Constants {
 // 32f4e15b847753b73f84c587b59ebd31  tmp/F18-klijent.exe
 
 
-const revisionS = '4.23.47';
+const revisionS = '4.23.48';
 const execHashListS: any = {
   'linux-x64': '0',
   'linux-x64-prev' : '4a76831a18eaf5aa20068bd321d0546f',
   'linux-x64-prev-rev': '4.23.43',
 
-  'windows-x64': '7b72b48b5d504d4450ca354ef847ef7b',
+  'windows-x64': '0ca351cc631a8b569dd651081da0cde7',
 
   'windows-x86': '0',
   'windows-x86-prev': '32f4e15b847753b73f84c587b59ebd31',
