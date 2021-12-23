@@ -92,8 +92,16 @@ export function activate(context: ExtensionContext) {
 						F18Panels.createF18Instance('epdv', 'pg');
 					})
 				);
+				
+				const onStartDelay: number = workspace.getConfiguration('f18').get('onStartDelay');
+				//setTimeout(() => {
+					const onStart: string = workspace.getConfiguration('f18').get('onStart');
+					if (onStart.trim() !== '')
+						commands.executeCommand(`f18.start.${onStart}`);
+				//}, onStartDelay);
+
 			} else {
-				window.showErrorMessage("PostgreSQL uspostavljanje konekcije nije ostvareno?!");
+				window.showErrorMessage("SERVER NIJE DOSTUPAN! Pozovite bring.out podršku");
 			}
 		});
 		
@@ -102,8 +110,7 @@ export function activate(context: ExtensionContext) {
 
 
 	const fullScreen = workspace.getConfiguration('f18').get('fullScreen');
-	const onStartDelay: number = workspace.getConfiguration('f18').get('onStartDelay');
-
+	
 	if (fullScreen) commands.executeCommand('workbench.action.toggleFullScreen');
 
 	commands.executeCommand('workbench.action.closeAllEditors');
@@ -115,10 +122,6 @@ export function activate(context: ExtensionContext) {
 	// const visibleSideBar = vscode.workspace.getConfiguration('workbench').get('sideBar.location');
 	// vscode.commands.executeCommand('workbench.action.toggleSidebarVisibility');
 
-	setTimeout(() => {
-		const onStart: string = workspace.getConfiguration('f18').get('onStart');
-		if (onStart.trim() !== '')
-			commands.executeCommand(`f18.start.${onStart}`);
-	}, onStartDelay);
+	
 }
 

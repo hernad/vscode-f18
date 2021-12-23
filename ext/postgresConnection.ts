@@ -81,10 +81,10 @@ export class PostgresConnection {
       }
       
       if (--tries > 0) {
-        window.showErrorMessage(`PostgreSQL error ${7-tries}/7`);
+        window.showErrorMessage(`MOLIMO SAČEKAJTE! [${30-tries}/30]`);
         setTimeout(function() {
           callback(resolve, reject);
-        }, 3000);
+        }, 5000);
       } else {
           reject(tries * -1);
           return;
@@ -97,7 +97,7 @@ export class PostgresConnection {
     let ret : number;
 
     // This one will try to get connection 5 times
-    await PostgresConnection.createPromiseCheckConnection(7)
+    await PostgresConnection.createPromiseCheckConnection(30)
       .then( (r: number ) => ret = r)
       .catch( (r: number) => ret = r);
   
