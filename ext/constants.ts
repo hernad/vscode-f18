@@ -8,7 +8,6 @@ export class Constants {
   public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
-
 // back na najstariju koja radi
 // F18-windows-x64_4.23.36.zip
 // f6e447707d8598de35a2d1c66ccfaadb  tmp/F18-klijent.exe
@@ -21,11 +20,14 @@ export class Constants {
 // F18-windows-x86_4.23.41.zip
 // 32f4e15b847753b73f84c587b59ebd31  tmp/F18-klijent.exe
 
-
-const revisionS = '4.23.48';
+const revisionS = '4.23.50';
 const execHashListS: any = {
-  'linux-x64': '10521d80cf33dadc83d3b78924cabf9c',
-  'windows-x64': '0ca351cc631a8b569dd651081da0cde7',
+  'linux-x64': '0',
+  'linux-x64-prev' : 'ad7344a1fe96a16493514b117d96b392',
+  'linux-x64-prev-rev': '4.23.49',
+
+  'windows-x64': 'c1c9a636b7ed824a4a684d7b58355048',
+
   'windows-x86': '0',
   'windows-x86-prev': '32f4e15b847753b73f84c587b59ebd31',
   'windows-x86-prev-rev': '4.23.41',
@@ -33,19 +35,18 @@ const execHashListS: any = {
 
 
 /*
-const revisionS = '4.23.48';
+const revisionS = '4.23.49';
 const execHashListS: any = {
-  'linux-x64': '0',
-  'linux-x64-prev' : '4a76831a18eaf5aa20068bd321d0546f',
-  'linux-x64-prev-rev': '4.23.43',
-
-  'windows-x64': '0ca351cc631a8b569dd651081da0cde7',
-
+  'linux-x64': 'ad7344a1fe96a16493514b117d96b392',
+  'windows-x64': '0',
+  'windows-x64-prev': '0ca351cc631a8b569dd651081da0cde7',
+  'windows-x64-prev-rev': '4.23.48',
   'windows-x86': '0',
   'windows-x86-prev': '32f4e15b847753b73f84c587b59ebd31',
   'windows-x86-prev-rev': '4.23.41',
 };
 */
+
 
 /*
 const revisionS = '4.23.43';
