@@ -20,9 +20,9 @@ export class Constants {
 // F18-windows-x86_4.23.41.zip
 // 32f4e15b847753b73f84c587b59ebd31  tmp/F18-klijent.exe
 
-const revisionS = '4.23.52';
+const revisionS = '4.24.1';
 const execHashListS: any = {
-  'windows-x64': '960f74779cc64f033a67942a49fde9d2',
+  'windows-x64': '66896a8f50b5af32eb90b7d63bc7caa5',
 
   'linux-x64': '0',
   'linux-x64-prev' : 'ad7344a1fe96a16493514b117d96b392',
