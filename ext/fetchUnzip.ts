@@ -6,7 +6,7 @@ import { Global } from './global';
 import { Helper } from './helper';
 import { Fetcher } from './fetcher';
 import { unzip } from './unzip';
-import * as md5File from 'md5-file/promise';
+import * as md5File from 'md5-file';
 // import { F18Panel } from './f18Panel';
 
 /*
