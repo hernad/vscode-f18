@@ -8,9 +8,9 @@ export class Constants {
   public static PostgresGlobalStateKey = 'postgresql.connections';
 }
 
-const revisionS = '4.24.16';
+const revisionS = '4.24.18';
 const execHashListS: any = {
-  'windows-x64': 'bc80ff77607815e2d1b478dea09da332',
+  'windows-x64': '484c949ae30e2ee4879059689e557bea',
   'linux-x64': '0',
   'linux-x64-prev': 'c1592edae4bc1dc2f1c7bfa9f13825ca',
   'linux-x64-prev-rev': '4.24.5',
